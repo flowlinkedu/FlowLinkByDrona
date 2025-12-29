@@ -1158,6 +1158,12 @@
                         <span class="nav-text">Profile</span>
                     </a>
                 </li>
+                <li class="nav-item" id="adminPanelLink" style="display: none;">
+                    <a href="admin-dashboard.html" class="nav-link" style="background: linear-gradient(135deg, rgba(41, 171, 226, 0.15), rgba(41, 226, 208, 0.15)); border-left: 3px solid #29ABE2;">
+                        <i class="fas fa-user-shield nav-icon" style="color: #29ABE2;"></i>
+                        <span class="nav-text" style="color: #29ABE2; font-weight: 600;">Admin Panel</span>
+                    </a>
+                </li>
             </ul>
         </nav>
 
@@ -1530,6 +1536,25 @@
                 }
             }
 
+            async checkIfUserIsAdmin(userEmail) {
+                try {
+                    // Check all global hierarchies to see if user is an admin
+                    const hierarchiesRef = collection(db, 'hierarchies');
+                    const snapshot = await getDocs(hierarchiesRef);
+                    
+                    for (const docSnap of snapshot.docs) {
+                        const data = docSnap.data();
+                        if (data.adminEmails && data.adminEmails.includes(userEmail)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                } catch (error) {
+                    console.error('Error checking admin status:', error);
+                    return false;
+                }
+            }
+
             getCurrentUser() {
                 return this.currentUser;
             }
@@ -1874,6 +1899,14 @@
 
                     // Load and display organization status
                     await this.loadOrganizationStatus(user.email);
+
+                    // Check if user is an admin and show Admin Panel link
+                    const isAdmin = await dashboardAuth.checkIfUserIsAdmin(user.email);
+                    const adminPanelLink = document.getElementById('adminPanelLink');
+                    if (adminPanelLink && isAdmin) {
+                        adminPanelLink.style.display = 'block';
+                        console.log('User is an admin, showing Admin Panel link');
+                    }
 
                     try {
                         // Get user profile using email as document ID

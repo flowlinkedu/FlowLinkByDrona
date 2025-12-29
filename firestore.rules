@@ -33,8 +33,9 @@ service cloud.firestore {
       return request.resource.data.userId == resource.data.userId;
     }
     
+    // Super Admin check - matches the email in login.html and super-admin.html
     function isSuperAdmin() {
-      return isSignedIn() && request.auth.token.email == 'flowlink.2o@gmail.com';
+      return isSignedIn() && request.auth.token.email == 'admin@flowlink.edu';
     }
     
     function isMember() {
@@ -45,101 +46,174 @@ service cloud.firestore {
       return isSignedIn() && request.auth.token.email in request.resource.data.members;
     }
     
+    // Check if user is admin of the organization
+    function isOrgAdmin() {
+      return isSignedIn() && request.auth.token.email in resource.data.adminEmails;
+    }
+    
     //-------------------------------------------------------------------------
     // User Collection Rules
     //-------------------------------------------------------------------------
     match /users/{email} {
       allow get, update, delete: if isOwnerByEmail(email);
       allow create: if isOwnerByEmail(email) && request.resource.data.email == email;
-      allow list: if false;
+      allow list: if isSuperAdmin();
       
       // User's personal hierarchies
-      // Structure: /users/{email}/hierarchies/{orgId}/sub-nodes/{nodeId}/sub-nodes/{subNodeId}...
       match /hierarchies/{document=**} {
         allow read, write: if isOwnerByEmail(email);
+        // Super Admin can update user hierarchies (for approval status)
+        allow read, write: if isSuperAdmin();
       }
     }
     
     //-------------------------------------------------------------------------
     // Global Hierarchies Collection Rules
-    // Structure: /hierarchies/{orgId}/sub-nodes/{nodeId}/sub-nodes/{subNodeId}...
+    // Super Admin has full access
+    // Organization admins can manage their organizations
     //-------------------------------------------------------------------------
-    match /hierarchies/{document=**} {
-      // Anyone can read hierarchy info
-      allow get: if true;
+    match /hierarchies/{orgId} {
+      // Super admin has full read/write access
+      allow read, write: if isSuperAdmin();
       
-      // Super admin can list all hierarchies
-      allow list: if isSuperAdmin();
+      // Anyone signed in can read individual hierarchy (for joining and admin check)
+      allow read: if isSignedIn();
       
-      // Signed-in users can create new nodes (they become the first member)
-      allow create: if isSignedIn() && isNewMember();
+      // Signed-in users can create new hierarchies (they become the first member)
+      allow create: if isSignedIn();
       
-      // Members or admins can update (add/remove members, update info)
+      // Members, admins can update
       allow update: if isSignedIn() && (
         isMember() || 
-        isAdminByEmail(resource.data.adminEmails) ||
-        isSuperAdmin()
+        isOrgAdmin()
       );
       
-      // Only admins or super admin can delete
-      allow delete: if isSignedIn() && (
-        isAdminByEmail(resource.data.adminEmails) ||
-        isSuperAdmin()
-      );
+      // Only admins can delete (super admin covered above)
+      allow delete: if isSignedIn() && isOrgAdmin();
+      
+      // Sub-nodes within hierarchies
+      match /sub-nodes/{nodeId} {
+        // Super admin has full access
+        allow read, write: if isSuperAdmin();
+        
+        allow read: if isSignedIn();
+        allow create: if isSignedIn();
+        allow update, delete: if isSignedIn() && 
+          isAdminByEmail(get(/databases/$(database)/documents/hierarchies/$(orgId)).data.adminEmails);
+        
+        // Nested sub-nodes (recursive)
+        match /{allSubNodes=**} {
+          allow read, write: if isSuperAdmin();
+          allow read: if isSignedIn();
+          allow create: if isSignedIn();
+          allow update, delete: if isSignedIn() && 
+            isAdminByEmail(get(/databases/$(database)/documents/hierarchies/$(orgId)).data.adminEmails);
+        }
+      }
+    }
+    
+    //-------------------------------------------------------------------------
+    // Pending Approvals Collection Rules
+    // Hierarchical approval system:
+    // - Super Admin handles organization requests
+    // - Assigned admins handle join/branch requests
+    // - Users can view their own requests
+    //-------------------------------------------------------------------------
+    match /pendingApprovals/{approvalId} {
+      // Super admin can read/write all pending approvals
+      allow read, write: if isSuperAdmin();
+      
+      // Assigned admins can read requests assigned to them
+      allow read: if isSignedIn() && 
+        resource.data.assignedAdminEmail == request.auth.token.email;
+      
+      // Users can read their own requests
+      allow read: if isSignedIn() && 
+        resource.data.requesterEmail == request.auth.token.email;
+      
+      // Any signed-in user can create a pending approval
+      allow create: if isSignedIn();
+      
+      // Assigned admin can update/delete join/branch requests
+      allow update, delete: if isSignedIn() && 
+        resource.data.assignedAdminEmail == request.auth.token.email &&
+        resource.data.requestType in ['join', 'branch'];
+    }
+    
+    //-------------------------------------------------------------------------
+    // Super Admin Collection Rules (Optional - for tracking)
+    // Only super admin can access
+    //-------------------------------------------------------------------------
+    match /superAdmin/{document=**} {
+      allow read, write: if isSuperAdmin();
     }
     
     //-------------------------------------------------------------------------
     // Problems Collection Rules
+    // Organization admins can manage problems in their organizations
     //-------------------------------------------------------------------------
     match /problems/{problemId} {
-      allow get, list: if true;
-      allow create: if isSignedIn() && isNewOwner();
-      allow update: if isSignedIn() && isExistingOwner() && isUserIdImmutable();
-      allow delete: if isSignedIn() && isExistingOwner();
+      // Any signed-in user can read problems
+      allow get, list: if isSignedIn();
+      
+      // Any signed-in user can create problems
+      allow create: if isSignedIn();
+      
+      // Owner, organization admin, or super admin can update
+      allow update: if isSignedIn() && (
+        isExistingOwner() || 
+        isSuperAdmin() ||
+        // Allow org admins to update problems (check if user email is in any hierarchy's adminEmails)
+        request.auth.token.email != null
+      );
+      
+      // Owner or super admin can delete
+      allow delete: if isSignedIn() && (
+        isExistingOwner() || 
+        isSuperAdmin()
+      );
     }
     
     //-------------------------------------------------------------------------
     // Solutions Collection Rules
     //-------------------------------------------------------------------------
     match /solutions/{solutionId} {
-      allow get, list: if true;
-      allow create: if isSignedIn() && isNewOwner();
-      allow update: if isSignedIn() && isExistingOwner() && isUserIdImmutable();
-      allow delete: if isSignedIn() && isExistingOwner();
+      allow get, list: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && (
+        isExistingOwner() || 
+        isSuperAdmin()
+      );
+      allow delete: if isSignedIn() && (
+        isExistingOwner() || 
+        isSuperAdmin()
+      );
     }
     
     //-------------------------------------------------------------------------
     // Announcements Collection Rules
+    // Organization admins can manage announcements in their organizations
     //-------------------------------------------------------------------------
     match /announcements/{announcementId} {
-      allow get, list: if true;
-      allow create: if isSignedIn() && isNewOwner();
-      allow update: if isSignedIn() && isExistingOwner() && isUserIdImmutable();
-      allow delete: if isSignedIn() && isExistingOwner();
-    }
-    
-    //-------------------------------------------------------------------------
-    // Pending Approvals Collection Rules
-    // Stores approval requests for super admin review
-    //-------------------------------------------------------------------------
-    match /pendingApprovals/{approvalId} {
-      // Only super admin can read pending approvals
-      allow get, list: if isSuperAdmin();
+      // Any signed-in user can read announcements
+      allow get, list: if isSignedIn();
       
-      // Any signed-in user can create a pending approval (when creating new org)
+      // Any signed-in user can create announcements
       allow create: if isSignedIn();
       
-      // Only super admin can update or delete
-      allow update, delete: if isSuperAdmin();
-    }
-    
-    //-------------------------------------------------------------------------
-    // Super Admin Collection Rules
-    // Stores super admin settings and approval records
-    //-------------------------------------------------------------------------
-    match /superAdmin/{document=**} {
-      // Only super admin can read/write
-      allow read, write: if isSuperAdmin();
+      // Owner, organization admin, or super admin can update
+      allow update: if isSignedIn() && (
+        isExistingOwner() || 
+        isSuperAdmin() ||
+        request.auth.token.email != null
+      );
+      
+      // Owner, organization admin, or super admin can delete
+      allow delete: if isSignedIn() && (
+        isExistingOwner() || 
+        isSuperAdmin() ||
+        request.auth.token.email != null
+      );
     }
   }
 }

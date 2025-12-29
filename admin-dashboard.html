@@ -4,447 +4,812 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - FlowLink</title>
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome for Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- AOS Animation Library -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    
-    <!-- Custom Styles -->
     <link rel="stylesheet" href="global.css">
+    <style>
+        :root { --admin-accent: #29ABE2; --danger-color: #EF4444; --success-color: #10B981; --warning-color: #F59E0B; }
+        .admin-dashboard-page { background: linear-gradient(135deg, #E5F6FD 0%, rgba(41, 171, 226, 0.1) 100%); min-height: 100vh; display: flex; font-family: 'PT Sans', sans-serif; }
+        .admin-sidebar { width: 280px; background: linear-gradient(180deg, #1F2933 0%, #2D3748 100%); position: fixed; top: 0; left: 0; height: 100vh; z-index: 1000; display: flex; flex-direction: column; box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; }
+        .admin-sidebar.collapsed { transform: translateX(-280px); }
+        .sidebar-header { padding: 2rem 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .sidebar-logo { display: flex; align-items: center; gap: 0.75rem; }
+        .sidebar-logo i { font-size: 1.8rem; color: #29ABE2; }
+        .sidebar-logo span { font-family: 'Poppins', sans-serif; font-size: 1.4rem; font-weight: 700; color: white; }
+        .admin-badge { display: inline-block; background: linear-gradient(135deg, var(--admin-accent), #29E2D0); color: white; font-size: 0.6rem; font-weight: 600; padding: 0.2rem 0.4rem; border-radius: 4px; margin-left: 0.5rem; text-transform: uppercase; }
+        .sidebar-nav { flex: 1; padding: 2rem 0; overflow-y: auto; }
+        .nav-list { list-style: none; padding: 0; margin: 0; }
+        .nav-item { margin-bottom: 0.5rem; cursor: pointer; }
+        .nav-link { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem; color: rgba(255, 255, 255, 0.7); text-decoration: none; font-weight: 500; transition: all 0.3s ease; border-left: 3px solid transparent; }
+        .nav-link:hover { background: rgba(255, 255, 255, 0.05); color: white; border-left-color: var(--admin-accent); }
+        .nav-item.active .nav-link { background: rgba(41, 171, 226, 0.2); color: white; border-left-color: var(--admin-accent); }
+        .nav-icon { font-size: 1.2rem; width: 24px; text-align: center; }
+        .nav-badge { background: var(--danger-color); color: white; font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 10px; margin-left: auto; }
+        .sidebar-footer { padding: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        .admin-profile { display: flex; align-items: center; gap: 1rem; }
+        .admin-avatar { width: 45px; height: 45px; border-radius: 12px; background: linear-gradient(135deg, var(--admin-accent), #29E2D0); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; }
+        .admin-info .admin-name { font-family: 'Poppins', sans-serif; font-weight: 600; color: white; font-size: 0.95rem; }
+        .admin-info .admin-role { color: rgba(255, 255, 255, 0.6); font-size: 0.8rem; }
+        .admin-main { flex: 1; margin-left: 280px; display: flex; flex-direction: column; min-height: 100vh; transition: margin-left 0.3s ease; }
+        .admin-main.expanded { margin-left: 0; }
+        .admin-topbar { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(41, 171, 226, 0.1); padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .topbar-left { display: flex; align-items: center; gap: 1rem; }
+        .mobile-menu-btn { display: none; background: none; border: none; color: #4B5563; font-size: 1.3rem; cursor: pointer; padding: 0.5rem; border-radius: 8px; }
+        .page-title { font-family: 'Poppins', sans-serif; font-size: 1.5rem; font-weight: 600; color: #1F2933; margin: 0; }
+        .topbar-badge { background: linear-gradient(135deg, var(--admin-accent), #29E2D0); color: white; font-size: 0.75rem; font-weight: 600; padding: 0.35rem 0.75rem; border-radius: 20px; }
+        .topbar-right { display: flex; align-items: center; gap: 1rem; }
+        .back-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: rgba(0, 0, 0, 0.05); color: #4B5563; border: none; border-radius: 10px; font-family: 'Poppins', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .back-btn:hover { background: rgba(0, 0, 0, 0.1); }
+        .sign-out-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, var(--admin-accent), #29E2D0); color: white; border: none; border-radius: 10px; font-family: 'Poppins', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .sign-out-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(41, 171, 226, 0.4); }
+        .admin-content { flex: 1; padding: 2rem; }
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .metric-card { background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); border: 1px solid rgba(41, 171, 226, 0.1); transition: all 0.3s ease; }
+        .metric-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); }
+        .metric-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: white; margin-bottom: 1rem; }
+        .metric-icon.members { background: linear-gradient(135deg, #29ABE2, #29E2D0); }
+        .metric-icon.problems { background: linear-gradient(135deg, #EF4444, #F97316); }
+        .metric-icon.solved { background: linear-gradient(135deg, #10B981, #059669); }
+        .metric-icon.pending { background: linear-gradient(135deg, #F59E0B, #D97706); }
+        .metric-icon.join { background: linear-gradient(135deg, #8B5CF6, #A78BFA); }
+        .metric-icon.branch { background: linear-gradient(135deg, #EC4899, #F472B6); }
+        .metric-value { font-family: 'Poppins', sans-serif; font-size: 2rem; font-weight: 700; color: #1F2933; margin-bottom: 0.25rem; }
+        .metric-label { color: #6B7280; font-size: 0.9rem; }
+</style>
 </head>
 <body class="admin-dashboard-page">
-    <!-- Admin Sidebar -->
     <aside class="admin-sidebar" id="adminSidebar">
         <div class="sidebar-header">
-            <div class="logo">
-                <i class="fas fa-crown"></i>
-                <span class="logo-text">FlowLink Admin</span>
-            </div>
-            <button class="sidebar-toggle" id="adminSidebarToggle">
-                <i class="fas fa-bars"></i>
-            </button>
+            <div class="sidebar-logo"><i class="fas fa-project-diagram"></i><span>FlowLink<span class="admin-badge">Admin</span></span></div>
         </div>
-        
         <nav class="sidebar-nav">
             <ul class="nav-list">
-                <li class="nav-item active">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-users nav-icon"></i>
-                        <span class="nav-text">User Management</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-sitemap nav-icon"></i>
-                        <span class="nav-text">Hierarchy Management</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-chart-bar nav-icon"></i>
-                        <span class="nav-text">Analytics</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-cog nav-icon"></i>
-                        <span class="nav-text">System Settings</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-shield-alt nav-icon"></i>
-                        <span class="nav-text">Security</span>
-                    </a>
-                </li>
+                <li class="nav-item active" data-page="dashboard"><a class="nav-link"><i class="fas fa-chart-line nav-icon"></i><span>Dashboard</span></a></li>
+                <li class="nav-item" data-page="join-requests"><a class="nav-link"><i class="fas fa-user-plus nav-icon"></i><span>Join Requests</span><span class="nav-badge" id="joinBadge" style="display:none;">0</span></a></li>
+                <li class="nav-item" data-page="branch-requests"><a class="nav-link"><i class="fas fa-code-branch nav-icon"></i><span>Branch Requests</span><span class="nav-badge" id="branchBadge" style="display:none;">0</span></a></li>
+                <li class="nav-item" data-page="subnodes"><a class="nav-link"><i class="fas fa-sitemap nav-icon"></i><span>Sub-Nodes</span></a></li>
+                <li class="nav-item" data-page="members"><a class="nav-link"><i class="fas fa-users nav-icon"></i><span>Members</span></a></li>
+                <li class="nav-item" data-page="problems"><a class="nav-link"><i class="fas fa-exclamation-triangle nav-icon"></i><span>Problems</span></a></li>
+                <li class="nav-item" data-page="announcements"><a class="nav-link"><i class="fas fa-bullhorn nav-icon"></i><span>Announcements</span></a></li>
             </ul>
         </nav>
-        
         <div class="sidebar-footer">
-            <div class="admin-info">
-                <div class="admin-avatar">
-                    <i class="fas fa-user-shield"></i>
-                </div>
-                <div class="admin-details">
-                    <span class="admin-name">Admin User</span>
-                    <span class="admin-role">Super Admin</span>
-                </div>
+            <div class="admin-profile">
+                <div class="admin-avatar"><i class="fas fa-user-shield"></i></div>
+                <div class="admin-info"><div class="admin-name" id="adminDisplayName">Admin</div><div class="admin-role">Organization Admin</div></div>
             </div>
         </div>
     </aside>
-
-    <!-- Main Content -->
-    <main class="admin-main-content">
-        <!-- Top Bar -->
-        <header class="admin-top-bar">
-            <div class="top-bar-left">
-                <button class="mobile-menu-toggle" id="adminMobileMenuToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 class="page-title">User Management</h1>
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+    <main class="admin-main" id="adminMain">
+        <header class="admin-topbar">
+            <div class="topbar-left">
+                <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
+                <h1 class="page-title" id="pageTitle">Admin Dashboard</h1>
+                <span class="topbar-badge">Organization Admin</span>
             </div>
-            
-            <div class="top-bar-right">
-                <div class="node-selector">
-                    <label for="nodeSelect" class="node-label">Current Node:</label>
-                    <select id="nodeSelect" class="node-select">
-                        <option value="root">Root Organization</option>
-                        <option value="academic">Academic Department</option>
-                        <option value="hostel">Hostel Management</option>
-                        <option value="sports">Sports Department</option>
-                        <option value="skills">Skills Development</option>
-                    </select>
-                </div>
-                
-                <div class="admin-actions">
-                    <button class="admin-btn primary" id="addUserBtn">
-                        <i class="fas fa-user-plus"></i>
-                        Add User
-                    </button>
-                    <button class="admin-btn secondary" id="exportBtn">
-                        <i class="fas fa-download"></i>
-                        Export
-                    </button>
-                </div>
+            <div class="topbar-right">
+                <button class="back-btn" id="backToDashboardBtn"><i class="fas fa-arrow-left"></i><span>Back to Dashboard</span></button>
+                <button class="sign-out-btn" id="signOutBtn"><i class="fas fa-sign-out-alt"></i><span>Sign Out</span></button>
             </div>
         </header>
-
-        <!-- Dashboard Content -->
-        <div class="admin-dashboard-content">
-            <!-- Stats Cards -->
-            <div class="stats-grid" data-aos="fade-up">
-                <div class="stat-card">
-                    <div class="stat-icon users">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3 class="stat-number">1,247</h3>
-                        <p class="stat-label">Total Users</p>
-                    </div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon admins">
-                        <i class="fas fa-user-shield"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3 class="stat-number">23</h3>
-                        <p class="stat-label">Administrators</p>
-                    </div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon active">
-                        <i class="fas fa-circle"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3 class="stat-number">892</h3>
-                        <p class="stat-label">Active Users</p>
-                    </div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon pending">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3 class="stat-number">15</h3>
-                        <p class="stat-label">Pending Approvals</p>
-                    </div>
-                </div>
+        <div class="admin-content" id="adminContent">
+            <div class="loading-spinner" id="loadingSpinner"><i class="fas fa-spinner"></i></div>
+            <div class="not-admin-message" id="notAdminMessage" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <h2>Access Denied</h2>
+                <p>You are not an admin of any organization. Please contact the Super Admin if you believe this is an error.</p>
+                <button class="btn-primary" onclick="window.location.href='dashboard.html'"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
             </div>
-
-            <!-- User Management Table -->
-            <div class="table-container" data-aos="fade-up" data-aos-delay="200">
-                <div class="table-header">
-                    <h2 class="table-title">User Management</h2>
-                    <div class="table-controls">
-                        <div class="search-box">
-                            <i class="fas fa-search search-icon"></i>
-                            <input type="text" placeholder="Search users..." class="search-input" id="userSearch">
-                        </div>
-                        <div class="filter-dropdown">
-                            <select id="roleFilter" class="filter-select">
-                                <option value="all">All Roles</option>
-                                <option value="admin">Administrators</option>
-                                <option value="moderator">Moderators</option>
-                                <option value="user">Regular Users</option>
-                            </select>
-                        </div>
-                    </div>
+            <div id="adminContentWrapper" style="display: none;">
+                <div class="section-header">
+                    <h2 class="section-title">Select Organization</h2>
+                    <div class="org-selector"><label for="orgSelect">Organization:</label><select id="orgSelect"></select></div>
                 </div>
-                
-                <div class="table-wrapper">
-                    <table class="user-table" id="userTable">
-                        <thead>
-                            <tr>
-                                <th>
-                                    <input type="checkbox" id="selectAll" class="table-checkbox">
-                                </th>
-                                <th>User</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Department</th>
-                                <th>Status</th>
-                                <th>Last Active</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="table-row" data-user-id="1" data-role="admin">
-                                <td>
-                                    <input type="checkbox" class="table-checkbox row-checkbox">
-                                </td>
-                                <td>
-                                    <div class="user-info">
-                                        <div class="user-avatar">
-                                            <img src="https://via.placeholder.com/40" alt="User Avatar">
-                                        </div>
-                                        <div class="user-details">
-                                            <span class="user-name">John Smith</span>
-                                            <span class="user-id">#USR001</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>john.smith@university.edu</td>
-                                <td>
-                                    <span class="role-badge admin">Administrator</span>
-                                </td>
-                                <td>Academic</td>
-                                <td>
-                                    <span class="status-badge active">Active</span>
-                                </td>
-                                <td>2 hours ago</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn remove-admin" title="Remove Admin">
-                                            <i class="fas fa-user-minus"></i>
-                                        </button>
-                                        <button class="action-btn edit" title="Edit User">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="action-btn delete" title="Delete User">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            
-                            <tr class="table-row" data-user-id="2" data-role="user">
-                                <td>
-                                    <input type="checkbox" class="table-checkbox row-checkbox">
-                                </td>
-                                <td>
-                                    <div class="user-info">
-                                        <div class="user-avatar">
-                                            <img src="https://via.placeholder.com/40" alt="User Avatar">
-                                        </div>
-                                        <div class="user-details">
-                                            <span class="user-name">Sarah Johnson</span>
-                                            <span class="user-id">#USR002</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>sarah.johnson@university.edu</td>
-                                <td>
-                                    <span class="role-badge user">Student</span>
-                                </td>
-                                <td>Hostel</td>
-                                <td>
-                                    <span class="status-badge active">Active</span>
-                                </td>
-                                <td>1 day ago</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn make-admin" title="Make Admin">
-                                            <i class="fas fa-user-plus"></i>
-                                        </button>
-                                        <button class="action-btn edit" title="Edit User">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="action-btn delete" title="Delete User">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            
-                            <tr class="table-row" data-user-id="3" data-role="moderator">
-                                <td>
-                                    <input type="checkbox" class="table-checkbox row-checkbox">
-                                </td>
-                                <td>
-                                    <div class="user-info">
-                                        <div class="user-avatar">
-                                            <img src="https://via.placeholder.com/40" alt="User Avatar">
-                                        </div>
-                                        <div class="user-details">
-                                            <span class="user-name">Mike Wilson</span>
-                                            <span class="user-id">#USR003</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>mike.wilson@university.edu</td>
-                                <td>
-                                    <span class="role-badge moderator">Moderator</span>
-                                </td>
-                                <td>Sports</td>
-                                <td>
-                                    <span class="status-badge inactive">Inactive</span>
-                                </td>
-                                <td>1 week ago</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn make-admin" title="Make Admin">
-                                            <i class="fas fa-user-plus"></i>
-                                        </button>
-                                        <button class="action-btn edit" title="Edit User">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="action-btn delete" title="Delete User">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            
-                            <tr class="table-row" data-user-id="4" data-role="user">
-                                <td>
-                                    <input type="checkbox" class="table-checkbox row-checkbox">
-                                </td>
-                                <td>
-                                    <div class="user-info">
-                                        <div class="user-avatar">
-                                            <img src="https://via.placeholder.com/40" alt="User Avatar">
-                                        </div>
-                                        <div class="user-details">
-                                            <span class="user-name">Emily Davis</span>
-                                            <span class="user-id">#USR004</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>emily.davis@university.edu</td>
-                                <td>
-                                    <span class="role-badge user">Student</span>
-                                </td>
-                                <td>Skills</td>
-                                <td>
-                                    <span class="status-badge active">Active</span>
-                                </td>
-                                <td>3 hours ago</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn make-admin" title="Make Admin">
-                                            <i class="fas fa-user-plus"></i>
-                                        </button>
-                                        <button class="action-btn edit" title="Edit User">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="action-btn delete" title="Delete User">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            
-                            <tr class="table-row" data-user-id="5" data-role="user">
-                                <td>
-                                    <input type="checkbox" class="table-checkbox row-checkbox">
-                                </td>
-                                <td>
-                                    <div class="user-info">
-                                        <div class="user-avatar">
-                                            <img src="https://via.placeholder.com/40" alt="User Avatar">
-                                        </div>
-                                        <div class="user-details">
-                                            <span class="user-name">Alex Thompson</span>
-                                            <span class="user-id">#USR005</span>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>alex.thompson@university.edu</td>
-                                <td>
-                                    <span class="role-badge user">Student</span>
-                                </td>
-                                <td>Academic</td>
-                                <td>
-                                    <span class="status-badge pending">Pending</span>
-                                </td>
-                                <td>Never</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn make-admin" title="Make Admin">
-                                            <i class="fas fa-user-plus"></i>
-                                        </button>
-                                        <button class="action-btn edit" title="Edit User">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="action-btn delete" title="Delete User">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div class="table-footer">
-                    <div class="table-info">
-                        Showing 1-5 of 1,247 users
+                <!-- Dashboard Page -->
+                <section class="page-section active" id="dashboardPage">
+                    <div class="metrics-grid">
+                        <div class="metric-card"><div class="metric-icon members"><i class="fas fa-users"></i></div><div class="metric-value" id="totalMembers">0</div><div class="metric-label">Total Members</div></div>
+                        <div class="metric-card"><div class="metric-icon join"><i class="fas fa-user-plus"></i></div><div class="metric-value" id="joinRequestCount">0</div><div class="metric-label">Join Requests</div></div>
+                        <div class="metric-card"><div class="metric-icon branch"><i class="fas fa-code-branch"></i></div><div class="metric-value" id="branchRequestCount">0</div><div class="metric-label">Branch Requests</div></div>
+                        <div class="metric-card"><div class="metric-icon problems"><i class="fas fa-exclamation-triangle"></i></div><div class="metric-value" id="totalProblems">0</div><div class="metric-label">Open Problems</div></div>
+                        <div class="metric-card"><div class="metric-icon solved"><i class="fas fa-check-circle"></i></div><div class="metric-value" id="solvedProblems">0</div><div class="metric-label">Solved Problems</div></div>
                     </div>
-                    <div class="pagination">
-                        <button class="page-btn" disabled>
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <button class="page-btn active">1</button>
-                        <button class="page-btn">2</button>
-                        <button class="page-btn">3</button>
-                        <button class="page-btn">...</button>
-                        <button class="page-btn">250</button>
-                        <button class="page-btn">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
+                    <div class="section-header"><h2 class="section-title">Recent Activity</h2></div>
+                    <div class="data-table" id="recentActivityTable"><div class="loading-spinner"><i class="fas fa-spinner"></i></div></div>
+                </section>
+                <!-- Join Requests Page -->
+                <section class="page-section" id="joinRequestsPage">
+                    <div class="section-header"><h2 class="section-title">Pending Join Requests</h2></div>
+                    <div class="data-table" id="joinRequestsTable"><div class="loading-spinner"><i class="fas fa-spinner"></i></div></div>
+                </section>
+                <!-- Branch Requests Page -->
+                <section class="page-section" id="branchRequestsPage">
+                    <div class="section-header"><h2 class="section-title">Pending Branch Requests</h2></div>
+                    <div class="data-table" id="branchRequestsTable"><div class="loading-spinner"><i class="fas fa-spinner"></i></div></div>
+                </section>
+                <!-- Sub-Nodes Page -->
+                <section class="page-section" id="subnodesPage">
+                    <div class="section-header">
+                        <h2 class="section-title">Sub-Nodes Management</h2>
+                        <button class="btn-primary" id="addSubnodeBtn"><i class="fas fa-plus"></i> Add Sub-Node</button>
                     </div>
-                </div>
+                    <div class="subnode-tree" id="subnodeTree"><div class="loading-spinner"><i class="fas fa-spinner"></i></div></div>
+                </section>
+                <!-- Members Page -->
+                <section class="page-section" id="membersPage">
+                    <div class="section-header"><h2 class="section-title">Organization Members</h2></div>
+                    <div class="data-table" id="membersTable"><div class="loading-spinner"><i class="fas fa-spinner"></i></div></div>
+                </section>
+                <!-- Problems Page -->
+                <section class="page-section" id="problemsPage">
+                    <div class="section-header"><h2 class="section-title">Problems</h2></div>
+                    <div class="data-table" id="problemsTable"><div class="loading-spinner"><i class="fas fa-spinner"></i></div></div>
+                </section>
+                <!-- Announcements Page -->
+                <section class="page-section" id="announcementsPage">
+                    <div class="section-header"><h2 class="section-title">Announcements</h2></div>
+                    <div class="data-table" id="announcementsTable"><div class="loading-spinner"><i class="fas fa-spinner"></i></div></div>
+                </section>
             </div>
         </div>
     </main>
 
-    <!-- Confirmation Modal -->
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="confirmation-modal" id="confirmationModal">
-            <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">Confirm Action</h3>
-                <button class="modal-close" id="modalClose">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="modal-icon" id="modalIcon">
-                    <i class="fas fa-question-circle"></i>
-                </div>
-                <p class="modal-message" id="modalMessage">Are you sure you want to perform this action?</p>
-            </div>
-            <div class="modal-footer">
-                <button class="modal-btn cancel" id="modalCancel">Cancel</button>
-                <button class="modal-btn confirm" id="modalConfirm">Confirm</button>
-            </div>
+<style>
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+        .section-title { font-family: 'Poppins', sans-serif; font-size: 1.25rem; font-weight: 600; color: #1F2933; }
+        .org-selector { display: flex; align-items: center; gap: 0.75rem; }
+        .org-selector label { font-weight: 600; color: #4B5563; }
+        .org-selector select { padding: 0.5rem 1rem; border: 2px solid rgba(41, 171, 226, 0.2); border-radius: 8px; font-size: 0.9rem; background: white; cursor: pointer; }
+        .org-selector select:focus { outline: none; border-color: var(--admin-accent); }
+        .data-table { width: 100%; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); margin-bottom: 2rem; }
+        .data-table table { width: 100%; border-collapse: collapse; }
+        .data-table th, .data-table td { padding: 1rem 1.5rem; text-align: left; }
+        .data-table th { background: rgba(41, 171, 226, 0.05); font-family: 'Poppins', sans-serif; font-weight: 600; color: #1F2933; font-size: 0.9rem; }
+        .data-table td { border-bottom: 1px solid rgba(0, 0, 0, 0.05); color: #4B5563; }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover td { background: rgba(41, 171, 226, 0.02); }
+        .status-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+        .status-badge.active { background: rgba(16, 185, 129, 0.1); color: #059669; }
+        .status-badge.pending { background: rgba(245, 158, 11, 0.1); color: #D97706; }
+        .status-badge.high { background: rgba(239, 68, 68, 0.1); color: #DC2626; }
+        .status-badge.medium { background: rgba(245, 158, 11, 0.1); color: #D97706; }
+        .status-badge.low { background: rgba(59, 130, 246, 0.1); color: #2563EB; }
+        .status-badge.join { background: rgba(139, 92, 246, 0.1); color: #7C3AED; }
+        .status-badge.branch { background: rgba(236, 72, 153, 0.1); color: #DB2777; }
+        .action-btn { padding: 0.5rem 1rem; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-right: 0.5rem; }
+        .action-btn.approve { background: rgba(16, 185, 129, 0.1); color: #059669; }
+        .action-btn.approve:hover { background: #10B981; color: white; }
+        .action-btn.reject { background: rgba(239, 68, 68, 0.1); color: #DC2626; }
+        .action-btn.reject:hover { background: #EF4444; color: white; }
+        .action-btn.view { background: rgba(41, 171, 226, 0.1); color: var(--admin-accent); }
+        .action-btn.view:hover { background: var(--admin-accent); color: white; }
+        .action-btn.assign { background: rgba(139, 92, 246, 0.1); color: #7C3AED; }
+        .action-btn.assign:hover { background: #7C3AED; color: white; }
+        .empty-state { text-align: center; padding: 3rem; color: #6B7280; }
+        .empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
+        .empty-state h3 { font-family: 'Poppins', sans-serif; margin-bottom: 0.5rem; color: #1F2933; }
+        .loading-spinner { display: flex; justify-content: center; align-items: center; padding: 3rem; }
+        .loading-spinner i { font-size: 2rem; color: var(--admin-accent); animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: white; padding: 1rem 1.5rem; border-radius: 12px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); display: none; align-items: center; gap: 0.75rem; z-index: 3000; }
+        .toast.show { display: flex; animation: toastIn 0.3s ease; }
+        .toast.success { border-left: 4px solid #10B981; }
+        .toast.error { border-left: 4px solid #EF4444; }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(1rem); } to { opacity: 1; transform: translateY(0); } }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 1rem; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: white; border-radius: 16px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; animation: modalIn 0.2s ease; }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+        .modal-title { font-family: 'Poppins', sans-serif; font-size: 1.25rem; font-weight: 600; }
+        .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #6B7280; }
+        .modal-body { padding: 1.5rem; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 0.75rem; padding: 1rem 1.5rem; border-top: 1px solid rgba(0, 0, 0, 0.1); }
+        .detail-row { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid rgba(0, 0, 0, 0.05); flex-wrap: wrap; gap: 0.5rem; }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { color: #6B7280; font-weight: 500; }
+        .detail-value { color: #1F2933; font-weight: 600; }
+        .form-group { margin-bottom: 1rem; }
+        .form-label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: #1F2933; }
+        .form-input { width: 100%; padding: 0.75rem 1rem; border: 2px solid rgba(41, 171, 226, 0.2); border-radius: 10px; font-size: 1rem; transition: all 0.3s ease; }
+        .form-input:focus { outline: none; border-color: var(--admin-accent); box-shadow: 0 0 0 3px rgba(41, 171, 226, 0.1); }
+        .btn-primary { background: linear-gradient(135deg, var(--admin-accent), #29E2D0); color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(41, 171, 226, 0.4); }
+        .btn-secondary { background: rgba(0, 0, 0, 0.05); color: #4B5563; padding: 0.75rem 1.5rem; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; }
+        .mobile-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 999; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .mobile-overlay.show { opacity: 1; visibility: visible; }
+        .not-admin-message { text-align: center; padding: 4rem 2rem; background: white; border-radius: 16px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); }
+        .not-admin-message i { font-size: 4rem; color: #EF4444; margin-bottom: 1.5rem; }
+        .not-admin-message h2 { font-family: 'Poppins', sans-serif; color: #1F2933; margin-bottom: 1rem; }
+        .not-admin-message p { color: #6B7280; margin-bottom: 2rem; }
+        .subnode-tree { background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); }
+        .subnode-item { padding: 1rem; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+        .subnode-item:hover { background: rgba(41, 171, 226, 0.02); }
+        .subnode-info { flex: 1; min-width: 200px; }
+        .subnode-name { font-weight: 600; color: #1F2933; }
+        .subnode-meta { font-size: 0.85rem; color: #6B7280; }
+        .subnode-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        @media (max-width: 768px) { .admin-sidebar { transform: translateX(-100%); } .admin-sidebar.show { transform: translateX(0); } .admin-main { margin-left: 0; } .mobile-menu-btn { display: block; } .metrics-grid { grid-template-columns: repeat(2, 1fr); } .admin-topbar { padding: 1rem; } .topbar-right { gap: 0.5rem; } .back-btn span, .sign-out-btn span { display: none; } }
+        @media (max-width: 480px) { .metrics-grid { grid-template-columns: 1fr; } }
+    </style>
+
+    <!-- Details Modal -->
+    <div class="modal-overlay" id="detailsModal">
+        <div class="modal">
+            <div class="modal-header"><h2 class="modal-title" id="modalTitle">Details</h2><button class="modal-close" onclick="closeModal('detailsModal')">&times;</button></div>
+            <div class="modal-body" id="modalContent"></div>
+            <div class="modal-footer"><button class="btn-secondary" onclick="closeModal('detailsModal')">Close</button></div>
         </div>
     </div>
+    <!-- Reject Reason Modal -->
+    <div class="modal-overlay" id="rejectModal">
+        <div class="modal">
+            <div class="modal-header"><h2 class="modal-title">Reject Request</h2><button class="modal-close" onclick="closeModal('rejectModal')">&times;</button></div>
+            <div class="modal-body">
+                <p style="margin-bottom:1rem;">Rejecting request from: <strong id="rejectRequester"></strong></p>
+                <div class="form-group"><label class="form-label">Rejection Reason (optional)</label><textarea class="form-input" id="rejectReason" rows="3" placeholder="Enter reason for rejection..."></textarea></div>
+            </div>
+            <div class="modal-footer"><button class="btn-secondary" onclick="closeModal('rejectModal')">Cancel</button><button class="btn-primary" style="background:linear-gradient(135deg, #EF4444, #DC2626);" id="confirmRejectBtn">Reject</button></div>
+        </div>
+    </div>
+    <!-- Add Sub-Node Modal -->
+    <div class="modal-overlay" id="addSubnodeModal">
+        <div class="modal">
+            <div class="modal-header"><h2 class="modal-title" id="subnodeModalTitle">Add Sub-Node</h2><button class="modal-close" onclick="closeModal('addSubnodeModal')">&times;</button></div>
+            <div class="modal-body">
+                <div class="form-group"><label class="form-label">Parent Node</label><select class="form-input" id="parentNodeSelect"></select></div>
+                <div class="form-group"><label class="form-label">Name</label><input type="text" class="form-input" id="subnodeName" placeholder="Enter sub-node name"></div>
+                <div class="form-group"><label class="form-label">Type</label><select class="form-input" id="subnodeType"><option value="department">Department</option><option value="team">Team</option><option value="project">Project</option><option value="academic">Academic</option><option value="hostel">Hostel</option><option value="sports">Sports</option><option value="club">Club</option></select></div>
+            </div>
+            <div class="modal-footer"><button class="btn-secondary" onclick="closeModal('addSubnodeModal')">Cancel</button><button class="btn-primary" id="saveSubnodeBtn">Save</button></div>
+        </div>
+    </div>
+    <!-- Assign Node Admin Modal -->
+    <div class="modal-overlay" id="assignNodeAdminModal">
+        <div class="modal">
+            <div class="modal-header"><h2 class="modal-title">Assign Node Admin</h2><button class="modal-close" onclick="closeModal('assignNodeAdminModal')">&times;</button></div>
+            <div class="modal-body">
+                <p style="margin-bottom:1rem;">Assign admin to: <strong id="assignNodeName"></strong></p>
+                <div class="form-group"><label class="form-label">Admin Email</label><input type="email" class="form-input" id="nodeAdminEmail" placeholder="admin@example.com"></div>
+            </div>
+            <div class="modal-footer"><button class="btn-secondary" onclick="closeModal('assignNodeAdminModal')">Cancel</button><button class="btn-primary" id="confirmAssignNodeAdminBtn">Assign</button></div>
+        </div>
+    </div>
+    <div class="toast" id="toast"><i class="fas fa-check-circle" style="color:#10B981;"></i><span id="toastMessage">Success!</span></div>
 
-    <!-- Mobile Overlay -->
-    <div class="mobile-overlay" id="adminMobileOverlay"></div>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, deleteDoc, query, where, serverTimestamp, arrayUnion, arrayRemove, addDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-    <!-- AOS Animation Library -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    
-    <!-- Custom JavaScript -->
-    <script src="global.js"></script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsuZL4U2H66C9tUKN91KXMm-l5umOa1vY",
+            authDomain: "flowlinkkiro.firebaseapp.com",
+            projectId: "flowlinkkiro",
+            storageBucket: "flowlinkkiro.firebasestorage.app",
+            messagingSenderId: "918596906932",
+            appId: "1:918596906932:web:55e2a235cefedd61098ce1",
+            measurementId: "G-B32FNF648G"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let adminOrganizations = [];
+        let selectedOrgId = null;
+        let allProblems = [];
+        let allAnnouncements = [];
+        let joinRequests = [];
+        let branchRequests = [];
+        let subNodes = [];
+        let currentRejectRequest = null;
+        let currentAssignNode = null;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = 'login.html'; return; }
+            currentUser = user;
+            document.getElementById('adminDisplayName').textContent = user.email;
+            await checkAdminStatus();
+        });
+
+        async function checkAdminStatus() {
+            try {
+                const userEmail = currentUser.email;
+                const hierarchiesRef = collection(db, 'hierarchies');
+                const snapshot = await getDocs(hierarchiesRef);
+                adminOrganizations = [];
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (data.adminEmails && data.adminEmails.includes(userEmail)) {
+                        adminOrganizations.push({ id: docSnap.id, ...data });
+                    }
+                });
+                document.getElementById('loadingSpinner').style.display = 'none';
+                if (adminOrganizations.length === 0) { document.getElementById('notAdminMessage').style.display = 'block'; return; }
+                document.getElementById('adminContentWrapper').style.display = 'block';
+                const orgSelect = document.getElementById('orgSelect');
+                orgSelect.innerHTML = adminOrganizations.map(org => `<option value="${org.id}">${org.name}</option>`).join('');
+                selectedOrgId = adminOrganizations[0].id;
+                orgSelect.addEventListener('change', (e) => { selectedOrgId = e.target.value; loadOrganizationData(); });
+                setupNavigation();
+                setupEventListeners();
+                await loadOrganizationData();
+            } catch (error) { console.error('Error checking admin status:', error); showToast('Error loading admin data: ' + error.message, 'error'); }
+        }
+
+        function setupNavigation() {
+            const pageMap = { 'dashboard': 'dashboardPage', 'join-requests': 'joinRequestsPage', 'branch-requests': 'branchRequestsPage', 'subnodes': 'subnodesPage', 'members': 'membersPage', 'problems': 'problemsPage', 'announcements': 'announcementsPage' };
+            const titles = { 'dashboard': 'Admin Dashboard', 'join-requests': 'Join Requests', 'branch-requests': 'Branch Requests', 'subnodes': 'Sub-Nodes', 'members': 'Members', 'problems': 'Problems', 'announcements': 'Announcements' };
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const page = item.dataset.page;
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+                    document.getElementById(pageMap[page]).classList.add('active');
+                    document.getElementById('pageTitle').textContent = titles[page];
+                    closeMobileMenu();
+                });
+            });
+        }
+
+        function setupEventListeners() {
+            document.getElementById('signOutBtn').addEventListener('click', async () => { await signOut(auth); window.location.href = 'login.html'; });
+            document.getElementById('backToDashboardBtn').addEventListener('click', () => { window.location.href = 'dashboard.html'; });
+            document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
+            document.getElementById('mobileOverlay').addEventListener('click', closeMobileMenu);
+            document.getElementById('addSubnodeBtn').addEventListener('click', openAddSubnodeModal);
+            document.getElementById('saveSubnodeBtn').addEventListener('click', saveSubnode);
+            document.getElementById('confirmRejectBtn').addEventListener('click', confirmReject);
+            document.getElementById('confirmAssignNodeAdminBtn').addEventListener('click', confirmAssignNodeAdmin);
+        }
+
+        function toggleMobileMenu() { document.getElementById('adminSidebar').classList.toggle('show'); document.getElementById('mobileOverlay').classList.toggle('show'); }
+        function closeMobileMenu() { document.getElementById('adminSidebar').classList.remove('show'); document.getElementById('mobileOverlay').classList.remove('show'); }
+
+        async function loadOrganizationData() {
+            const org = adminOrganizations.find(o => o.id === selectedOrgId);
+            if (!org) return;
+            document.getElementById('totalMembers').textContent = (org.members || []).length;
+            await Promise.all([loadJoinRequests(), loadBranchRequests(), loadSubNodes(), loadProblems(org), loadAnnouncements(org)]);
+            updateBadges();
+            renderAllSections(org);
+        }
+
+        async function loadJoinRequests() {
+            try {
+                const pendingRef = collection(db, 'pendingApprovals');
+                const snapshot = await getDocs(pendingRef);
+                console.log('Loading join requests for org:', selectedOrgId, 'admin:', currentUser.email);
+                console.log('Total pending approvals:', snapshot.docs.length);
+                
+                joinRequests = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
+                    .filter(r => {
+                        const isJoin = r.requestType === 'join';
+                        const isPending = r.status === 'pending';
+                        // Check both targetOrgId and if the targetNodePath starts with the org
+                        const isForOrg = r.targetOrgId === selectedOrgId || 
+                                         (r.targetNodePath && r.targetNodePath.startsWith(`hierarchies/${selectedOrgId}`));
+                        const isAssignedToMe = r.assignedAdminEmail === currentUser.email;
+                        
+                        console.log('Join request:', r.id, { 
+                            isJoin, isPending, isForOrg, isAssignedToMe, 
+                            targetOrgId: r.targetOrgId, 
+                            targetNodePath: r.targetNodePath,
+                            assignedAdmin: r.assignedAdminEmail,
+                            selectedOrgId: selectedOrgId
+                        });
+                        
+                        return isJoin && isPending && isForOrg && isAssignedToMe;
+                    });
+                console.log('Filtered join requests:', joinRequests.length);
+                document.getElementById('joinRequestCount').textContent = joinRequests.length;
+            } catch (error) { console.error('Error loading join requests:', error); joinRequests = []; }
+        }
+
+        async function loadBranchRequests() {
+            try {
+                const pendingRef = collection(db, 'pendingApprovals');
+                const snapshot = await getDocs(pendingRef);
+                console.log('Loading branch requests for org:', selectedOrgId, 'admin:', currentUser.email);
+                console.log('Total pending approvals:', snapshot.docs.length);
+                
+                branchRequests = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
+                    .filter(r => {
+                        const isBranch = r.requestType === 'branch';
+                        const isPending = r.status === 'pending';
+                        // Check both parentOrgId and if the parentNodePath starts with the org
+                        const isForOrg = r.parentOrgId === selectedOrgId || 
+                                         (r.parentNodePath && r.parentNodePath.startsWith(`hierarchies/${selectedOrgId}`));
+                        const isAssignedToMe = r.assignedAdminEmail === currentUser.email;
+                        
+                        console.log('Branch request:', r.id, { 
+                            isBranch, isPending, isForOrg, isAssignedToMe, 
+                            parentOrgId: r.parentOrgId, 
+                            parentNodePath: r.parentNodePath,
+                            assignedAdmin: r.assignedAdminEmail,
+                            selectedOrgId: selectedOrgId
+                        });
+                        
+                        return isBranch && isPending && isForOrg && isAssignedToMe;
+                    });
+                console.log('Filtered branch requests:', branchRequests.length);
+                document.getElementById('branchRequestCount').textContent = branchRequests.length;
+            } catch (error) { console.error('Error loading branch requests:', error); branchRequests = []; }
+        }
+
+        async function loadSubNodes() {
+            try {
+                subNodes = [];
+                const orgRef = doc(db, 'hierarchies', selectedOrgId);
+                const subNodesRef = collection(orgRef, 'sub-nodes');
+                await fetchSubNodesRecursive(subNodesRef, `hierarchies/${selectedOrgId}`, 0);
+            } catch (error) { console.error('Error loading sub-nodes:', error); subNodes = []; }
+        }
+
+        async function fetchSubNodesRecursive(colRef, parentPath, level) {
+            try {
+                const snapshot = await getDocs(colRef);
+                for (const docSnap of snapshot.docs) {
+                    const data = docSnap.data();
+                    const nodePath = `${parentPath}/sub-nodes/${docSnap.id}`;
+                    subNodes.push({ id: docSnap.id, path: nodePath, level, ...data });
+                    const childrenRef = collection(docSnap.ref, 'sub-nodes');
+                    await fetchSubNodesRecursive(childrenRef, nodePath, level + 1);
+                }
+            } catch (e) { /* No children */ }
+        }
+
+        async function loadProblems(org) {
+            try {
+                const problemsRef = collection(db, 'problems');
+                const snapshot = await getDocs(problemsRef);
+                allProblems = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
+                    .filter(p => p.organizationId === org.id || (org.members && org.members.includes(p.createdBy)));
+                document.getElementById('totalProblems').textContent = allProblems.filter(p => p.status !== 'solved').length;
+                document.getElementById('solvedProblems').textContent = allProblems.filter(p => p.status === 'solved').length;
+            } catch (error) { console.error('Error loading problems:', error); allProblems = []; }
+        }
+
+        async function loadAnnouncements(org) {
+            try {
+                const announcementsRef = collection(db, 'announcements');
+                const snapshot = await getDocs(announcementsRef);
+                allAnnouncements = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
+                    .filter(a => a.organizationId === org.id || (org.members && org.members.includes(a.createdBy)));
+            } catch (error) { console.error('Error loading announcements:', error); allAnnouncements = []; }
+        }
+
+        function updateBadges() {
+            const joinBadge = document.getElementById('joinBadge');
+            const branchBadge = document.getElementById('branchBadge');
+            if (joinRequests.length > 0) { joinBadge.textContent = joinRequests.length; joinBadge.style.display = 'inline'; }
+            else { joinBadge.style.display = 'none'; }
+            if (branchRequests.length > 0) { branchBadge.textContent = branchRequests.length; branchBadge.style.display = 'inline'; }
+            else { branchBadge.style.display = 'none'; }
+        }
+
+        function renderAllSections(org) {
+            renderRecentActivity();
+            renderJoinRequests();
+            renderBranchRequests();
+            renderSubNodes();
+            renderMembers(org);
+            renderProblems();
+            renderAnnouncements();
+        }
+
+        function renderRecentActivity() {
+            const container = document.getElementById('recentActivityTable');
+            const recentItems = [...joinRequests.map(r => ({...r, itemType: 'join'})), ...branchRequests.map(r => ({...r, itemType: 'branch'})), ...allProblems.slice(0, 3)]
+                .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)).slice(0, 5);
+            if (recentItems.length === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><h3>No Recent Activity</h3><p>Activity will appear here.</p></div>'; return; }
+            container.innerHTML = `<table><thead><tr><th>Type</th><th>Details</th><th>From</th><th>Date</th><th>Status</th></tr></thead><tbody>${recentItems.map(item => `<tr>
+                <td><span class="status-badge ${item.itemType || (item.priority ? 'high' : 'pending')}">${item.itemType === 'join' ? 'Join Request' : item.itemType === 'branch' ? 'Branch Request' : 'Problem'}</span></td>
+                <td><strong>${item.targetNodeName || item.proposedName || item.title || 'N/A'}</strong></td>
+                <td>${item.requesterEmail || item.createdBy || 'Unknown'}</td>
+                <td>${item.createdAt ? new Date(item.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</td>
+                <td><span class="status-badge ${item.status || 'pending'}">${item.status || 'pending'}</span></td>
+            </tr>`).join('')}</tbody></table>`;
+        }
+
+        function renderJoinRequests() {
+            const container = document.getElementById('joinRequestsTable');
+            if (joinRequests.length === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa-user-plus"></i><h3>No Pending Join Requests</h3><p>All join requests have been processed.</p></div>'; return; }
+            container.innerHTML = `<table><thead><tr><th>Requester</th><th>Target Node</th><th>Date</th><th>Actions</th></tr></thead><tbody>${joinRequests.map(r => `<tr>
+                <td><strong>${r.requesterEmail}</strong></td>
+                <td>${r.targetNodeName || 'Organization Root'}</td>
+                <td>${r.createdAt ? new Date(r.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</td>
+                <td><button class="action-btn approve" onclick="approveJoinRequest('${r.id}')">Approve</button><button class="action-btn reject" onclick="openRejectModal('${r.id}', 'join', '${r.requesterEmail}')">Reject</button></td>
+            </tr>`).join('')}</tbody></table>`;
+        }
+
+        function renderBranchRequests() {
+            const container = document.getElementById('branchRequestsTable');
+            if (branchRequests.length === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa-code-branch"></i><h3>No Pending Branch Requests</h3><p>All branch requests have been processed.</p></div>'; return; }
+            container.innerHTML = `<table><thead><tr><th>Requester</th><th>Proposed Name</th><th>Type</th><th>Parent Node</th><th>Date</th><th>Actions</th></tr></thead><tbody>${branchRequests.map(r => `<tr>
+                <td><strong>${r.requesterEmail}</strong></td>
+                <td>${r.proposedName}</td>
+                <td>${r.proposedType || 'department'}</td>
+                <td>${r.parentNodeName || 'Organization Root'}</td>
+                <td>${r.createdAt ? new Date(r.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</td>
+                <td><button class="action-btn approve" onclick="approveBranchRequest('${r.id}')">Approve</button><button class="action-btn reject" onclick="openRejectModal('${r.id}', 'branch', '${r.requesterEmail}')">Reject</button></td>
+            </tr>`).join('')}</tbody></table>`;
+        }
+
+        function renderSubNodes() {
+            const container = document.getElementById('subnodeTree');
+            if (subNodes.length === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa-sitemap"></i><h3>No Sub-Nodes</h3><p>Create sub-nodes to organize your hierarchy.</p></div>'; return; }
+            container.innerHTML = subNodes.map(node => `<div class="subnode-item" style="margin-left:${node.level * 20}px;">
+                <div class="subnode-info">
+                    <div class="subnode-name">${node.level > 0 ? '└ ' : ''}${node.name}</div>
+                    <div class="subnode-meta">${node.type || 'department'} • ${(node.members || []).length} members • ${(node.adminEmails || []).length > 0 ? 'Admin: ' + node.adminEmails.join(', ') : 'No admin'}</div>
+                </div>
+                <div class="subnode-actions">
+                    <button class="action-btn assign" onclick="openAssignNodeAdminModal('${node.path}', '${node.name}')">Assign Admin</button>
+                    <button class="action-btn view" onclick="editSubnode('${node.id}', '${node.path}')">Edit</button>
+                    <button class="action-btn reject" onclick="deleteSubnode('${node.path}', '${node.name}')">Delete</button>
+                </div>
+            </div>`).join('');
+        }
+
+        function renderMembers(org) {
+            const container = document.getElementById('membersTable');
+            const members = org.members || [];
+            if (members.length === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><h3>No Members</h3><p>No members have joined yet.</p></div>'; return; }
+            container.innerHTML = `<table><thead><tr><th>Email</th><th>Role</th><th>Actions</th></tr></thead><tbody>${members.map(email => `<tr>
+                <td><strong>${email}</strong></td>
+                <td><span class="status-badge ${org.adminEmails?.includes(email) ? 'active' : 'pending'}">${org.adminEmails?.includes(email) ? 'Admin' : 'Member'}</span></td>
+                <td>${!org.adminEmails?.includes(email) ? `<button class="action-btn approve" onclick="makeAdmin('${email}')">Make Admin</button>` : `<button class="action-btn reject" onclick="removeAdmin('${email}')">Remove Admin</button>`}<button class="action-btn reject" onclick="removeMember('${email}')">Remove</button></td>
+            </tr>`).join('')}</tbody></table>`;
+        }
+
+        function renderProblems() {
+            const container = document.getElementById('problemsTable');
+            if (allProblems.length === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>No Problems</h3><p>No problems reported yet.</p></div>'; return; }
+            container.innerHTML = `<table><thead><tr><th>Title</th><th>Priority</th><th>Status</th><th>Created By</th><th>Date</th><th>Actions</th></tr></thead><tbody>${allProblems.map(item => `<tr>
+                <td><strong>${item.title || 'Untitled'}</strong></td>
+                <td><span class="status-badge ${item.priority || 'medium'}">${item.priority || 'medium'}</span></td>
+                <td><span class="status-badge ${item.status || 'pending'}">${item.status || 'pending'}</span></td>
+                <td>${item.createdBy || 'Unknown'}</td>
+                <td>${item.createdAt ? new Date(item.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</td>
+                <td><button class="action-btn view" onclick="viewProblem('${item.id}')">View</button>${item.status !== 'solved' ? `<button class="action-btn approve" onclick="markSolved('${item.id}')">Solved</button>` : ''}</td>
+            </tr>`).join('')}</tbody></table>`;
+        }
+
+        function renderAnnouncements() {
+            const container = document.getElementById('announcementsTable');
+            if (allAnnouncements.length === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa-bullhorn"></i><h3>No Announcements</h3><p>No announcements posted yet.</p></div>'; return; }
+            container.innerHTML = `<table><thead><tr><th>Title</th><th>Created By</th><th>Date</th><th>Actions</th></tr></thead><tbody>${allAnnouncements.map(item => `<tr>
+                <td><strong>${item.title || 'Untitled'}</strong></td>
+                <td>${item.createdBy || 'Unknown'}</td>
+                <td>${item.createdAt ? new Date(item.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</td>
+                <td><button class="action-btn view" onclick="viewAnnouncement('${item.id}')">View</button><button class="action-btn reject" onclick="deleteAnnouncement('${item.id}')">Delete</button></td>
+            </tr>`).join('')}</tbody></table>`;
+        }
+
+        // Join/Branch Request Actions
+        window.approveJoinRequest = async function(requestId) {
+            try {
+                const request = joinRequests.find(r => r.id === requestId);
+                if (!request) return;
+                // Add user to target node's members
+                const targetRef = doc(db, request.targetNodePath);
+                await setDoc(targetRef, { members: arrayUnion(request.requesterEmail), updatedAt: serverTimestamp() }, { merge: true });
+                // Also add to user's personal hierarchies
+                const userHierarchyRef = doc(db, 'users', request.requesterEmail, 'hierarchies', request.targetOrgId);
+                await setDoc(userHierarchyRef, { name: request.targetNodeName, joinedAt: serverTimestamp() }, { merge: true });
+                // Update request status
+                await setDoc(doc(db, 'pendingApprovals', requestId), { status: 'approved', processedBy: currentUser.email, processedAt: serverTimestamp() }, { merge: true });
+                await deleteDoc(doc(db, 'pendingApprovals', requestId));
+                showToast('Join request approved!', 'success');
+                await loadOrganizationData();
+            } catch (error) { showToast('Error: ' + error.message, 'error'); }
+        };
+
+        window.approveBranchRequest = async function(requestId) {
+            try {
+                const request = branchRequests.find(r => r.id === requestId);
+                if (!request) return;
+                // Create the new sub-node
+                const nodeId = request.proposedName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                const newNodePath = `${request.parentNodePath}/sub-nodes/${nodeId}`;
+                const newNodeRef = doc(db, newNodePath);
+                await setDoc(newNodeRef, {
+                    name: request.proposedName,
+                    type: request.proposedType || 'department',
+                    status: 'active',
+                    members: [request.requesterEmail],
+                    adminEmails: [],
+                    createdBy: request.requesterEmail,
+                    createdAt: serverTimestamp()
+                });
+                // Update request status
+                await setDoc(doc(db, 'pendingApprovals', requestId), { status: 'approved', processedBy: currentUser.email, processedAt: serverTimestamp() }, { merge: true });
+                await deleteDoc(doc(db, 'pendingApprovals', requestId));
+                showToast('Branch request approved! Sub-node created.', 'success');
+                await loadOrganizationData();
+            } catch (error) { showToast('Error: ' + error.message, 'error'); }
+        };
+
+        window.openRejectModal = function(requestId, type, requesterEmail) {
+            currentRejectRequest = { id: requestId, type };
+            document.getElementById('rejectRequester').textContent = requesterEmail;
+            document.getElementById('rejectReason').value = '';
+            document.getElementById('rejectModal').classList.add('show');
+        };
+
+        async function confirmReject() {
+            if (!currentRejectRequest) return;
+            const reason = document.getElementById('rejectReason').value.trim();
+            try {
+                await setDoc(doc(db, 'pendingApprovals', currentRejectRequest.id), {
+                    status: 'rejected',
+                    processedBy: currentUser.email,
+                    processedAt: serverTimestamp(),
+                    rejectionReason: reason || 'No reason provided'
+                }, { merge: true });
+                await deleteDoc(doc(db, 'pendingApprovals', currentRejectRequest.id));
+                closeModal('rejectModal');
+                showToast('Request rejected', 'success');
+                await loadOrganizationData();
+            } catch (error) { showToast('Error: ' + error.message, 'error'); }
+        }
+
+        // Sub-Node Management
+        function openAddSubnodeModal() {
+            document.getElementById('subnodeModalTitle').textContent = 'Add Sub-Node';
+            document.getElementById('subnodeName').value = '';
+            document.getElementById('subnodeType').value = 'department';
+            // Populate parent node options
+            const parentSelect = document.getElementById('parentNodeSelect');
+            const org = adminOrganizations.find(o => o.id === selectedOrgId);
+            let options = `<option value="hierarchies/${selectedOrgId}">${org?.name || 'Organization'} (Root)</option>`;
+            subNodes.forEach(node => { options += `<option value="${node.path}">${'—'.repeat(node.level + 1)} ${node.name}</option>`; });
+            parentSelect.innerHTML = options;
+            document.getElementById('addSubnodeModal').classList.add('show');
+        }
+
+        async function saveSubnode() {
+            const parentPath = document.getElementById('parentNodeSelect').value;
+            const name = document.getElementById('subnodeName').value.trim();
+            const type = document.getElementById('subnodeType').value;
+            if (!name) { showToast('Please enter a name', 'error'); return; }
+            try {
+                const nodeId = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                const newNodePath = `${parentPath}/sub-nodes/${nodeId}`;
+                await setDoc(doc(db, newNodePath), {
+                    name, type, status: 'active', members: [], adminEmails: [],
+                    createdBy: currentUser.email, createdAt: serverTimestamp()
+                });
+                closeModal('addSubnodeModal');
+                showToast('Sub-node created!', 'success');
+                await loadOrganizationData();
+            } catch (error) { showToast('Error: ' + error.message, 'error'); }
+        }
+
+        window.deleteSubnode = async function(nodePath, nodeName) {
+            if (!confirm(`Delete "${nodeName}" and all its children?`)) return;
+            try {
+                await deleteNodeRecursive(nodePath);
+                showToast('Sub-node deleted!', 'success');
+                await loadOrganizationData();
+            } catch (error) { showToast('Error: ' + error.message, 'error'); }
+        };
+
+        async function deleteNodeRecursive(nodePath) {
+            const nodeRef = doc(db, nodePath);
+            const childrenRef = collection(nodeRef, 'sub-nodes');
+            const snapshot = await getDocs(childrenRef);
+            for (const docSnap of snapshot.docs) { await deleteNodeRecursive(`${nodePath}/sub-nodes/${docSnap.id}`); }
+            await deleteDoc(nodeRef);
+        }
+
+        window.openAssignNodeAdminModal = function(nodePath, nodeName) {
+            currentAssignNode = { path: nodePath, name: nodeName };
+            document.getElementById('assignNodeName').textContent = nodeName;
+            document.getElementById('nodeAdminEmail').value = '';
+            document.getElementById('assignNodeAdminModal').classList.add('show');
+        };
+
+        async function confirmAssignNodeAdmin() {
+            if (!currentAssignNode) return;
+            const email = document.getElementById('nodeAdminEmail').value.trim();
+            if (!email) { showToast('Please enter an email', 'error'); return; }
+            try {
+                await setDoc(doc(db, currentAssignNode.path), { adminEmails: arrayUnion(email), updatedAt: serverTimestamp() }, { merge: true });
+                closeModal('assignNodeAdminModal');
+                showToast(`${email} assigned as admin!`, 'success');
+                await loadOrganizationData();
+            } catch (error) { showToast('Error: ' + error.message, 'error'); }
+        }
+
+        // Member Management
+        window.makeAdmin = async function(email) {
+            if (!confirm(`Make ${email} an admin?`)) return;
+            try {
+                await setDoc(doc(db, 'hierarchies', selectedOrgId), { adminEmails: arrayUnion(email), updatedAt: serverTimestamp() }, { merge: true });
+                showToast(`${email} is now an admin!`, 'success');
+                await checkAdminStatus();
+            } catch (error) { showToast('Error: ' + error.message, 'error'); }
+        };
+
+        window.removeAdmin = async function(email) {
+            if (!confirm(`Remove ${email} as admin?`)) return;
+            try {
+                await setDoc(doc(db, 'hierarchies', selectedOrgId), { adminEmails: arrayRemove(email), updatedAt: serverTimestamp() }, { merge: true });
+                showToast(`${email} removed as admin!`, 'success');
+                await checkAdminStatus();
+            } catch (error) { showToast('Error: ' + error.message, 'error'); }
+        };
+
+        window.removeMember = async function(email) {
+            if (!confirm(`Remove ${email} from the organization?`)) return;
+            try {
+                await setDoc(doc(db, 'hierarchies', selectedOrgId), { members: arrayRemove(email), adminEmails: arrayRemove(email), updatedAt: serverTimestamp() }, { merge: true });
+                showToast(`${email} removed!`, 'success');
+                await checkAdminStatus();
+            } catch (error) { showToast('Error: ' + error.message, 'error'); }
+        };
+
+        // Problem/Announcement Actions
+        window.viewProblem = function(problemId) {
+            const problem = allProblems.find(p => p.id === problemId);
+            if (!problem) return;
+            document.getElementById('modalTitle').textContent = 'Problem Details';
+            document.getElementById('modalContent').innerHTML = `
+                <div class="detail-row"><span class="detail-label">Title</span><span class="detail-value">${problem.title || 'Untitled'}</span></div>
+                <div class="detail-row"><span class="detail-label">Description</span><span class="detail-value">${problem.description || 'No description'}</span></div>
+                <div class="detail-row"><span class="detail-label">Priority</span><span class="detail-value"><span class="status-badge ${problem.priority || 'medium'}">${problem.priority || 'medium'}</span></span></div>
+                <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value"><span class="status-badge ${problem.status || 'pending'}">${problem.status || 'pending'}</span></span></div>
+                <div class="detail-row"><span class="detail-label">Created By</span><span class="detail-value">${problem.createdBy || 'Unknown'}</span></div>`;
+            document.getElementById('detailsModal').classList.add('show');
+        };
+
+        window.viewAnnouncement = function(announcementId) {
+            const announcement = allAnnouncements.find(a => a.id === announcementId);
+            if (!announcement) return;
+            document.getElementById('modalTitle').textContent = 'Announcement Details';
+            document.getElementById('modalContent').innerHTML = `
+                <div class="detail-row"><span class="detail-label">Title</span><span class="detail-value">${announcement.title || 'Untitled'}</span></div>
+                <div class="detail-row"><span class="detail-label">Content</span><span class="detail-value">${announcement.content || announcement.description || 'No content'}</span></div>
+                <div class="detail-row"><span class="detail-label">Created By</span><span class="detail-value">${announcement.createdBy || 'Unknown'}</span></div>`;
+            document.getElementById('detailsModal').classList.add('show');
+        };
+
+        window.markSolved = async function(problemId) {
+            try {
+                await setDoc(doc(db, 'problems', problemId), { status: 'solved', solvedAt: serverTimestamp(), solvedBy: currentUser.email }, { merge: true });
+                showToast('Problem marked as solved!', 'success');
+                await loadOrganizationData();
+            } catch (error) { showToast('Error: ' + error.message, 'error'); }
+        };
+
+        window.deleteAnnouncement = async function(announcementId) {
+            if (!confirm('Delete this announcement?')) return;
+            try {
+                await deleteDoc(doc(db, 'announcements', announcementId));
+                showToast('Announcement deleted!', 'success');
+                await loadOrganizationData();
+            } catch (error) { showToast('Error: ' + error.message, 'error'); }
+        };
+
+        window.closeModal = function(modalId) { document.getElementById(modalId).classList.remove('show'); };
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = toast.querySelector('i');
+            document.getElementById('toastMessage').textContent = message;
+            toast.className = `toast show ${type}`;
+            icon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+            icon.style.color = type === 'success' ? '#10B981' : '#EF4444';
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
 </body>
 </html>

@@ -925,6 +925,65 @@
         </div>
     </div>
 
+    <!-- Edit Organization Modal -->
+    <div class="modal-overlay" id="editOrgModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Organization</h2><button class="modal-close"
+                    onclick="closeModal('editOrgModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Organization Name</label>
+                    <input type="text" class="form-input" id="editOrgName" placeholder="Organization name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Type</label>
+                    <select class="form-input" id="editOrgType">
+                        <option value="organization">Organization</option>
+                        <option value="department">Department</option>
+                        <option value="team">Team</option>
+                        <option value="academic">Academic</option>
+                        <option value="hostel">Hostel</option>
+                        <option value="sports">Sports</option>
+                        <option value="club">Club</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select class="form-input" id="editOrgStatus">
+                        <option value="pending">Pending</option>
+                        <option value="active">Active</option>
+                        <option value="suspended">Suspended</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('editOrgModal')">Cancel</button>
+                <button class="btn-primary" id="confirmEditBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteOrgModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Delete Organization</h2><button class="modal-close"
+                    onclick="closeModal('deleteOrgModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="color:#EF4444;margin-bottom:1rem;"><i class="fas fa-exclamation-triangle"></i> Warning: This action cannot be undone!</p>
+                <p>Are you sure you want to delete <strong id="deleteOrgName"></strong>?</p>
+                <p style="margin-top:0.5rem;color:#6B7280;font-size:0.9rem;">This will also delete all sub-nodes and remove all members.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('deleteOrgModal')">Cancel</button>
+                <button class="btn-primary" style="background:linear-gradient(135deg, #EF4444, #DC2626);" id="confirmDeleteBtn">Delete Organization</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast -->
     <div class="toast" id="toast"><i class="fas fa-check-circle" style="color:#10B981;"></i><span
             id="toastMessage">Success!</span></div>
@@ -932,7 +991,8 @@
     <!-- Firebase Integration -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, getDoc, serverTimestamp, arrayUnion, arrayRemove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, getDoc, updateDoc, serverTimestamp, arrayUnion, arrayRemove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyBsuZL4U2H66C9tUKN91KXMm-l5umOa1vY",
@@ -945,20 +1005,63 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
+
+        // Super Admin credentials
+        const SUPER_ADMIN_EMAIL = 'admin@flowlink.edu';
+        const SUPER_ADMIN_PASSWORD = 'drona@admin';
 
         let organizations = [];
         let pendingApprovals = [];
         let currentOrgForAssign = null;
+        let isAuthenticated = false;
 
-        // Check super admin auth
+        // Check super admin auth from session
         if (sessionStorage.getItem('superAdminAuth') !== 'true') {
             window.location.href = 'login.html';
+        }
+
+        // Authenticate with Firebase as Super Admin
+        async function authenticateSuperAdmin() {
+            try {
+                // Check if already signed in
+                const currentUser = auth.currentUser;
+                if (currentUser && currentUser.email === SUPER_ADMIN_EMAIL) {
+                    console.log('Already authenticated as Super Admin:', currentUser.email);
+                    isAuthenticated = true;
+                    return true;
+                }
+
+                // Sign in with super admin credentials
+                console.log('Attempting to sign in as Super Admin...');
+                const userCredential = await signInWithEmailAndPassword(auth, SUPER_ADMIN_EMAIL, SUPER_ADMIN_PASSWORD);
+                console.log('Super Admin authenticated:', userCredential.user.email);
+                isAuthenticated = true;
+                return true;
+            } catch (error) {
+                console.error('Super Admin authentication error:', error.code, error.message);
+                
+                // Show specific error message
+                if (error.code === 'auth/user-not-found') {
+                    showToast('Super Admin user not found. Please create user admin@flowlink.edu in Firebase Auth.', 'error');
+                } else if (error.code === 'auth/wrong-password') {
+                    showToast('Wrong password for Super Admin account.', 'error');
+                } else if (error.code === 'auth/invalid-credential') {
+                    showToast('Invalid credentials. Please create user admin@flowlink.edu with password drona@admin in Firebase Auth.', 'error');
+                } else {
+                    showToast('Authentication error: ' + error.message, 'error');
+                }
+                return false;
+            }
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
             setupNavigation();
             setupEventListeners();
+            
+            // Authenticate first, then load data
+            await authenticateSuperAdmin();
             await loadAllData();
         });
 
@@ -978,7 +1081,12 @@
         }
 
         function setupEventListeners() {
-            document.getElementById('signOutBtn').addEventListener('click', () => {
+            document.getElementById('signOutBtn').addEventListener('click', async () => {
+                try {
+                    await signOut(auth);
+                } catch (e) {
+                    console.log('Sign out error:', e);
+                }
                 sessionStorage.removeItem('superAdminAuth');
                 window.location.href = 'login.html';
             });
@@ -989,11 +1097,16 @@
         }
 
         async function loadAllData() {
-            await Promise.all([loadOrganizations(), loadPendingApprovals()]);
-            updateMetrics();
-            renderPendingApprovals();
-            renderOrganizations();
-            renderAdminControl();
+            try {
+                await Promise.all([loadOrganizations(), loadPendingApprovals()]);
+                updateMetrics();
+                renderPendingApprovals();
+                renderOrganizations();
+                renderAdminControl();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showToast('Error loading data: ' + error.message, 'error');
+            }
         }
 
         async function fetchHierarchiesRecursive(colRef, parentPath = '') {
@@ -1008,7 +1121,9 @@
                     node.children = await fetchHierarchiesRecursive(childrenRef, nodePath);
                     nodes.push(node);
                 }
-            } catch (e) { }
+            } catch (e) {
+                console.error('Error fetching hierarchies:', e);
+            }
             return nodes;
         }
 
@@ -1025,56 +1140,80 @@
 
         async function loadOrganizations() {
             try {
+                console.log('Loading organizations...');
+                console.log('Current auth user:', auth.currentUser?.email);
                 const hierarchiesRef = collection(db, 'hierarchies');
                 const hierarchyTree = await fetchHierarchiesRecursive(hierarchiesRef);
                 organizations = flattenHierarchy(hierarchyTree);
+                console.log('Loaded organizations:', organizations.length, organizations);
             } catch (error) {
-                console.error('Error loading organizations:', error);
+                console.error('Error loading organizations:', error.code, error.message);
+                showToast('Error loading organizations: ' + error.message, 'error');
                 organizations = [];
             }
         }
 
         async function loadPendingApprovals() {
             try {
+                console.log('Loading pending approvals...');
+                console.log('Current auth user:', auth.currentUser?.email);
                 const pendingRef = collection(db, 'pendingApprovals');
                 const snapshot = await getDocs(pendingRef);
-                pendingApprovals = snapshot.docs.map(d => ({ id: d.id, docRef: d.ref, ...d.data() }));
+                // Filter to only show organization requests (or legacy requests without requestType)
+                // Super Admin should NOT see join or branch requests - those go to Org/Node Admins
+                pendingApprovals = snapshot.docs
+                    .map(d => ({ id: d.id, docRef: d.ref, ...d.data() }))
+                    .filter(p => !p.requestType || p.requestType === 'organization');
+                console.log('Loaded organization pending approvals:', pendingApprovals.length, pendingApprovals);
             } catch (error) {
-                console.error('Error loading pending approvals:', error);
+                console.error('Error loading pending approvals:', error.code, error.message);
+                showToast('Error loading pending approvals: ' + error.message, 'error');
                 pendingApprovals = [];
             }
         }
 
         function updateMetrics() {
+            // Only count root-level organizations for Super Admin view
             const rootOrgs = organizations.filter(o => o.level === 0);
             const allMembers = new Set();
             const allAdmins = new Set();
-            organizations.forEach(org => {
+            // Only count members/admins from root organizations
+            rootOrgs.forEach(org => {
                 (org.members || []).forEach(m => allMembers.add(m));
                 (org.adminEmails || []).forEach(a => allAdmins.add(a));
             });
             document.getElementById('totalOrgs').textContent = rootOrgs.length;
             document.getElementById('totalUsers').textContent = allMembers.size;
             document.getElementById('totalAdmins').textContent = allAdmins.size;
+            // Only count organization-level pending approvals
             document.getElementById('pendingCount').textContent = pendingApprovals.length;
         }
 
         function renderPendingApprovals() {
             const container = document.getElementById('pendingApprovalsTable');
             if (pendingApprovals.length === 0) {
-                container.innerHTML = '<div class="empty-state"><i class="fas fa-check-circle"></i><h3>No Pending Approvals</h3><p>All organizations have been reviewed.</p></div>';
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-check-circle"></i><h3>No Pending Organization Requests</h3><p>All organization requests have been reviewed.</p><p style="color:#6B7280;font-size:0.85rem;margin-top:0.5rem;">Note: Join and branch requests are handled by Organization Admins.</p></div>';
                 return;
             }
-            container.innerHTML = `<table><thead><tr><th>Organization</th><th>Type</th><th>Requested By</th><th>Date</th><th>Actions</th></tr></thead><tbody>${pendingApprovals.map(p => `<tr><td><strong>${p.name || p.orgName || 'Unknown'}</strong></td><td>${p.type || 'organization'}</td><td>${p.createdBy || p.requestedBy || 'Unknown'}</td><td>${p.createdAt ? new Date(p.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</td><td><button class="action-btn approve" onclick="approveOrg('${p.id}')">Approve</button><button class="action-btn reject" onclick="rejectOrg('${p.id}')">Reject</button></td></tr>`).join('')}</tbody></table>`;
+            container.innerHTML = `<table><thead><tr><th>Organization Name</th><th>Type</th><th>Requested By</th><th>Date</th><th>Actions</th></tr></thead><tbody>${pendingApprovals.map(p => `<tr><td><strong>${p.organizationName || p.name || p.orgName || 'Unknown'}</strong></td><td>${p.organizationType || p.type || 'organization'}</td><td>${p.requesterEmail || p.createdBy || p.requestedBy || 'Unknown'}</td><td>${p.createdAt ? new Date(p.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</td><td><button class="action-btn approve" onclick="approveOrg('${p.id}')">Approve</button><button class="action-btn reject" onclick="rejectOrg('${p.id}')">Reject</button></td></tr>`).join('')}</tbody></table>`;
         }
 
         function renderOrganizations() {
             const container = document.getElementById('organizationsTable');
-            if (organizations.length === 0) {
+            // Only show root-level organizations - sub-nodes are managed by Org Admins
+            const rootOrgs = organizations.filter(o => o.level === 0);
+            if (rootOrgs.length === 0) {
                 container.innerHTML = '<div class="empty-state"><i class="fas fa-building"></i><h3>No Organizations</h3><p>No organizations have been created yet.</p></div>';
                 return;
             }
-            container.innerHTML = `<table><thead><tr><th>Organization</th><th>Type</th><th>Members</th><th>Status</th><th>Actions</th></tr></thead><tbody>${organizations.map(org => `<tr><td><strong style="padding-left:${org.level * 20}px">${org.level > 0 ? '└ ' : ''}${org.name}</strong></td><td>${org.type || 'organization'}</td><td>${(org.members || []).length}</td><td><span class="status-badge ${org.status || 'pending'}">${org.status || 'pending'}</span></td><td><button class="action-btn view" onclick="viewOrgDetails('${org.id}')">View</button>${org.status === 'pending' ? `<button class="action-btn approve" onclick="approveOrgDirect('${org.path}')">Approve</button>` : ''}</td></tr>`).join('')}</tbody></table>`;
+            container.innerHTML = `<table><thead><tr><th>Organization</th><th>Type</th><th>Members</th><th>Admins</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rootOrgs.map(org => `<tr><td><strong>${org.name}</strong></td><td>${org.type || 'organization'}</td><td>${(org.members || []).length}</td><td>${(org.adminEmails || []).length > 0 ? org.adminEmails.join(', ') : '<em>None</em>'}</td><td><span class="status-badge ${org.status || 'pending'}">${org.status || 'pending'}</span></td><td>
+                <button class="action-btn view" onclick="viewOrgDetails('${org.id}')">View</button>
+                <button class="action-btn assign" onclick="openEditOrgModal('${org.id}', '${org.path}')">Edit</button>
+                ${org.status === 'pending' ? `<button class="action-btn approve" onclick="approveOrgDirect('${org.path}')">Approve</button>` : ''}
+                ${org.status === 'active' ? `<button class="action-btn reject" onclick="suspendOrg('${org.path}')">Suspend</button>` : ''}
+                ${org.status === 'suspended' ? `<button class="action-btn approve" onclick="approveOrgDirect('${org.path}')">Reactivate</button>` : ''}
+                <button class="action-btn reject" onclick="confirmDeleteOrg('${org.id}', '${org.name}', '${org.path}')">Delete</button>
+            </td></tr>`).join('')}</tbody></table>`;
         }
 
         function renderAdminControl() {
@@ -1084,7 +1223,12 @@
                 container.innerHTML = '<div class="empty-state"><i class="fas fa-user-shield"></i><h3>No Organizations</h3><p>Create organizations first to assign admins.</p></div>';
                 return;
             }
-            container.innerHTML = `<table><thead><tr><th>Organization</th><th>Current Admins</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rootOrgs.map(org => `<tr><td><strong>${org.name}</strong></td><td>${(org.adminEmails || []).length > 0 ? org.adminEmails.join(', ') : '<em>No admins assigned</em>'}</td><td><span class="status-badge ${org.status || 'pending'}">${org.status || 'pending'}</span></td><td><button class="action-btn assign" onclick="openAssignModal('${org.id}', '${org.name}', '${org.path}')">Assign Admin</button></td></tr>`).join('')}</tbody></table>`;
+            container.innerHTML = `<table><thead><tr><th>Organization</th><th>Current Admins</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rootOrgs.map(org => `<tr>
+                <td><strong>${org.name}</strong></td>
+                <td>${(org.adminEmails || []).length > 0 ? org.adminEmails.map(email => `<span style="display:inline-flex;align-items:center;gap:0.25rem;background:rgba(139,92,246,0.1);padding:0.25rem 0.5rem;border-radius:12px;margin:0.125rem;font-size:0.85rem;">${email}<button onclick="removeAdmin('${org.path}', '${email}')" style="background:none;border:none;color:#EF4444;cursor:pointer;padding:0 0.25rem;font-size:0.9rem;" title="Remove admin">&times;</button></span>`).join('') : '<em>No admins assigned</em>'}</td>
+                <td><span class="status-badge ${org.status || 'pending'}">${org.status || 'pending'}</span></td>
+                <td><button class="action-btn assign" onclick="openAssignModal('${org.id}', '${org.name}', '${org.path}')">Assign Admin</button></td>
+            </tr>`).join('')}</tbody></table>`;
         }
 
         window.closeModal = function (modalId) { document.getElementById(modalId).classList.remove('show'); };
@@ -1107,52 +1251,139 @@
             const email = document.getElementById('adminEmailInput').value.trim();
             if (!email || !currentOrgForAssign) { showToast('Please enter a valid email', 'error'); return; }
             try {
-                const orgRef = doc(db, currentOrgForAssign.path);
+                console.log('Assigning admin:', email, 'to org:', currentOrgForAssign);
+                // Ensure path is correct - should be hierarchies/{orgId}
+                let orgPath = currentOrgForAssign.path;
+                if (!orgPath.startsWith('hierarchies/')) {
+                    orgPath = `hierarchies/${currentOrgForAssign.id}`;
+                }
+                console.log('Using path:', orgPath);
+                
+                const orgRef = doc(db, orgPath);
                 await setDoc(orgRef, { adminEmails: arrayUnion(email), updatedAt: serverTimestamp() }, { merge: true });
                 showToast(`Admin ${email} assigned successfully!`, 'success');
                 closeModal('assignAdminModal');
                 await loadAllData();
             } catch (error) {
                 console.error('Error assigning admin:', error);
-                showToast('Failed to assign admin', 'error');
+                showToast('Failed to assign admin: ' + error.message, 'error');
             }
         }
+
+        // Remove admin from organization
+        window.removeAdmin = async function (orgPath, email) {
+            if (!confirm(`Remove ${email} as admin?`)) return;
+            
+            try {
+                const orgRef = doc(db, orgPath);
+                await setDoc(orgRef, { 
+                    adminEmails: arrayRemove(email), 
+                    updatedAt: serverTimestamp() 
+                }, { merge: true });
+                showToast(`Admin ${email} removed successfully!`, 'success');
+                await loadAllData();
+            } catch (error) {
+                console.error('Error removing admin:', error);
+                showToast('Failed to remove admin', 'error');
+            }
+        };
 
         window.approveOrg = async function (approvalId) {
             try {
                 const approval = pendingApprovals.find(p => p.id === approvalId);
                 if (!approval) return;
-                if (approval.hierarchyPath) {
-                    const orgRef = doc(db, approval.hierarchyPath);
-                    await setDoc(orgRef, { status: 'active', approvedAt: serverTimestamp() }, { merge: true });
+                
+                const orgName = approval.organizationName || approval.name || approval.orgName;
+                const orgId = orgName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                const userEmail = approval.requesterEmail || approval.createdBy;
+                
+                // Update user's personal hierarchy status to active
+                if (userEmail) {
+                    const userHierarchyRef = doc(db, 'users', userEmail, 'hierarchies', orgId);
+                    await setDoc(userHierarchyRef, {
+                        status: 'active',
+                        approvedAt: serverTimestamp(),
+                        approvedBy: SUPER_ADMIN_EMAIL
+                    }, { merge: true });
                 }
-                const approvalRecordRef = doc(db, 'superAdmin', 'approvals');
-                await setDoc(approvalRecordRef, { approvedIds: arrayUnion(approvalId), updatedAt: serverTimestamp() }, { merge: true });
+                
+                // Create/update in global hierarchies collection
+                const orgRef = doc(db, 'hierarchies', orgId);
+                const existingOrg = await getDoc(orgRef);
+                
+                if (existingOrg.exists()) {
+                    // Organization already exists - just update status and add member
+                    await setDoc(orgRef, {
+                        status: 'active',
+                        members: arrayUnion(userEmail),
+                        approvedAt: serverTimestamp(),
+                        approvedBy: SUPER_ADMIN_EMAIL
+                    }, { merge: true });
+                } else {
+                    // Create new organization
+                    await setDoc(orgRef, {
+                        name: orgName,
+                        type: approval.organizationType || approval.type || 'organization',
+                        status: 'active',
+                        members: [userEmail],
+                        adminEmails: [],
+                        createdBy: userEmail,
+                        createdAt: approval.createdAt || serverTimestamp(),
+                        approvedAt: serverTimestamp(),
+                        approvedBy: SUPER_ADMIN_EMAIL
+                    });
+                }
+                
+                // Delete from pending approvals
                 await deleteDoc(doc(db, 'pendingApprovals', approvalId));
+                
                 showToast('Organization approved!', 'success');
                 await loadAllData();
+                
+                // Prompt to assign admin
+                setTimeout(() => {
+                    if (confirm(`Organization "${orgName}" approved! Would you like to assign an admin now?`)) {
+                        openAssignModal(orgId, orgName, `hierarchies/${orgId}`);
+                    }
+                }, 500);
             } catch (error) {
                 console.error('Error approving:', error);
-                showToast('Failed to approve', 'error');
+                showToast('Failed to approve: ' + error.message, 'error');
             }
         };
 
         window.rejectOrg = async function (approvalId) {
+            const reason = prompt('Enter rejection reason (optional):');
             try {
                 const approval = pendingApprovals.find(p => p.id === approvalId);
                 if (!approval) return;
-                if (approval.hierarchyPath) {
-                    const orgRef = doc(db, approval.hierarchyPath);
-                    await setDoc(orgRef, { status: 'suspended', rejectedAt: serverTimestamp() }, { merge: true });
+                
+                const orgName = approval.organizationName || approval.name || approval.orgName;
+                const orgId = orgName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                const userEmail = approval.requesterEmail || approval.createdBy;
+                
+                // Update user's personal hierarchy status to rejected
+                if (userEmail) {
+                    const userHierarchyRef = doc(db, 'users', userEmail, 'hierarchies', orgId);
+                    const userHierarchyDoc = await getDoc(userHierarchyRef);
+                    if (userHierarchyDoc.exists()) {
+                        await setDoc(userHierarchyRef, {
+                            status: 'rejected',
+                            rejectedAt: serverTimestamp(),
+                            rejectedBy: SUPER_ADMIN_EMAIL,
+                            rejectionReason: reason || 'No reason provided'
+                        }, { merge: true });
+                    }
                 }
-                const approvalRecordRef = doc(db, 'superAdmin', 'approvals');
-                await setDoc(approvalRecordRef, { rejectedIds: arrayUnion(approvalId), updatedAt: serverTimestamp() }, { merge: true });
+                
+                // Delete from pending approvals
                 await deleteDoc(doc(db, 'pendingApprovals', approvalId));
-                showToast('Organization rejected', 'success');
+                
+                showToast('Organization request rejected', 'success');
                 await loadAllData();
             } catch (error) {
                 console.error('Error rejecting:', error);
-                showToast('Failed to reject', 'error');
+                showToast('Failed to reject: ' + error.message, 'error');
             }
         };
 
@@ -1167,6 +1398,128 @@
                 showToast('Failed to approve', 'error');
             }
         };
+
+        // Suspend organization
+        window.suspendOrg = async function (orgPath) {
+            try {
+                const orgRef = doc(db, orgPath);
+                await setDoc(orgRef, { status: 'suspended', suspendedAt: serverTimestamp() }, { merge: true });
+                showToast('Organization suspended!', 'success');
+                await loadAllData();
+            } catch (error) {
+                console.error('Error suspending:', error);
+                showToast('Failed to suspend', 'error');
+            }
+        };
+
+        // Edit organization modal
+        let currentOrgForEdit = null;
+        
+        window.openEditOrgModal = function (orgId, orgPath) {
+            const org = organizations.find(o => o.id === orgId);
+            if (!org) return;
+            
+            currentOrgForEdit = { id: orgId, path: orgPath, org: org };
+            document.getElementById('editOrgName').value = org.name || '';
+            document.getElementById('editOrgType').value = org.type || 'organization';
+            document.getElementById('editOrgStatus').value = org.status || 'pending';
+            document.getElementById('editOrgModal').classList.add('show');
+        };
+
+        // Save edited organization
+        document.getElementById('confirmEditBtn').addEventListener('click', async function() {
+            if (!currentOrgForEdit) return;
+            
+            const newName = document.getElementById('editOrgName').value.trim();
+            const newType = document.getElementById('editOrgType').value;
+            const newStatus = document.getElementById('editOrgStatus').value;
+            
+            if (!newName) {
+                showToast('Please enter a name', 'error');
+                return;
+            }
+            
+            try {
+                const orgRef = doc(db, currentOrgForEdit.path);
+                await setDoc(orgRef, {
+                    name: newName,
+                    type: newType,
+                    status: newStatus,
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+                
+                // Also update nameAliases if name changed
+                if (newName !== currentOrgForEdit.org.name) {
+                    await setDoc(orgRef, {
+                        nameAliases: arrayUnion(newName)
+                    }, { merge: true });
+                }
+                
+                showToast('Organization updated successfully!', 'success');
+                closeModal('editOrgModal');
+                currentOrgForEdit = null;
+                await loadAllData();
+            } catch (error) {
+                console.error('Error updating organization:', error);
+                showToast('Failed to update organization', 'error');
+            }
+        });
+
+        // Delete organization
+        let currentOrgForDelete = null;
+        
+        window.confirmDeleteOrg = function (orgId, orgName, orgPath) {
+            currentOrgForDelete = { id: orgId, name: orgName, path: orgPath };
+            document.getElementById('deleteOrgName').textContent = orgName;
+            document.getElementById('deleteOrgModal').classList.add('show');
+        };
+
+        // Recursively delete organization and all sub-nodes
+        async function deleteOrgRecursive(orgPath) {
+            try {
+                const orgRef = doc(db, orgPath);
+                
+                // First delete all sub-nodes
+                const subNodesRef = collection(orgRef, 'sub-nodes');
+                const snapshot = await getDocs(subNodesRef);
+                
+                for (const docSnap of snapshot.docs) {
+                    await deleteOrgRecursive(`${orgPath}/sub-nodes/${docSnap.id}`);
+                }
+                
+                // Then delete the org itself
+                await deleteDoc(orgRef);
+            } catch (error) {
+                console.error('Error in recursive delete:', error);
+                throw error;
+            }
+        }
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+            if (!currentOrgForDelete) return;
+            
+            try {
+                await deleteOrgRecursive(currentOrgForDelete.path);
+                
+                // Also remove any pending approvals for this org
+                const pendingRef = collection(db, 'pendingApprovals');
+                const snapshot = await getDocs(pendingRef);
+                for (const docSnap of snapshot.docs) {
+                    const data = docSnap.data();
+                    if (data.hierarchyPath && data.hierarchyPath.startsWith(currentOrgForDelete.path)) {
+                        await deleteDoc(docSnap.ref);
+                    }
+                }
+                
+                showToast('Organization deleted successfully!', 'success');
+                closeModal('deleteOrgModal');
+                currentOrgForDelete = null;
+                await loadAllData();
+            } catch (error) {
+                console.error('Error deleting organization:', error);
+                showToast('Failed to delete organization', 'error');
+            }
+        });
 
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');

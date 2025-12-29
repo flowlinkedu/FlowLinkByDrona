@@ -581,6 +581,10 @@
                 <p>Visualize your affiliations and manage your network nodes.</p>
             </div>
             <div class="header-actions">
+                <button class="btn btn-outline" id="browseOrgsBtn" style="background: rgba(139, 92, 246, 0.1); border-color: #8B5CF6; color: #8B5CF6;">
+                    <i data-lucide="search" style="width: 16px; height: 16px;"></i>
+                    Browse & Join
+                </button>
                 <button class="btn btn-outline" id="addNodeBtn">
                     <i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i>
                     Add Node
@@ -589,6 +593,26 @@
                     <i data-lucide="check" style="width: 16px; height: 16px;"></i>
                     Done
                 </button>
+            </div>
+        </div>
+
+        <!-- Browse Organizations Section (Hidden by default) -->
+        <div class="card" id="browseSection" style="display: none; margin-bottom: 1.5rem;">
+            <div style="padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 class="font-headline" style="font-size: 1.25rem; font-weight: 600;">Discover Organizations</h2>
+                    <button class="btn btn-ghost" id="closeBrowseBtn" style="padding: 0.25rem;">
+                        <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+                    </button>
+                </div>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <input type="text" class="form-input" id="searchOrgsInput" placeholder="Search organizations..." style="max-width: 400px;">
+                </div>
+                <div id="browseOrgsList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
+                    <div class="loading-spinner" style="grid-column: 1/-1; text-align: center; padding: 2rem;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; color: var(--primary);"></i>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -609,11 +633,17 @@
                 <div class="empty-state" id="emptyState" style="display: none;">
                     <i class="fas fa-sitemap"></i>
                     <h3>No Network Setup Yet</h3>
-                    <p>You haven't set up your network yet. Create your first node to build your affiliation tree.</p>
-                    <button class="btn btn-primary" id="createFirstBtn">
-                        <i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i>
-                        Create First Node
-                    </button>
+                    <p>You haven't set up your network yet. Browse existing organizations or create your own.</p>
+                    <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+                        <button class="btn btn-primary" id="browseFirstBtn" style="background: linear-gradient(135deg, #8B5CF6, #A78BFA);">
+                            <i data-lucide="search" style="width: 16px; height: 16px;"></i>
+                            Browse Organizations
+                        </button>
+                        <button class="btn btn-outline" id="createFirstBtn">
+                            <i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i>
+                            Create New
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Flowchart -->
@@ -744,6 +774,7 @@
 
     // Recursive fetch using 'sub-nodes' collection for children
     // Path: /users/{email}/hierarchies/{orgId}/sub-nodes/{nodeId}/sub-nodes/{subNodeId}...
+    // Status is now stored directly in user's hierarchy document
     async function fetchNodesRecursive(colRef, basePath) {
         const nodes = [];
         try {
@@ -753,17 +784,21 @@
                 const data = docSnap.data();
                 const nodePath = `${basePath}/${docSnap.id}`;
 
-                // Get status from global hierarchy (in case super admin updated it)
-                const globalPath = getGlobalHierarchyPath(nodePath);
+                // Use status directly from user's hierarchy document
                 let status = data.status || 'pending';
+                let members = data.members || [];
+                
+                // Optionally get members from global hierarchy for display
                 try {
+                    const globalPath = getGlobalHierarchyPath(nodePath);
                     const globalDocRef = doc(db, globalPath);
                     const globalDoc = await getDoc(globalDocRef);
                     if (globalDoc.exists()) {
-                        status = globalDoc.data().status || status;
+                        const globalData = globalDoc.data();
+                        members = globalData.members || members;
                     }
                 } catch (e) {
-                    // Use local status if global fetch fails
+                    // Use local data if global fetch fails
                 }
 
                 // Fetch children from 'sub-nodes' collection
@@ -775,6 +810,7 @@
                     name: data.name || docSnap.id,
                     type: data.type || 'organization',
                     admins: data.adminEmails || [],
+                    members: members,
                     status: status,
                     path: nodePath,
                     docRef: docSnap.ref,
@@ -832,9 +868,12 @@
         wrapper.className = 'flowchart-node';
 
         // Determine status display
-        const statusClass = node.status === 'active' ? 'active' : (node.status === 'suspended' ? 'suspended' : 'pending');
-        const statusText = node.status === 'active' ? 'Approved' : (node.status === 'suspended' ? 'Rejected' : 'Pending Approval');
-        const statusColor = node.status === 'active' ? '#10B981' : (node.status === 'suspended' ? '#EF4444' : '#F59E0B');
+        const statusClass = node.status === 'active' ? 'active' : (node.status === 'rejected' ? 'rejected' : 'pending');
+        const statusText = node.status === 'active' ? 'Approved' : (node.status === 'rejected' ? 'Rejected' : 'Pending Approval');
+        const statusColor = node.status === 'active' ? '#10B981' : (node.status === 'rejected' ? '#EF4444' : '#F59E0B');
+
+        // Check if user is already a member
+        const isMember = node.members && node.members.includes(currentUser.email);
 
         const card = document.createElement('div');
         card.className = `node-card ${isRoot ? 'root' : ''}`;
@@ -844,9 +883,16 @@
                 </div>
                 <div class="node-meta">${node.type} • <span style="color: ${statusColor}; font-weight: 600;">${statusText}</span></div>
                 <div class="node-actions">
-                    <button class="btn btn-ghost btn-sm add-child-btn" title="Add Child">
-                        <i data-lucide="plus" style="width: 14px; height: 14px;"></i>
-                    </button>
+                    ${node.status === 'active' ? `
+                        <button class="btn btn-ghost btn-sm add-child-btn" title="Request Sub-Node">
+                            <i data-lucide="plus" style="width: 14px; height: 14px;"></i>
+                        </button>
+                        ${!isMember ? `
+                            <button class="btn btn-ghost btn-sm join-btn" title="Request to Join" style="color: #8B5CF6;">
+                                <i data-lucide="user-plus" style="width: 14px; height: 14px;"></i>
+                            </button>
+                        ` : ''}
+                    ` : ''}
                     <button class="btn btn-ghost btn-sm edit-btn" title="Edit">
                         <i data-lucide="pencil" style="width: 14px; height: 14px;"></i>
                     </button>
@@ -857,10 +903,21 @@
             `;
 
         // Event listeners
-        card.querySelector('.add-child-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            openAddChildModal(node);
-        });
+        const addChildBtn = card.querySelector('.add-child-btn');
+        if (addChildBtn) {
+            addChildBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openAddChildModal(node);
+            });
+        }
+
+        const joinBtn = card.querySelector('.join-btn');
+        if (joinBtn) {
+            joinBtn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                await handleJoinRequest(node);
+            });
+        }
 
         card.querySelector('.edit-btn').addEventListener('click', (e) => {
             e.stopPropagation();
@@ -907,6 +964,30 @@
         return wrapper;
     }
 
+    // Handle join request
+    async function handleJoinRequest(node) {
+        // Get the org ID from the path
+        const pathParts = node.path.split('/');
+        const orgId = pathParts[pathParts.indexOf('hierarchies') + 1];
+        const globalPath = getGlobalHierarchyPath(node.path);
+        
+        // Check if already has pending request
+        const hasPending = await checkPendingRequest(globalPath, 'join');
+        if (hasPending) {
+            showToast('You already have a pending join request for this node.', 'error');
+            return;
+        }
+        
+        if (!confirm(`Request to join "${node.name}"? An admin will review your request.`)) return;
+        
+        try {
+            await createJoinRequest(orgId, globalPath, node.name);
+            showToast('Join request submitted! Waiting for admin approval.', 'success');
+        } catch (error) {
+            showToast(error.message, 'error');
+        }
+    }
+
     // Sanitize name for document ID
     function sanitizeName(name) {
         return name.toLowerCase().trim()
@@ -919,8 +1000,8 @@
     // Modal functions
     function openAddModal() {
         editingNode = null;
-        parentDocRef = null; // Root level - will create in hierarchies collection
-        document.getElementById('modalTitle').textContent = 'Add Organization';
+        parentDocRef = null; // Root level - will create organization request
+        document.getElementById('modalTitle').textContent = 'Request New Organization';
         document.getElementById('nodeName').value = '';
         document.getElementById('nodeType').value = 'organization';
         document.getElementById('nodeNameError').style.display = 'none';
@@ -930,8 +1011,8 @@
 
     function openAddChildModal(parentNode) {
         editingNode = null;
-        parentDocRef = parentNode.docRef; // Will create in parent's children collection
-        document.getElementById('modalTitle').textContent = 'Add Sub-node';
+        parentDocRef = parentNode.docRef; // Will create branch request
+        document.getElementById('modalTitle').textContent = 'Request New Sub-Node';
         document.getElementById('nodeName').value = '';
         document.getElementById('nodeType').value = 'department';
         document.getElementById('nodeNameError').style.display = 'none';
@@ -973,8 +1054,218 @@
     // Just removes the users/{email}/ prefix
     function getGlobalHierarchyPath(userPath) {
         const parts = userPath.split('/');
+        // If path starts with 'users', remove users/{email}/ prefix
         // parts[0] = 'users', parts[1] = email, parts[2] = 'hierarchies', rest is the path
-        return parts.slice(2).join('/');
+        if (parts[0] === 'users') {
+            return parts.slice(2).join('/');
+        }
+        // If path already starts with 'hierarchies', return as-is
+        if (parts[0] === 'hierarchies') {
+            return userPath;
+        }
+        // Otherwise, assume it's just the org path and prepend 'hierarchies/'
+        return `hierarchies/${userPath}`;
+    }
+
+    // Find the appropriate admin for a node (approval chain)
+    async function findApproverForNode(orgId, nodePath) {
+        try {
+            // Check if target node has an admin
+            const nodeDoc = await getDoc(doc(db, nodePath));
+            if (nodeDoc.exists() && nodeDoc.data().adminEmails?.length > 0) {
+                return nodeDoc.data().adminEmails[0];
+            }
+            
+            // Traverse up to parent nodes
+            const pathParts = nodePath.split('/sub-nodes/');
+            for (let i = pathParts.length - 1; i > 0; i--) {
+                const parentPath = pathParts.slice(0, i).join('/sub-nodes/');
+                const parentDoc = await getDoc(doc(db, parentPath));
+                if (parentDoc.exists() && parentDoc.data().adminEmails?.length > 0) {
+                    return parentDoc.data().adminEmails[0];
+                }
+            }
+            
+            // Fall back to organization admin
+            const orgDoc = await getDoc(doc(db, 'hierarchies', orgId));
+            if (orgDoc.exists() && orgDoc.data().adminEmails?.length > 0) {
+                return orgDoc.data().adminEmails[0];
+            }
+            
+            return null; // No admin found
+        } catch (error) {
+            console.error('Error finding approver:', error);
+            return null;
+        }
+    }
+
+    // Check if organization already exists (approved or pending)
+    async function checkExistingOrganization(name) {
+        const sanitizedName = sanitizeName(name);
+        
+        // Check in global hierarchies (approved orgs)
+        try {
+            const hierarchiesRef = collection(db, 'hierarchies');
+            const snapshot = await getDocs(hierarchiesRef);
+            
+            for (const docSnap of snapshot.docs) {
+                const data = docSnap.data();
+                const orgName = data.name || '';
+                const aliases = data.nameAliases || [orgName];
+                
+                // Check if name matches (case-insensitive)
+                if (orgName.toLowerCase() === name.toLowerCase() ||
+                    aliases.some(a => a.toLowerCase() === name.toLowerCase()) ||
+                    docSnap.id === sanitizedName) {
+                    return {
+                        exists: true,
+                        type: 'approved',
+                        orgId: docSnap.id,
+                        orgName: data.name,
+                        orgPath: `hierarchies/${docSnap.id}`,
+                        hasAdmin: (data.adminEmails || []).length > 0,
+                        isMember: (data.members || []).includes(currentUser.email)
+                    };
+                }
+            }
+        } catch (e) {
+            console.error('Error checking hierarchies:', e);
+        }
+        
+        // Check in pending approvals
+        try {
+            const pendingRef = collection(db, 'pendingApprovals');
+            const snapshot = await getDocs(pendingRef);
+            
+            for (const docSnap of snapshot.docs) {
+                const data = docSnap.data();
+                if (data.requestType === 'organization' && data.status === 'pending') {
+                    const pendingName = data.organizationName || data.name || '';
+                    if (pendingName.toLowerCase() === name.toLowerCase()) {
+                        return {
+                            exists: true,
+                            type: 'pending',
+                            requesterEmail: data.requesterEmail,
+                            isOwnRequest: data.requesterEmail === currentUser.email
+                        };
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('Error checking pending approvals:', e);
+        }
+        
+        return { exists: false };
+    }
+
+    // Create organization request (for Super Admin)
+    async function createOrganizationRequest(name, type) {
+        // First check if organization already exists
+        const existing = await checkExistingOrganization(name);
+        
+        if (existing.exists) {
+            if (existing.type === 'approved') {
+                if (existing.isMember) {
+                    throw new Error(`You are already a member of "${existing.orgName}".`);
+                }
+                if (!existing.hasAdmin) {
+                    throw new Error(`"${existing.orgName}" already exists but has no admin yet. Please wait for Super Admin to assign one, then use "Browse & Join" to join.`);
+                }
+                throw new Error(`"${existing.orgName}" already exists! Use "Browse & Join" to request membership instead.`);
+            } else if (existing.type === 'pending') {
+                if (existing.isOwnRequest) {
+                    throw new Error(`You already have a pending request for "${name}". Please wait for Super Admin approval.`);
+                }
+                throw new Error(`"${name}" is already pending approval by another user. Please wait for it to be approved, then use "Browse & Join" to join.`);
+            }
+        }
+        
+        const sanitizedName = sanitizeName(name);
+        const approvalId = `org-${sanitizedName}-${Date.now()}`;
+        
+        await setDoc(doc(db, 'pendingApprovals', approvalId), {
+            requestType: 'organization',
+            status: 'pending',
+            requesterEmail: currentUser.email,
+            organizationName: name,
+            organizationType: type,
+            createdAt: serverTimestamp()
+        });
+        
+        return approvalId;
+    }
+
+    // Create join request (for Node/Org Admin)
+    async function createJoinRequest(orgId, nodePath, nodeName) {
+        const approverEmail = await findApproverForNode(orgId, nodePath);
+        
+        if (!approverEmail) {
+            throw new Error('No admin found for this organization. Please wait for an admin to be assigned.');
+        }
+        
+        const approvalId = `join-${Date.now()}`;
+        await setDoc(doc(db, 'pendingApprovals', approvalId), {
+            requestType: 'join',
+            status: 'pending',
+            requesterEmail: currentUser.email,
+            targetOrgId: orgId,
+            targetNodePath: nodePath,
+            targetNodeName: nodeName,
+            assignedAdminEmail: approverEmail,
+            createdAt: serverTimestamp()
+        });
+        
+        return approvalId;
+    }
+
+    // Create branch request (for Node/Org Admin)
+    async function createBranchRequest(orgId, parentPath, parentName, proposedName, proposedType) {
+        const approverEmail = await findApproverForNode(orgId, parentPath);
+        
+        if (!approverEmail) {
+            throw new Error('No admin found for this organization. Please wait for an admin to be assigned.');
+        }
+        
+        const approvalId = `branch-${Date.now()}`;
+        await setDoc(doc(db, 'pendingApprovals', approvalId), {
+            requestType: 'branch',
+            status: 'pending',
+            requesterEmail: currentUser.email,
+            parentOrgId: orgId,
+            parentNodePath: parentPath,
+            parentNodeName: parentName,
+            proposedName: proposedName,
+            proposedType: proposedType,
+            assignedAdminEmail: approverEmail,
+            createdAt: serverTimestamp()
+        });
+        
+        return approvalId;
+    }
+
+    // Check if user has pending request for a node
+    async function checkPendingRequest(nodePath, requestType) {
+        try {
+            const pendingRef = collection(db, 'pendingApprovals');
+            const snapshot = await getDocs(pendingRef);
+            
+            for (const docSnap of snapshot.docs) {
+                const data = docSnap.data();
+                if (data.requesterEmail === currentUser.email && 
+                    data.status === 'pending' &&
+                    data.requestType === requestType) {
+                    if (requestType === 'join' && data.targetNodePath === nodePath) {
+                        return true;
+                    }
+                    if (requestType === 'branch' && data.parentNodePath === nodePath) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        } catch (error) {
+            return false;
+        }
     }
 
     // Find existing global hierarchy by name alias
@@ -1159,7 +1450,7 @@
         }
     }
 
-    // Save node
+    // Save node - now creates requests instead of direct creation
     async function saveNode() {
         const name = document.getElementById('nodeName').value.trim();
 
@@ -1177,61 +1468,88 @@
         saveBtn.textContent = 'Saving...';
 
         try {
-            let newNodePath = '';
-            const nodeData = {
-                name: name,
-                type: nodeType
-            };
-
             if (editingNode) {
-                // Update existing node
+                // Update existing node (direct update allowed for own nodes)
                 await setDoc(editingNode.docRef, {
                     name: name,
                     type: nodeType,
                     updatedAt: serverTimestamp()
                 }, { merge: true });
-                newNodePath = editingNode.path;
 
                 // Sync update to global hierarchy
-                await syncToGlobalHierarchy(newNodePath, nodeData);
+                const nodeData = { name, type: nodeType };
+                const globalPath = getGlobalHierarchyPath(editingNode.path);
+                
+                try {
+                    const globalDocRef = doc(db, globalPath);
+                    const globalDoc = await getDoc(globalDocRef);
+                    if (globalDoc.exists()) {
+                        await setDoc(globalDocRef, {
+                            name: name,
+                            type: nodeType,
+                            updatedAt: serverTimestamp()
+                        }, { merge: true });
+                        console.log('Global hierarchy updated:', globalPath);
+                    }
+                } catch (e) {
+                    console.error('Error syncing edit to global:', e);
+                }
+                
+                showToast('Node updated successfully!', 'success');
             } else if (parentDocRef) {
-                // Create child node in 'sub-nodes' collection
-                const childrenRef = collection(parentDocRef, 'sub-nodes');
-                const newDocRef = doc(childrenRef, sanitizedName);
-                await setDoc(newDocRef, {
-                    name: name,
-                    type: nodeType,
-                    status: 'pending', // Pending until super admin approves
-                    createdAt: serverTimestamp(),
-                    createdBy: currentUser.email
-                });
-                newNodePath = `${parentDocRef.path}/sub-nodes/${sanitizedName}`;
-
-                // Sync to global hierarchy
-                await syncToGlobalHierarchy(newNodePath, nodeData);
+                // Creating child node - create BRANCH REQUEST instead of direct creation
+                const parentPath = parentDocRef.path;
+                const globalParentPath = getGlobalHierarchyPath(parentPath);
+                
+                // Get org ID from path - handle both formats
+                // Format 1: hierarchies/{orgId}/sub-nodes/...
+                // Format 2: {orgId}/sub-nodes/...
+                let orgId;
+                const pathParts = globalParentPath.split('/');
+                if (pathParts[0] === 'hierarchies') {
+                    orgId = pathParts[1];
+                } else {
+                    orgId = pathParts[0];
+                }
+                
+                console.log('Creating branch request - parentPath:', parentPath, 'globalParentPath:', globalParentPath, 'orgId:', orgId);
+                
+                // Get parent name
+                const parentDoc = await getDoc(parentDocRef);
+                const parentName = parentDoc.exists() ? parentDoc.data().name : 'Organization';
+                
+                // Check if org has admin
+                const orgDoc = await getDoc(doc(db, 'hierarchies', orgId));
+                if (!orgDoc.exists() || !orgDoc.data().adminEmails?.length) {
+                    showToast('This organization has no admin yet. Please wait for Super Admin to assign one.', 'error');
+                    return;
+                }
+                
+                await createBranchRequest(orgId, globalParentPath, parentName, name, nodeType);
+                showToast('Branch request submitted! Waiting for admin approval.', 'success');
             } else {
-                // Create root node in hierarchies collection
+                // Creating root organization - create ORGANIZATION REQUEST for Super Admin
+                await createOrganizationRequest(name, nodeType);
+                
+                // Also create in user's personal hierarchies with pending status
                 const hierarchiesRef = collection(db, 'users', currentUser.email, 'hierarchies');
                 const newDocRef = doc(hierarchiesRef, sanitizedName);
                 await setDoc(newDocRef, {
                     name: name,
                     type: nodeType,
-                    status: 'pending', // Pending until super admin approves
+                    status: 'pending',
                     createdAt: serverTimestamp(),
                     createdBy: currentUser.email
                 });
-                newNodePath = `users/${currentUser.email}/hierarchies/${sanitizedName}`;
-
-                // Sync to global hierarchy
-                await syncToGlobalHierarchy(newNodePath, nodeData);
+                
+                showToast('Organization request submitted! Waiting for Super Admin approval.', 'success');
             }
 
             closeNodeModal();
-            showToast('Node saved successfully!', 'success');
             await loadHierarchy();
         } catch (error) {
             console.error('Error saving node:', error);
-            showToast('Failed to save node: ' + error.message, 'error');
+            showToast('Failed to save: ' + error.message, 'error');
         } finally {
             saveBtn.disabled = false;
             saveBtn.textContent = 'Save';
@@ -1300,6 +1618,209 @@
         }, 3000);
     }
 
+    // ==================== BROWSE ORGANIZATIONS FEATURE ====================
+    let allAvailableOrgs = [];
+    
+    // Load all approved organizations from global hierarchies
+    async function loadAvailableOrganizations() {
+        try {
+            const hierarchiesRef = collection(db, 'hierarchies');
+            const snapshot = await getDocs(hierarchiesRef);
+            
+            allAvailableOrgs = [];
+            for (const docSnap of snapshot.docs) {
+                const data = docSnap.data();
+                // Only show active/approved organizations
+                if (data.status === 'active') {
+                    const isMember = data.members && data.members.includes(currentUser.email);
+                    
+                    // Load sub-nodes for this org
+                    const subNodes = await loadOrgSubNodes(docSnap.id, `hierarchies/${docSnap.id}`);
+                    
+                    allAvailableOrgs.push({
+                        id: docSnap.id,
+                        path: `hierarchies/${docSnap.id}`,
+                        name: data.name,
+                        type: data.type || 'organization',
+                        memberCount: (data.members || []).length,
+                        isMember: isMember,
+                        hasAdmin: (data.adminEmails || []).length > 0,
+                        subNodes: subNodes
+                    });
+                }
+            }
+            
+            return allAvailableOrgs;
+        } catch (error) {
+            console.error('Error loading available organizations:', error);
+            return [];
+        }
+    }
+    
+    // Load sub-nodes for an organization
+    async function loadOrgSubNodes(orgId, parentPath) {
+        const subNodes = [];
+        try {
+            const subNodesRef = collection(db, parentPath, 'sub-nodes');
+            const snapshot = await getDocs(subNodesRef);
+            
+            for (const docSnap of snapshot.docs) {
+                const data = docSnap.data();
+                if (data.status === 'active') {
+                    const nodePath = `${parentPath}/sub-nodes/${docSnap.id}`;
+                    const isMember = data.members && data.members.includes(currentUser.email);
+                    
+                    // Recursively load children
+                    const children = await loadOrgSubNodes(orgId, nodePath);
+                    
+                    subNodes.push({
+                        id: docSnap.id,
+                        orgId: orgId,
+                        path: nodePath,
+                        name: data.name,
+                        type: data.type || 'department',
+                        memberCount: (data.members || []).length,
+                        isMember: isMember,
+                        hasAdmin: (data.adminEmails || []).length > 0,
+                        children: children
+                    });
+                }
+            }
+        } catch (e) {
+            // No sub-nodes
+        }
+        return subNodes;
+    }
+    
+    // Render browse organizations list
+    function renderBrowseOrganizations(orgs, searchTerm = '') {
+        const container = document.getElementById('browseOrgsList');
+        
+        // Filter by search term
+        let filtered = orgs;
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase();
+            filtered = orgs.filter(org => 
+                org.name.toLowerCase().includes(term) ||
+                org.type.toLowerCase().includes(term)
+            );
+        }
+        
+        if (filtered.length === 0) {
+            container.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: var(--muted-foreground);">
+                    <i class="fas fa-building" style="font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.5;"></i>
+                    <p>${searchTerm ? 'No organizations match your search.' : 'No approved organizations available yet.'}</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = filtered.map(org => `
+            <div class="org-browse-card" style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; transition: all 0.2s;">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                    <h3 style="font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 1rem;">${org.name}</h3>
+                    ${org.isMember ? '<span style="background: rgba(16, 185, 129, 0.1); color: #059669; font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 10px;">Joined</span>' : ''}
+                </div>
+                <p style="font-size: 0.85rem; color: var(--muted-foreground); margin-bottom: 0.75rem;">
+                    ${org.type} • ${org.memberCount} member${org.memberCount !== 1 ? 's' : ''}
+                    ${!org.hasAdmin ? ' • <span style="color: #F59E0B;">No admin yet</span>' : ''}
+                </p>
+                ${org.subNodes.length > 0 ? `
+                    <div style="margin-bottom: 0.75rem;">
+                        <p style="font-size: 0.75rem; color: var(--muted-foreground); margin-bottom: 0.25rem;">Sub-nodes:</p>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.25rem;">
+                            ${org.subNodes.slice(0, 3).map(sub => `
+                                <span style="background: var(--secondary); font-size: 0.7rem; padding: 0.15rem 0.4rem; border-radius: 4px;">${sub.name}</span>
+                            `).join('')}
+                            ${org.subNodes.length > 3 ? `<span style="font-size: 0.7rem; color: var(--muted-foreground);">+${org.subNodes.length - 3} more</span>` : ''}
+                        </div>
+                    </div>
+                ` : ''}
+                <div style="display: flex; gap: 0.5rem;">
+                    ${!org.isMember ? `
+                        <button class="btn btn-primary btn-sm join-org-btn" data-org-id="${org.id}" data-org-path="${org.path}" data-org-name="${org.name}" ${!org.hasAdmin ? 'disabled title="Waiting for admin assignment"' : ''} style="flex: 1; font-size: 0.8rem; padding: 0.4rem 0.75rem;">
+                            <i data-lucide="user-plus" style="width: 14px; height: 14px;"></i> Join
+                        </button>
+                    ` : ''}
+                    <button class="btn btn-outline btn-sm view-org-btn" data-org-id="${org.id}" style="flex: 1; font-size: 0.8rem; padding: 0.4rem 0.75rem;">
+                        <i data-lucide="eye" style="width: 14px; height: 14px;"></i> View
+                    </button>
+                </div>
+            </div>
+        `).join('');
+        
+        lucide.createIcons();
+        
+        // Add event listeners for join buttons
+        container.querySelectorAll('.join-org-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const orgId = btn.dataset.orgId;
+                const orgPath = btn.dataset.orgPath;
+                const orgName = btn.dataset.orgName;
+                await handleJoinOrganization(orgId, orgPath, orgName);
+            });
+        });
+        
+        // Add event listeners for view buttons
+        container.querySelectorAll('.view-org-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const orgId = btn.dataset.orgId;
+                showOrgDetails(orgId);
+            });
+        });
+    }
+    
+    // Handle joining an organization
+    async function handleJoinOrganization(orgId, orgPath, orgName) {
+        // Check if already has pending request
+        const hasPending = await checkPendingRequest(orgPath, 'join');
+        if (hasPending) {
+            showToast('You already have a pending join request for this organization.', 'error');
+            return;
+        }
+        
+        if (!confirm(`Request to join "${orgName}"? An admin will review your request.`)) return;
+        
+        try {
+            await createJoinRequest(orgId, orgPath, orgName);
+            showToast('Join request submitted! Waiting for admin approval.', 'success');
+            
+            // Refresh the browse list
+            await loadAvailableOrganizations();
+            renderBrowseOrganizations(allAvailableOrgs, document.getElementById('searchOrgsInput').value);
+        } catch (error) {
+            showToast(error.message, 'error');
+        }
+    }
+    
+    // Show organization details modal
+    function showOrgDetails(orgId) {
+        const org = allAvailableOrgs.find(o => o.id === orgId);
+        if (!org) return;
+        
+        // Create a simple alert with org details (could be enhanced to a modal)
+        let details = `Organization: ${org.name}\nType: ${org.type}\nMembers: ${org.memberCount}`;
+        if (org.subNodes.length > 0) {
+            details += `\n\nSub-nodes:\n${org.subNodes.map(s => `  - ${s.name} (${s.type})`).join('\n')}`;
+        }
+        alert(details);
+    }
+    
+    // Toggle browse section
+    function toggleBrowseSection(show) {
+        const browseSection = document.getElementById('browseSection');
+        if (show) {
+            browseSection.style.display = 'block';
+            loadAvailableOrganizations().then(orgs => {
+                renderBrowseOrganizations(orgs);
+            });
+        } else {
+            browseSection.style.display = 'none';
+        }
+    }
+    // ==================== END BROWSE ORGANIZATIONS FEATURE ====================
+
     // Done button
     function handleDone() {
         if (hierarchyData.length === 0) {
@@ -1324,6 +1845,14 @@
     document.getElementById('confirmDeleteBtn').addEventListener('click', deleteNode);
     document.getElementById('nodeName').addEventListener('input', () => {
         document.getElementById('nodeNameError').style.display = 'none';
+    });
+    
+    // Browse organizations event listeners
+    document.getElementById('browseOrgsBtn').addEventListener('click', () => toggleBrowseSection(true));
+    document.getElementById('browseFirstBtn').addEventListener('click', () => toggleBrowseSection(true));
+    document.getElementById('closeBrowseBtn').addEventListener('click', () => toggleBrowseSection(false));
+    document.getElementById('searchOrgsInput').addEventListener('input', (e) => {
+        renderBrowseOrganizations(allAvailableOrgs, e.target.value);
     });
 
     nodeModal.addEventListener('click', (e) => { if (e.target === nodeModal) closeNodeModal(); });

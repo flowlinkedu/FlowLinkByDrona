@@ -131,15 +131,24 @@
                 prompt: 'select_account'
             });
 
+            // Super Admin email constant
+            const SUPER_ADMIN_EMAIL = 'admin@flowlink.edu';
+
             // Simple auth check
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     console.log('User is signed in:', user.email);
 
+                    // Skip redirect for Super Admin - they are handled separately
+                    if (user.email === SUPER_ADMIN_EMAIL) {
+                        console.log('Super Admin detected, skipping auto-redirect');
+                        return;
+                    }
+
                     // Check if user has any hierarchies set up
                     const hasHierarchies = await checkUserHierarchies(user);
 
-                    // Ensure user document exists
+                    // Ensure user document exists (only for regular users)
                     await ensureUserDocument(user, !hasHierarchies);
 
                     // Redirect based on hierarchy status
@@ -254,8 +263,7 @@
                 });
             });
 
-            // Super Admin Credentials (Frontend Mock)
-            const SUPER_ADMIN_EMAIL = 'admin@flowlink.edu';
+            // Super Admin Credentials - Must match Firebase rules
             const SUPER_ADMIN_PASSWORD = 'drona@admin';
 
             // Handle email/password login
@@ -269,14 +277,27 @@
                 // Add loading state
                 this.classList.add('loading');
 
-                // Check for Super Admin credentials (Frontend-only mock auth)
+                // Check for Super Admin credentials
                 if (!isSignupMode && email === SUPER_ADMIN_EMAIL && password === SUPER_ADMIN_PASSWORD) {
-                    sessionStorage.setItem('superAdminAuth', 'true');
-                    showMessage('Super Admin access granted!', 'success');
-                    setTimeout(() => {
+                    try {
+                        // Authenticate with Firebase as Super Admin
+                        await signInWithEmailAndPassword(auth, email, password);
+                        sessionStorage.setItem('superAdminAuth', 'true');
+                        showMessage('Super Admin access granted!', 'success');
+                        
+                        // Redirect immediately to super-admin page
                         window.location.href = 'super-admin.html';
-                    }, 1000);
-                    return;
+                        return;
+                    } catch (error) {
+                        console.error('Super Admin auth error:', error);
+                        if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+                            showMessage('Super Admin user not found in Firebase. Please create user admin@flowlink.edu in Firebase Auth Console.', 'error');
+                        } else {
+                            showMessage('Super Admin authentication failed: ' + error.message, 'error');
+                        }
+                        this.classList.remove('loading');
+                        return;
+                    }
                 }
 
                 try {
