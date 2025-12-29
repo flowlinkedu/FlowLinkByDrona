@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin - FlowLink</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=PT+Sans:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="global.css">
+    <style>
+        :root {
+            --super-admin-accent: #8B5CF6;
+            --danger-color: #EF4444;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+        }
+
+        .super-admin-page {
+            background: linear-gradient(135deg, #E5F6FD 0%, rgba(139, 92, 246, 0.05) 100%);
+            min-height: 100vh;
+            display: flex;
+            font-family: 'PT Sans', sans-serif;
+        }
+
+        .admin-sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1F2933 0%, #2D3748 100%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sidebar-logo i {
+            font-size: 1.8rem;
+            color: #29ABE2;
+        }
+
+        .sidebar-logo span {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .super-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--super-admin-accent), #A78BFA);
+            color: white;
+            font-size: 0.6rem;
+            font-weight: 600;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            margin-left: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 2rem 0;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border-left-color: var(--super-admin-accent);
+        }
+
+        .nav-item.active .nav-link {
+            background: rgba(139, 92, 246, 0.2);
+            color: white;
+            border-left-color: var(--super-admin-accent);
+        }
+
+        .nav-icon {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--super-admin-accent), #A78BFA);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .admin-info .admin-name {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: white;
+            font-size: 0.95rem;
+        }
+
+        .admin-info .admin-role {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+        }
+
+        .admin-main {
+            flex: 1;
+            margin-left: 280px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .admin-topbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1F2933;
+            margin: 0;
+        }
+
+        .topbar-badge {
+            background: linear-gradient(135deg, var(--super-admin-accent), #A78BFA);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+        }
+
+        .sign-out-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, var(--super-admin-accent), #A78BFA);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sign-out-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+        }
+
+        .admin-content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .metric-icon.orgs {
+            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+        }
+
+        .metric-icon.users {
+            background: linear-gradient(135deg, #10B981, #059669);
+        }
+
+        .metric-icon.admins {
+            background: linear-gradient(135deg, var(--super-admin-accent), #A78BFA);
+        }
+
+        .metric-icon.pending {
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+        }
+
+        .metric-value {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1F2933;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-label {
+            color: #6B7280;
+            font-size: 0.9rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1F2933;
+        }
+
+        .data-table {
+            width: 100%;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .data-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+        }
+
+        .data-table th {
+            background: rgba(139, 92, 246, 0.05);
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: #1F2933;
+            font-size: 0.9rem;
+        }
+
+        .data-table td {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            color: #4B5563;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tr:hover td {
+            background: rgba(139, 92, 246, 0.02);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-badge.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .status-badge.pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: #D97706;
+        }
+
+        .status-badge.suspended {
+            background: rgba(239, 68, 68, 0.1);
+            color: #DC2626;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 0.5rem;
+        }
+
+        .action-btn.approve {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .action-btn.approve:hover {
+            background: #10B981;
+            color: white;
+        }
+
+        .action-btn.reject {
+            background: rgba(239, 68, 68, 0.1);
+            color: #DC2626;
+        }
+
+        .action-btn.reject:hover {
+            background: #EF4444;
+            color: white;
+        }
+
+        .action-btn.view {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--super-admin-accent);
+        }
+
+        .action-btn.view:hover {
+            background: var(--super-admin-accent);
+            color: white;
+        }
+
+        .action-btn.assign {
+            background: rgba(41, 171, 226, 0.1);
+            color: #29ABE2;
+        }
+
+        .action-btn.assign:hover {
+            background: #29ABE2;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6B7280;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 0.5rem;
+            color: #1F2933;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 1rem;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalIn 0.2s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6B7280;
+        }
+
+        .modal-close:hover {
+            color: #1F2933;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1F2933;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid rgba(139, 92, 246, 0.2);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--super-admin-accent);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--super-admin-accent), #A78BFA);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(0, 0, 0, 0.05);
+            color: #4B5563;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 3000;
+        }
+
+        .toast.show {
+            display: flex;
+            animation: toastIn 0.3s ease;
+        }
+
+        .toast.success {
+            border-left: 4px solid #10B981;
+        }
+
+        .toast.error {
+            border-left: 4px solid #EF4444;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(1rem);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .settings-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .settings-card h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1F2933;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .toggle-switch:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-label {
+            color: #4B5563;
+        }
+
+        .toggle-input {
+            width: 50px;
+            height: 26px;
+            background: #E5E7EB;
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle-input.active {
+            background: var(--super-admin-accent);
+        }
+
+        .toggle-input::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-input.active::after {
+            transform: translateX(24px);
+        }
+
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+        }
+
+        .loading-spinner i {
+            font-size: 2rem;
+            color: var(--super-admin-accent);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #6B7280;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #1F2933;
+            font-weight: 600;
+        }
+
+        .members-list {
+            max-height: 150px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .member-item {
+            padding: 0.25rem 0;
+            font-size: 0.9rem;
+            color: #4B5563;
+        }
+
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+            }
+
+            .admin-sidebar.open {
+                transform: translateX(0);
+            }
+
+            .admin-main {
+                margin-left: 0;
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body class="super-admin-page">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-project-diagram"></i>
+                <span>FlowLink<span class="super-badge">Super</span></span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <ul class="nav-list">
+                <li class="nav-item active" data-page="dashboard">
+                    <a class="nav-link"><i class="fas fa-chart-line nav-icon"></i><span>Dashboard</span></a>
+                </li>
+                <li class="nav-item" data-page="organizations">
+                    <a class="nav-link"><i class="fas fa-building nav-icon"></i><span>Organizations</span></a>
+                </li>
+                <li class="nav-item" data-page="admin-control">
+                    <a class="nav-link"><i class="fas fa-user-shield nav-icon"></i><span>Admin Control</span></a>
+                </li>
+                <li class="nav-item" data-page="settings">
+                    <a class="nav-link"><i class="fas fa-cog nav-icon"></i><span>Platform Settings</span></a>
+                </li>
+            </ul>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="admin-profile">
+                <div class="admin-avatar"><i class="fas fa-crown"></i></div>
+                <div class="admin-info">
+                    <div class="admin-name">Super Admin</div>
+                    <div class="admin-role">Platform Owner</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <header class="admin-topbar">
+            <div class="topbar-left">
+                <h1 class="page-title" id="pageTitle">Dashboard</h1>
+                <span class="topbar-badge">Super Admin</span>
+            </div>
+            <button class="sign-out-btn" id="signOutBtn"><i class="fas fa-sign-out-alt"></i><span>Sign
+                    Out</span></button>
+        </header>
+
+        <div class="admin-content">
+            <!-- Dashboard Page -->
+            <section class="page-section active" id="dashboardPage">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon orgs"><i class="fas fa-building"></i></div>
+                        <div class="metric-value" id="totalOrgs">0</div>
+                        <div class="metric-label">Total Organizations</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon users"><i class="fas fa-users"></i></div>
+                        <div class="metric-value" id="totalUsers">0</div>
+                        <div class="metric-label">Total Users</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon admins"><i class="fas fa-user-shield"></i></div>
+                        <div class="metric-value" id="totalAdmins">0</div>
+                        <div class="metric-label">Assigned Admins</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon pending"><i class="fas fa-clock"></i></div>
+                        <div class="metric-value" id="pendingCount">0</div>
+                        <div class="metric-label">Pending Approvals</div>
+                    </div>
+                </div>
+                <div class="section-header">
+                    <h2 class="section-title">Pending Approvals</h2>
+                </div>
+                <div class="data-table" id="pendingApprovalsTable">
+                    <div class="loading-spinner"><i class="fas fa-spinner"></i></div>
+                </div>
+            </section>
+
+            <!-- Organizations Page -->
+            <section class="page-section" id="organizationsPage">
+                <div class="section-header">
+                    <h2 class="section-title">All Organizations</h2>
+                </div>
+                <div class="data-table" id="organizationsTable">
+                    <div class="loading-spinner"><i class="fas fa-spinner"></i></div>
+                </div>
+            </section>
+
+            <!-- Admin Control Page -->
+            <section class="page-section" id="adminControlPage">
+                <div class="section-header">
+                    <h2 class="section-title">Admin Management</h2>
+                </div>
+                <div class="data-table" id="adminControlTable">
+                    <div class="loading-spinner"><i class="fas fa-spinner"></i></div>
+                </div>
+            </section>
+
+            <!-- Platform Settings Page -->
+            <section class="page-section" id="settingsPage">
+                <div class="settings-grid">
+                    <div class="settings-card">
+                        <h3><i class="fas fa-shield-alt"></i> Security Settings</h3>
+                        <div class="toggle-switch"><span class="toggle-label">Require Email Verification</span>
+                            <div class="toggle-input active" data-setting="emailVerification"></div>
+                        </div>
+                        <div class="toggle-switch"><span class="toggle-label">Auto-approve Organizations</span>
+                            <div class="toggle-input" data-setting="autoApprove"></div>
+                        </div>
+                    </div>
+                    <div class="settings-card">
+                        <h3><i class="fas fa-bell"></i> Notification Settings</h3>
+                        <div class="toggle-switch"><span class="toggle-label">Email on New Organization</span>
+                            <div class="toggle-input active" data-setting="newOrgEmail"></div>
+                        </div>
+                        <div class="toggle-switch"><span class="toggle-label">Email on Admin Assignment</span>
+                            <div class="toggle-input active" data-setting="adminAssignEmail"></div>
+                        </div>
+                    </div>
+                    <div class="settings-card">
+                        <h3><i class="fas fa-database"></i> Data Management</h3>
+                        <div class="toggle-switch"><span class="toggle-label">Allow Data Export</span>
+                            <div class="toggle-input active" data-setting="dataExport"></div>
+                        </div>
+                        <div class="toggle-switch"><span class="toggle-label">Enable Analytics</span>
+                            <div class="toggle-input active" data-setting="analytics"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Assign Admin Modal -->
+    <div class="modal-overlay" id="assignAdminModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Assign Admin</h2><button class="modal-close"
+                    onclick="closeModal('assignAdminModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom:1rem;color:#6B7280;">Assign an admin to: <strong id="assignOrgName"></strong>
+                </p>
+                <div class="form-group"><label class="form-label">Admin Email</label><input type="email"
+                        class="form-input" id="adminEmailInput" placeholder="admin@example.com"></div>
+            </div>
+            <div class="modal-footer"><button class="btn-secondary"
+                    onclick="closeModal('assignAdminModal')">Cancel</button><button class="btn-primary"
+                    id="confirmAssignBtn">Assign Admin</button></div>
+        </div>
+    </div>
+
+    <!-- Organization Details Modal -->
+    <div class="modal-overlay" id="orgDetailsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Organization Details</h2><button class="modal-close"
+                    onclick="closeModal('orgDetailsModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="orgDetailsContent"></div>
+            <div class="modal-footer"><button class="btn-secondary"
+                    onclick="closeModal('orgDetailsModal')">Close</button></div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"><i class="fas fa-check-circle" style="color:#10B981;"></i><span
+            id="toastMessage">Success!</span></div>
+
+    <!-- Firebase Integration -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, getDoc, serverTimestamp, arrayUnion, arrayRemove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsuZL4U2H66C9tUKN91KXMm-l5umOa1vY",
+            authDomain: "flowlinkkiro.firebaseapp.com",
+            projectId: "flowlinkkiro",
+            storageBucket: "flowlinkkiro.firebasestorage.app",
+            messagingSenderId: "918596906932",
+            appId: "1:918596906932:web:55e2a235cefedd61098ce1",
+            measurementId: "G-B32FNF648G"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let organizations = [];
+        let pendingApprovals = [];
+        let currentOrgForAssign = null;
+
+        // Check super admin auth
+        if (sessionStorage.getItem('superAdminAuth') !== 'true') {
+            window.location.href = 'login.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            setupNavigation();
+            setupEventListeners();
+            await loadAllData();
+        });
+
+        function setupNavigation() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const page = item.dataset.page;
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+                    const pageMap = { 'dashboard': 'dashboardPage', 'organizations': 'organizationsPage', 'admin-control': 'adminControlPage', 'settings': 'settingsPage' };
+                    document.getElementById(pageMap[page]).classList.add('active');
+                    const titles = { 'dashboard': 'Dashboard', 'organizations': 'Organizations', 'admin-control': 'Admin Control', 'settings': 'Platform Settings' };
+                    document.getElementById('pageTitle').textContent = titles[page];
+                });
+            });
+        }
+
+        function setupEventListeners() {
+            document.getElementById('signOutBtn').addEventListener('click', () => {
+                sessionStorage.removeItem('superAdminAuth');
+                window.location.href = 'login.html';
+            });
+            document.getElementById('confirmAssignBtn').addEventListener('click', assignAdmin);
+            document.querySelectorAll('.toggle-input').forEach(toggle => {
+                toggle.addEventListener('click', () => toggle.classList.toggle('active'));
+            });
+        }
+
+        async function loadAllData() {
+            await Promise.all([loadOrganizations(), loadPendingApprovals()]);
+            updateMetrics();
+            renderPendingApprovals();
+            renderOrganizations();
+            renderAdminControl();
+        }
+
+        async function fetchHierarchiesRecursive(colRef, parentPath = '') {
+            const nodes = [];
+            try {
+                const snapshot = await getDocs(colRef);
+                for (const docSnap of snapshot.docs) {
+                    const data = docSnap.data();
+                    const nodePath = parentPath ? `${parentPath}/sub-nodes/${docSnap.id}` : `hierarchies/${docSnap.id}`;
+                    const node = { id: docSnap.id, path: nodePath, docRef: docSnap.ref, ...data };
+                    const childrenRef = collection(docSnap.ref, 'sub-nodes');
+                    node.children = await fetchHierarchiesRecursive(childrenRef, nodePath);
+                    nodes.push(node);
+                }
+            } catch (e) { }
+            return nodes;
+        }
+
+        function flattenHierarchy(nodes, level = 0) {
+            let flat = [];
+            for (const node of nodes) {
+                flat.push({ ...node, level });
+                if (node.children && node.children.length > 0) {
+                    flat = flat.concat(flattenHierarchy(node.children, level + 1));
+                }
+            }
+            return flat;
+        }
+
+        async function loadOrganizations() {
+            try {
+                const hierarchiesRef = collection(db, 'hierarchies');
+                const hierarchyTree = await fetchHierarchiesRecursive(hierarchiesRef);
+                organizations = flattenHierarchy(hierarchyTree);
+            } catch (error) {
+                console.error('Error loading organizations:', error);
+                organizations = [];
+            }
+        }
+
+        async function loadPendingApprovals() {
+            try {
+                const pendingRef = collection(db, 'pendingApprovals');
+                const snapshot = await getDocs(pendingRef);
+                pendingApprovals = snapshot.docs.map(d => ({ id: d.id, docRef: d.ref, ...d.data() }));
+            } catch (error) {
+                console.error('Error loading pending approvals:', error);
+                pendingApprovals = [];
+            }
+        }
+
+        function updateMetrics() {
+            const rootOrgs = organizations.filter(o => o.level === 0);
+            const allMembers = new Set();
+            const allAdmins = new Set();
+            organizations.forEach(org => {
+                (org.members || []).forEach(m => allMembers.add(m));
+                (org.adminEmails || []).forEach(a => allAdmins.add(a));
+            });
+            document.getElementById('totalOrgs').textContent = rootOrgs.length;
+            document.getElementById('totalUsers').textContent = allMembers.size;
+            document.getElementById('totalAdmins').textContent = allAdmins.size;
+            document.getElementById('pendingCount').textContent = pendingApprovals.length;
+        }
+
+        function renderPendingApprovals() {
+            const container = document.getElementById('pendingApprovalsTable');
+            if (pendingApprovals.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-check-circle"></i><h3>No Pending Approvals</h3><p>All organizations have been reviewed.</p></div>';
+                return;
+            }
+            container.innerHTML = `<table><thead><tr><th>Organization</th><th>Type</th><th>Requested By</th><th>Date</th><th>Actions</th></tr></thead><tbody>${pendingApprovals.map(p => `<tr><td><strong>${p.name || p.orgName || 'Unknown'}</strong></td><td>${p.type || 'organization'}</td><td>${p.createdBy || p.requestedBy || 'Unknown'}</td><td>${p.createdAt ? new Date(p.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</td><td><button class="action-btn approve" onclick="approveOrg('${p.id}')">Approve</button><button class="action-btn reject" onclick="rejectOrg('${p.id}')">Reject</button></td></tr>`).join('')}</tbody></table>`;
+        }
+
+        function renderOrganizations() {
+            const container = document.getElementById('organizationsTable');
+            if (organizations.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-building"></i><h3>No Organizations</h3><p>No organizations have been created yet.</p></div>';
+                return;
+            }
+            container.innerHTML = `<table><thead><tr><th>Organization</th><th>Type</th><th>Members</th><th>Status</th><th>Actions</th></tr></thead><tbody>${organizations.map(org => `<tr><td><strong style="padding-left:${org.level * 20}px">${org.level > 0 ? '└ ' : ''}${org.name}</strong></td><td>${org.type || 'organization'}</td><td>${(org.members || []).length}</td><td><span class="status-badge ${org.status || 'pending'}">${org.status || 'pending'}</span></td><td><button class="action-btn view" onclick="viewOrgDetails('${org.id}')">View</button>${org.status === 'pending' ? `<button class="action-btn approve" onclick="approveOrgDirect('${org.path}')">Approve</button>` : ''}</td></tr>`).join('')}</tbody></table>`;
+        }
+
+        function renderAdminControl() {
+            const container = document.getElementById('adminControlTable');
+            const rootOrgs = organizations.filter(o => o.level === 0);
+            if (rootOrgs.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-user-shield"></i><h3>No Organizations</h3><p>Create organizations first to assign admins.</p></div>';
+                return;
+            }
+            container.innerHTML = `<table><thead><tr><th>Organization</th><th>Current Admins</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rootOrgs.map(org => `<tr><td><strong>${org.name}</strong></td><td>${(org.adminEmails || []).length > 0 ? org.adminEmails.join(', ') : '<em>No admins assigned</em>'}</td><td><span class="status-badge ${org.status || 'pending'}">${org.status || 'pending'}</span></td><td><button class="action-btn assign" onclick="openAssignModal('${org.id}', '${org.name}', '${org.path}')">Assign Admin</button></td></tr>`).join('')}</tbody></table>`;
+        }
+
+        window.closeModal = function (modalId) { document.getElementById(modalId).classList.remove('show'); };
+
+        window.openAssignModal = function (orgId, orgName, orgPath) {
+            currentOrgForAssign = { id: orgId, name: orgName, path: orgPath };
+            document.getElementById('assignOrgName').textContent = orgName;
+            document.getElementById('adminEmailInput').value = '';
+            document.getElementById('assignAdminModal').classList.add('show');
+        };
+
+        window.viewOrgDetails = function (orgId) {
+            const org = organizations.find(o => o.id === orgId);
+            if (!org) return;
+            document.getElementById('orgDetailsContent').innerHTML = `<div class="detail-row"><span class="detail-label">Name</span><span class="detail-value">${org.name}</span></div><div class="detail-row"><span class="detail-label">Type</span><span class="detail-value">${org.type || 'organization'}</span></div><div class="detail-row"><span class="detail-label">Status</span><span class="detail-value"><span class="status-badge ${org.status || 'pending'}">${org.status || 'pending'}</span></span></div><div class="detail-row"><span class="detail-label">Created By</span><span class="detail-value">${org.createdBy || 'Unknown'}</span></div><div class="detail-row"><span class="detail-label">Admins</span><span class="detail-value">${(org.adminEmails || []).join(', ') || 'None'}</span></div><div class="detail-row"><span class="detail-label">Members (${(org.members || []).length})</span></div><div class="members-list">${(org.members || []).map(m => `<div class="member-item">${m}</div>`).join('') || '<em>No members</em>'}</div>${org.nameAliases ? `<div class="detail-row"><span class="detail-label">Name Aliases</span><span class="detail-value">${org.nameAliases.join(', ')}</span></div>` : ''}`;
+            document.getElementById('orgDetailsModal').classList.add('show');
+        };
+
+        async function assignAdmin() {
+            const email = document.getElementById('adminEmailInput').value.trim();
+            if (!email || !currentOrgForAssign) { showToast('Please enter a valid email', 'error'); return; }
+            try {
+                const orgRef = doc(db, currentOrgForAssign.path);
+                await setDoc(orgRef, { adminEmails: arrayUnion(email), updatedAt: serverTimestamp() }, { merge: true });
+                showToast(`Admin ${email} assigned successfully!`, 'success');
+                closeModal('assignAdminModal');
+                await loadAllData();
+            } catch (error) {
+                console.error('Error assigning admin:', error);
+                showToast('Failed to assign admin', 'error');
+            }
+        }
+
+        window.approveOrg = async function (approvalId) {
+            try {
+                const approval = pendingApprovals.find(p => p.id === approvalId);
+                if (!approval) return;
+                if (approval.hierarchyPath) {
+                    const orgRef = doc(db, approval.hierarchyPath);
+                    await setDoc(orgRef, { status: 'active', approvedAt: serverTimestamp() }, { merge: true });
+                }
+                const approvalRecordRef = doc(db, 'superAdmin', 'approvals');
+                await setDoc(approvalRecordRef, { approvedIds: arrayUnion(approvalId), updatedAt: serverTimestamp() }, { merge: true });
+                await deleteDoc(doc(db, 'pendingApprovals', approvalId));
+                showToast('Organization approved!', 'success');
+                await loadAllData();
+            } catch (error) {
+                console.error('Error approving:', error);
+                showToast('Failed to approve', 'error');
+            }
+        };
+
+        window.rejectOrg = async function (approvalId) {
+            try {
+                const approval = pendingApprovals.find(p => p.id === approvalId);
+                if (!approval) return;
+                if (approval.hierarchyPath) {
+                    const orgRef = doc(db, approval.hierarchyPath);
+                    await setDoc(orgRef, { status: 'suspended', rejectedAt: serverTimestamp() }, { merge: true });
+                }
+                const approvalRecordRef = doc(db, 'superAdmin', 'approvals');
+                await setDoc(approvalRecordRef, { rejectedIds: arrayUnion(approvalId), updatedAt: serverTimestamp() }, { merge: true });
+                await deleteDoc(doc(db, 'pendingApprovals', approvalId));
+                showToast('Organization rejected', 'success');
+                await loadAllData();
+            } catch (error) {
+                console.error('Error rejecting:', error);
+                showToast('Failed to reject', 'error');
+            }
+        };
+
+        window.approveOrgDirect = async function (orgPath) {
+            try {
+                const orgRef = doc(db, orgPath);
+                await setDoc(orgRef, { status: 'active', approvedAt: serverTimestamp() }, { merge: true });
+                showToast('Organization approved!', 'success');
+                await loadAllData();
+            } catch (error) {
+                console.error('Error approving:', error);
+                showToast('Failed to approve', 'error');
+            }
+        };
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = toast.querySelector('i');
+            document.getElementById('toastMessage').textContent = message;
+            toast.className = `toast show ${type}`;
+            icon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+            icon.style.color = type === 'success' ? '#10B981' : '#EF4444';
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+
+</html>

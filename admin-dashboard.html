@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - FlowLink</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="global.css">
+</head>
+<body class="admin-dashboard-page">
+    <!-- Admin Sidebar -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-crown"></i>
+                <span class="logo-text">FlowLink Admin</span>
+            </div>
+            <button class="sidebar-toggle" id="adminSidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <ul class="nav-list">
+                <li class="nav-item active">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-users nav-icon"></i>
+                        <span class="nav-text">User Management</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-sitemap nav-icon"></i>
+                        <span class="nav-text">Hierarchy Management</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-chart-bar nav-icon"></i>
+                        <span class="nav-text">Analytics</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-cog nav-icon"></i>
+                        <span class="nav-text">System Settings</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-shield-alt nav-icon"></i>
+                        <span class="nav-text">Security</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="admin-info">
+                <div class="admin-avatar">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div class="admin-details">
+                    <span class="admin-name">Admin User</span>
+                    <span class="admin-role">Super Admin</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main-content">
+        <!-- Top Bar -->
+        <header class="admin-top-bar">
+            <div class="top-bar-left">
+                <button class="mobile-menu-toggle" id="adminMobileMenuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title">User Management</h1>
+            </div>
+            
+            <div class="top-bar-right">
+                <div class="node-selector">
+                    <label for="nodeSelect" class="node-label">Current Node:</label>
+                    <select id="nodeSelect" class="node-select">
+                        <option value="root">Root Organization</option>
+                        <option value="academic">Academic Department</option>
+                        <option value="hostel">Hostel Management</option>
+                        <option value="sports">Sports Department</option>
+                        <option value="skills">Skills Development</option>
+                    </select>
+                </div>
+                
+                <div class="admin-actions">
+                    <button class="admin-btn primary" id="addUserBtn">
+                        <i class="fas fa-user-plus"></i>
+                        Add User
+                    </button>
+                    <button class="admin-btn secondary" id="exportBtn">
+                        <i class="fas fa-download"></i>
+                        Export
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="admin-dashboard-content">
+            <!-- Stats Cards -->
+            <div class="stats-grid" data-aos="fade-up">
+                <div class="stat-card">
+                    <div class="stat-icon users">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="stat-number">1,247</h3>
+                        <p class="stat-label">Total Users</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon admins">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="stat-number">23</h3>
+                        <p class="stat-label">Administrators</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon active">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="stat-number">892</h3>
+                        <p class="stat-label">Active Users</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon pending">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="stat-number">15</h3>
+                        <p class="stat-label">Pending Approvals</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Management Table -->
+            <div class="table-container" data-aos="fade-up" data-aos-delay="200">
+                <div class="table-header">
+                    <h2 class="table-title">User Management</h2>
+                    <div class="table-controls">
+                        <div class="search-box">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" placeholder="Search users..." class="search-input" id="userSearch">
+                        </div>
+                        <div class="filter-dropdown">
+                            <select id="roleFilter" class="filter-select">
+                                <option value="all">All Roles</option>
+                                <option value="admin">Administrators</option>
+                                <option value="moderator">Moderators</option>
+                                <option value="user">Regular Users</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="table-wrapper">
+                    <table class="user-table" id="userTable">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" id="selectAll" class="table-checkbox">
+                                </th>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Department</th>
+                                <th>Status</th>
+                                <th>Last Active</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="table-row" data-user-id="1" data-role="admin">
+                                <td>
+                                    <input type="checkbox" class="table-checkbox row-checkbox">
+                                </td>
+                                <td>
+                                    <div class="user-info">
+                                        <div class="user-avatar">
+                                            <img src="https://via.placeholder.com/40" alt="User Avatar">
+                                        </div>
+                                        <div class="user-details">
+                                            <span class="user-name">John Smith</span>
+                                            <span class="user-id">#USR001</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>john.smith@university.edu</td>
+                                <td>
+                                    <span class="role-badge admin">Administrator</span>
+                                </td>
+                                <td>Academic</td>
+                                <td>
+                                    <span class="status-badge active">Active</span>
+                                </td>
+                                <td>2 hours ago</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn remove-admin" title="Remove Admin">
+                                            <i class="fas fa-user-minus"></i>
+                                        </button>
+                                        <button class="action-btn edit" title="Edit User">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Delete User">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr class="table-row" data-user-id="2" data-role="user">
+                                <td>
+                                    <input type="checkbox" class="table-checkbox row-checkbox">
+                                </td>
+                                <td>
+                                    <div class="user-info">
+                                        <div class="user-avatar">
+                                            <img src="https://via.placeholder.com/40" alt="User Avatar">
+                                        </div>
+                                        <div class="user-details">
+                                            <span class="user-name">Sarah Johnson</span>
+                                            <span class="user-id">#USR002</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>sarah.johnson@university.edu</td>
+                                <td>
+                                    <span class="role-badge user">Student</span>
+                                </td>
+                                <td>Hostel</td>
+                                <td>
+                                    <span class="status-badge active">Active</span>
+                                </td>
+                                <td>1 day ago</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn make-admin" title="Make Admin">
+                                            <i class="fas fa-user-plus"></i>
+                                        </button>
+                                        <button class="action-btn edit" title="Edit User">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Delete User">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr class="table-row" data-user-id="3" data-role="moderator">
+                                <td>
+                                    <input type="checkbox" class="table-checkbox row-checkbox">
+                                </td>
+                                <td>
+                                    <div class="user-info">
+                                        <div class="user-avatar">
+                                            <img src="https://via.placeholder.com/40" alt="User Avatar">
+                                        </div>
+                                        <div class="user-details">
+                                            <span class="user-name">Mike Wilson</span>
+                                            <span class="user-id">#USR003</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>mike.wilson@university.edu</td>
+                                <td>
+                                    <span class="role-badge moderator">Moderator</span>
+                                </td>
+                                <td>Sports</td>
+                                <td>
+                                    <span class="status-badge inactive">Inactive</span>
+                                </td>
+                                <td>1 week ago</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn make-admin" title="Make Admin">
+                                            <i class="fas fa-user-plus"></i>
+                                        </button>
+                                        <button class="action-btn edit" title="Edit User">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Delete User">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr class="table-row" data-user-id="4" data-role="user">
+                                <td>
+                                    <input type="checkbox" class="table-checkbox row-checkbox">
+                                </td>
+                                <td>
+                                    <div class="user-info">
+                                        <div class="user-avatar">
+                                            <img src="https://via.placeholder.com/40" alt="User Avatar">
+                                        </div>
+                                        <div class="user-details">
+                                            <span class="user-name">Emily Davis</span>
+                                            <span class="user-id">#USR004</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>emily.davis@university.edu</td>
+                                <td>
+                                    <span class="role-badge user">Student</span>
+                                </td>
+                                <td>Skills</td>
+                                <td>
+                                    <span class="status-badge active">Active</span>
+                                </td>
+                                <td>3 hours ago</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn make-admin" title="Make Admin">
+                                            <i class="fas fa-user-plus"></i>
+                                        </button>
+                                        <button class="action-btn edit" title="Edit User">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Delete User">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr class="table-row" data-user-id="5" data-role="user">
+                                <td>
+                                    <input type="checkbox" class="table-checkbox row-checkbox">
+                                </td>
+                                <td>
+                                    <div class="user-info">
+                                        <div class="user-avatar">
+                                            <img src="https://via.placeholder.com/40" alt="User Avatar">
+                                        </div>
+                                        <div class="user-details">
+                                            <span class="user-name">Alex Thompson</span>
+                                            <span class="user-id">#USR005</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>alex.thompson@university.edu</td>
+                                <td>
+                                    <span class="role-badge user">Student</span>
+                                </td>
+                                <td>Academic</td>
+                                <td>
+                                    <span class="status-badge pending">Pending</span>
+                                </td>
+                                <td>Never</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn make-admin" title="Make Admin">
+                                            <i class="fas fa-user-plus"></i>
+                                        </button>
+                                        <button class="action-btn edit" title="Edit User">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn delete" title="Delete User">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="table-footer">
+                    <div class="table-info">
+                        Showing 1-5 of 1,247 users
+                    </div>
+                    <div class="pagination">
+                        <button class="page-btn" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <button class="page-btn">...</button>
+                        <button class="page-btn">250</button>
+                        <button class="page-btn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="confirmation-modal" id="confirmationModal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Confirm Action</h3>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-icon" id="modalIcon">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+                <p class="modal-message" id="modalMessage">Are you sure you want to perform this action?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel" id="modalCancel">Cancel</button>
+                <button class="modal-btn confirm" id="modalConfirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="adminMobileOverlay"></div>
+
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="global.js"></script>
+</body>
+</html>
