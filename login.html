@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - FlowLink</title>
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=PT+Sans:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="global.css">
+</head>
+
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-card" data-aos="fade-up" data-aos-duration="800">
+            <div class="login-header">
+                <h1 class="login-title">Welcome Back</h1>
+                <p class="login-subtitle">Sign in to your FlowLink account</p>
+            </div>
+
+            <form class="login-form" id="loginForm">
+                <div class="input-group">
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" id="email" class="form-input" placeholder="" required>
+                        <label for="email" class="input-label">Email</label>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="password" class="form-input" placeholder="" required>
+                        <label for="password" class="input-label">Password</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary login-btn">
+                    <span>Sign In</span>
+                </button>
+
+                <div class="divider">
+                    <span>or</span>
+                </div>
+
+                <button type="button" class="btn btn-google" id="googleSignIn">
+                    <svg class="google-icon" viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="#4285F4"
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                        <path fill="#34A853"
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                        <path fill="#FBBC05"
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                        <path fill="#EA4335"
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                    </svg>
+                    <span>Continue with Google</span>
+                </button>
+
+                <div class="login-footer">
+                    <p>First time? <a href="#" class="signup-link" id="signupLink">Create your hierarchy</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        console.log('Starting Firebase initialization...');
+
+        try {
+            // Import Firebase modules from CDN
+            const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
+            const { getAnalytics } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js');
+            const {
+                getAuth,
+                signInWithEmailAndPassword,
+                signInWithPopup,
+                GoogleAuthProvider,
+                createUserWithEmailAndPassword,
+                onAuthStateChanged
+            } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
+            const {
+                getFirestore,
+                doc,
+                setDoc,
+                getDoc,
+                collection,
+                getDocs,
+                serverTimestamp
+            } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+
+            console.log('Firebase modules imported successfully');
+
+            // Firebase configuration
+            const firebaseConfig = {
+                apiKey: "AIzaSyBsuZL4U2H66C9tUKN91KXMm-l5umOa1vY",
+                authDomain: "flowlinkkiro.firebaseapp.com",
+                projectId: "flowlinkkiro",
+                storageBucket: "flowlinkkiro.firebasestorage.app",
+                messagingSenderId: "918596906932",
+                appId: "1:918596906932:web:55e2a235cefedd61098ce1",
+                measurementId: "G-B32FNF648G"
+            };
+
+            // Initialize Firebase
+            const app = initializeApp(firebaseConfig);
+            const analytics = getAnalytics(app);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+            const googleProvider = new GoogleAuthProvider();
+
+            console.log('Firebase initialized successfully');
+
+            // Configure Google provider
+            googleProvider.setCustomParameters({
+                prompt: 'select_account'
+            });
+
+            // Simple auth check
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    console.log('User is signed in:', user.email);
+
+                    // Check if user has any hierarchies set up
+                    const hasHierarchies = await checkUserHierarchies(user);
+
+                    // Ensure user document exists
+                    await ensureUserDocument(user, !hasHierarchies);
+
+                    // Redirect based on hierarchy status
+                    if (hasHierarchies) {
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        window.location.href = 'welcome.html';
+                    }
+                } else {
+                    console.log('User is signed out');
+                }
+            });
+
+            // Check if user has any hierarchies
+            async function checkUserHierarchies(user) {
+                try {
+                    const hierarchiesColRef = collection(db, 'users', user.email, 'hierarchies');
+                    const querySnapshot = await getDocs(hierarchiesColRef);
+                    return !querySnapshot.empty;
+                } catch (error) {
+                    console.error('Error checking hierarchies:', error);
+                    return false;
+                }
+            }
+
+            // Function to create or update user document in Firestore
+            async function ensureUserDocument(user, isFirstTime) {
+                try {
+                    // Use email as document ID
+                    const userRef = doc(db, 'users', user.email);
+
+                    const userData = {
+                        userId: user.uid, // Store Firebase UID for compatibility
+                        email: user.email,
+                        displayName: user.displayName || user.email.split('@')[0],
+                        photoURL: user.photoURL || null,
+                        role: 'student', // Default role
+                        isActive: true,
+                        lastLoginAt: serverTimestamp(),
+                        updatedAt: serverTimestamp()
+                    };
+
+                    const userDoc = await getDoc(userRef);
+
+                    if (!userDoc.exists()) {
+                        // Create new user document for first-time user
+                        userData.createdAt = serverTimestamp();
+                        userData.stats = {
+                            problemsCreated: 0,
+                            problemsSolved: 0,
+                            announcementsRead: 0,
+                            loginCount: 1
+                        };
+                        userData.preferences = {
+                            theme: 'light',
+                            notifications: true,
+                            language: 'en'
+                        };
+
+                        await setDoc(userRef, userData);
+                        console.log('New user document created with email ID:', user.email);
+                    } else {
+                        // Update existing user document
+                        const existingData = userDoc.data();
+
+                        userData.stats = {
+                            ...existingData.stats,
+                            loginCount: (existingData.stats?.loginCount || 0) + 1
+                        };
+
+                        // Preserve existing preferences
+                        userData.preferences = existingData.preferences || userData.preferences;
+
+                        await setDoc(userRef, userData, { merge: true });
+                        console.log('User document updated for email:', user.email);
+                    }
+                } catch (error) {
+                    console.error('Error managing user document:', error);
+                }
+            }
+
+            // Initialize AOS
+            AOS.init({
+                duration: 800,
+                easing: 'ease-out',
+                once: true,
+                offset: 100
+            });
+
+            // Get form elements
+            const loginForm = document.getElementById('loginForm');
+            const googleSignInBtn = document.getElementById('googleSignIn');
+            const signupLink = document.getElementById('signupLink');
+
+            // Enhanced input focus effects
+            const inputs = document.querySelectorAll('.form-input');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function () {
+                    this.parentElement.classList.add('focused');
+                });
+
+                input.addEventListener('blur', function () {
+                    this.parentElement.classList.remove('focused');
+                });
+
+                input.addEventListener('input', function () {
+                    if (this.value.length > 0) {
+                        this.parentElement.classList.add('has-value');
+                    } else {
+                        this.parentElement.classList.remove('has-value');
+                    }
+                });
+            });
+
+            // Super Admin Credentials (Frontend Mock)
+            const SUPER_ADMIN_EMAIL = 'admin@flowlink.edu';
+            const SUPER_ADMIN_PASSWORD = 'drona@admin';
+
+            // Handle email/password login
+            loginForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const isSignupMode = this.classList.contains('signup-mode');
+
+                // Add loading state
+                this.classList.add('loading');
+
+                // Check for Super Admin credentials (Frontend-only mock auth)
+                if (!isSignupMode && email === SUPER_ADMIN_EMAIL && password === SUPER_ADMIN_PASSWORD) {
+                    sessionStorage.setItem('superAdminAuth', 'true');
+                    showMessage('Super Admin access granted!', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'super-admin.html';
+                    }, 1000);
+                    return;
+                }
+
+                try {
+                    let result;
+                    if (isSignupMode) {
+                        result = await createUserWithEmailAndPassword(auth, email, password);
+                        showMessage('Account created successfully!', 'success');
+
+                        // User document will be created by onAuthStateChanged
+                    } else {
+                        result = await signInWithEmailAndPassword(auth, email, password);
+                        showMessage('Login successful!', 'success');
+
+                        // User document will be updated by onAuthStateChanged
+                    }
+                } catch (error) {
+                    console.error('Authentication error:', error);
+                    showMessage(getErrorMessage(error.code), 'error');
+                } finally {
+                    this.classList.remove('loading');
+                }
+            });
+
+            // Handle Google sign-in
+            googleSignInBtn.addEventListener('click', async function (e) {
+                e.preventDefault();
+
+                // Add loading state
+                this.classList.add('loading');
+                this.disabled = true;
+
+                try {
+                    const result = await signInWithPopup(auth, googleProvider);
+                    showMessage('Google sign-in successful!', 'success');
+
+                    // User document will be created/updated by onAuthStateChanged
+                } catch (error) {
+                    console.error('Google sign-in error:', error);
+                    showMessage(getErrorMessage(error.code), 'error');
+                } finally {
+                    this.classList.remove('loading');
+                    this.disabled = false;
+                }
+            });
+
+            // Handle signup link (toggle between login and signup)
+            signupLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                toggleSignupMode();
+            });
+
+            // Toggle between login and signup modes
+            function toggleSignupMode() {
+                const form = document.getElementById('loginForm');
+                const title = document.querySelector('.login-title');
+                const subtitle = document.querySelector('.login-subtitle');
+                const submitBtn = document.querySelector('.login-btn span');
+                const signupLink = document.getElementById('signupLink');
+
+                const isSignupMode = form.classList.contains('signup-mode');
+
+                if (isSignupMode) {
+                    // Switch to login mode
+                    form.classList.remove('signup-mode');
+                    title.textContent = 'Welcome Back';
+                    subtitle.textContent = 'Sign in to your FlowLink account';
+                    submitBtn.textContent = 'Sign In';
+                    signupLink.textContent = 'Create your hierarchy';
+                } else {
+                    // Switch to signup mode
+                    form.classList.add('signup-mode');
+                    title.textContent = 'Create Account';
+                    subtitle.textContent = 'Join FlowLink and start organizing';
+                    submitBtn.textContent = 'Create Account';
+                    signupLink.textContent = 'Already have an account?';
+                }
+            }
+
+            // Show messages
+            function showMessage(message, type = 'info') {
+                const existingMessage = document.querySelector('.login-message');
+                if (existingMessage) {
+                    existingMessage.remove();
+                }
+
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `login-message login-message-${type}`;
+                messageDiv.textContent = message;
+
+                const loginCard = document.querySelector('.login-card');
+                loginCard.appendChild(messageDiv);
+
+                // Animate in
+                setTimeout(() => {
+                    messageDiv.style.opacity = '1';
+                    messageDiv.style.transform = 'translateY(0)';
+                }, 100);
+
+                // Remove after delay (except for success messages)
+                if (type !== 'success') {
+                    setTimeout(() => {
+                        messageDiv.style.opacity = '0';
+                        messageDiv.style.transform = 'translateY(-10px)';
+                        setTimeout(() => {
+                            messageDiv.remove();
+                        }, 300);
+                    }, 4000);
+                }
+            }
+
+            // Get user-friendly error messages
+            function getErrorMessage(errorCode) {
+                const errorMessages = {
+                    'auth/user-not-found': 'No account found with this email address.',
+                    'auth/wrong-password': 'Incorrect password. Please try again.',
+                    'auth/email-already-in-use': 'An account with this email already exists.',
+                    'auth/weak-password': 'Password should be at least 6 characters long.',
+                    'auth/invalid-email': 'Please enter a valid email address.',
+                    'auth/user-disabled': 'This account has been disabled.',
+                    'auth/too-many-requests': 'Too many failed attempts. Please try again later.',
+                    'auth/network-request-failed': 'Network error. Please check your connection.',
+                    'auth/popup-closed-by-user': 'Sign-in popup was closed before completion.',
+                    'auth/cancelled-popup-request': 'Sign-in was cancelled.',
+                    'auth/popup-blocked': 'Sign-in popup was blocked by the browser.'
+                };
+                return errorMessages[errorCode] || 'An unexpected error occurred. Please try again.';
+            }
+
+            console.log('Login page initialized successfully');
+
+        } catch (error) {
+            console.error('Error initializing Firebase:', error);
+            document.body.innerHTML = `
+                <div style="padding: 2rem; text-align: center; font-family: Arial, sans-serif;">
+                    <h2>Loading Error</h2>
+                    <p>There was an error loading the login page. Please refresh and try again.</p>
+                    <p style="color: #666; font-size: 0.9rem;">Error: ${error.message}</p>
+                </div>
+            `;
+        }
+    </script>
+
+    <style>
+        .login-message {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .login-message-success {
+            background: rgba(34, 197, 94, 0.1);
+            color: #059669;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .login-message-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .input-wrapper.focused .input-icon {
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        .input-wrapper.has-value .input-label {
+            transform: translateY(-2.5rem) scale(0.85);
+            color: var(--primary-color);
+        }
+
+        .btn.loading {
+            pointer-events: none;
+            opacity: 0.7;
+            position: relative;
+        }
+
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes spin {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+    </style>
+</body>
+
+</html>

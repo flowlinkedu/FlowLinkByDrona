@@ -1,0 +1,124 @@
+You are designing the frontend for a project named “FlowLink”.
+
+This project must follow a STRICT, CONSISTENT design system across ALL pages.
+
+════════════════════════════════════
+🎨 COLOR SCHEME (MANDATORY)
+════════════════════════════════════
+
+Primary Color: #29ABE2  (Main actions, buttons, highlights)
+Background Color: #E5F6FD  (Entire app background)
+Accent Color: #29E2D0  (Animations, hover effects, admin actions)
+Card / Surface Color: #FFFFFF
+Primary Text Color: #1F2933
+Secondary Text Color: #4B5563
+Border Color: rgba(41,171,226,0.2)
+Shadow Color: rgba(0,0,0,0.08)
+
+⚠️ Do NOT introduce new colors unless absolutely required.
+
+════════════════════════════════════
+🔤 TYPOGRAPHY
+════════════════════════════════════
+
+Use Google Fonts via CDN only.
+
+Headings:
+- Font: "Poppins", sans-serif
+- Weight: 600–700
+
+Body Text:
+- Font: "PT Sans", sans-serif
+- Weight: 400–500
+
+Rules:
+- Headings always bold
+- Body text never too thin
+- Use proper line-height (1.5–1.7)
+
+════════════════════════════════════
+🧩 LAYOUT RULES
+════════════════════════════════════
+
+- Use clean, card-based layouts
+- Rounded corners (border-radius: 12px–16px)
+- Consistent padding (16px–24px)
+- Soft shadows on cards and modals
+- Grid or flex-based layout only
+- Fully responsive (mobile-first)
+
+════════════════════════════════════
+✨ ANIMATION PHILOSOPHY
+════════════════════════════════════
+
+Animations should feel:
+- Smooth
+- Professional
+- Purpose-driven (not flashy)
+
+Default animation timing:
+- Duration: 0.3s–0.6s
+- Easing: ease, ease-in-out, cubic-bezier
+
+Use animations for:
+✔ Page load transitions (fade + slide)
+✔ Card hover elevation
+✔ Button hover glow or ripple
+✔ Modal open/close
+✔ Flowchart node creation
+✔ Notifications & badges
+✔ Step transitions
+
+Avoid:
+✘ Heavy or distracting animations
+✘ Random movement
+✘ Long delays
+
+════════════════════════════════════
+📦 ALLOWED LIBRARIES (CDN ONLY)
+════════════════════════════════════
+
+- Google Fonts
+- Font Awesome or Lucide Icons
+- AOS (scroll animations)
+- GSAP (advanced animations)
+- SVG for flowcharts
+- Vanilla JavaScript only (NO frameworks)
+
+════════════════════════════════════
+🧠 UI & UX PRINCIPLES
+════════════════════════════════════
+
+- Clear hierarchy of information
+- Visual separation between sections
+- Icons only where meaningful
+- Buttons must look clickable
+- Admin actions visually distinct using Accent Color
+- Errors and warnings subtle but visible
+
+════════════════════════════════════
+🗂 FILE STRUCTURE EXPECTATION
+════════════════════════════════════
+
+- global.css → all colors, fonts, base styles
+- components.css → buttons, cards, inputs
+- animations.css → reusable animations
+- global.js → shared JS logic
+
+Every page:
+- Must import global.css
+- Must reuse existing components
+- Must NOT redefine colors or fonts
+
+════════════════════════════════════
+🎯 GOAL
+════════════════════════════════════
+
+FlowLink should feel:
+- Structured
+- Trustworthy
+- Modern
+- Scalable
+- Governance-driven
+
+The UI should reflect hierarchy, control, clarity, and collaboration.

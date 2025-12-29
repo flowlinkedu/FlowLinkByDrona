@@ -1,0 +1,145 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    //-------------------------------------------------------------------------
+    // Helper Functions
+    //-------------------------------------------------------------------------
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    function isOwnerByEmail(email) {
+      return isSignedIn() && request.auth.token.email == email;
+    }
+    
+    function isNewOwner() {
+      return isOwner(request.resource.data.userId);
+    }
+    
+    function isExistingOwner() {
+      return isOwner(resource.data.userId);
+    }
+    
+    function isAdminByEmail(adminList) {
+      return isSignedIn() && request.auth.token.email in adminList;
+    }
+    
+    function isUserIdImmutable() {
+      return request.resource.data.userId == resource.data.userId;
+    }
+    
+    function isSuperAdmin() {
+      return isSignedIn() && request.auth.token.email == 'flowlink.2o@gmail.com';
+    }
+    
+    function isMember() {
+      return isSignedIn() && request.auth.token.email in resource.data.members;
+    }
+    
+    function isNewMember() {
+      return isSignedIn() && request.auth.token.email in request.resource.data.members;
+    }
+    
+    //-------------------------------------------------------------------------
+    // User Collection Rules
+    //-------------------------------------------------------------------------
+    match /users/{email} {
+      allow get, update, delete: if isOwnerByEmail(email);
+      allow create: if isOwnerByEmail(email) && request.resource.data.email == email;
+      allow list: if false;
+      
+      // User's personal hierarchies
+      // Structure: /users/{email}/hierarchies/{orgId}/sub-nodes/{nodeId}/sub-nodes/{subNodeId}...
+      match /hierarchies/{document=**} {
+        allow read, write: if isOwnerByEmail(email);
+      }
+    }
+    
+    //-------------------------------------------------------------------------
+    // Global Hierarchies Collection Rules
+    // Structure: /hierarchies/{orgId}/sub-nodes/{nodeId}/sub-nodes/{subNodeId}...
+    //-------------------------------------------------------------------------
+    match /hierarchies/{document=**} {
+      // Anyone can read hierarchy info
+      allow get: if true;
+      
+      // Super admin can list all hierarchies
+      allow list: if isSuperAdmin();
+      
+      // Signed-in users can create new nodes (they become the first member)
+      allow create: if isSignedIn() && isNewMember();
+      
+      // Members or admins can update (add/remove members, update info)
+      allow update: if isSignedIn() && (
+        isMember() || 
+        isAdminByEmail(resource.data.adminEmails) ||
+        isSuperAdmin()
+      );
+      
+      // Only admins or super admin can delete
+      allow delete: if isSignedIn() && (
+        isAdminByEmail(resource.data.adminEmails) ||
+        isSuperAdmin()
+      );
+    }
+    
+    //-------------------------------------------------------------------------
+    // Problems Collection Rules
+    //-------------------------------------------------------------------------
+    match /problems/{problemId} {
+      allow get, list: if true;
+      allow create: if isSignedIn() && isNewOwner();
+      allow update: if isSignedIn() && isExistingOwner() && isUserIdImmutable();
+      allow delete: if isSignedIn() && isExistingOwner();
+    }
+    
+    //-------------------------------------------------------------------------
+    // Solutions Collection Rules
+    //-------------------------------------------------------------------------
+    match /solutions/{solutionId} {
+      allow get, list: if true;
+      allow create: if isSignedIn() && isNewOwner();
+      allow update: if isSignedIn() && isExistingOwner() && isUserIdImmutable();
+      allow delete: if isSignedIn() && isExistingOwner();
+    }
+    
+    //-------------------------------------------------------------------------
+    // Announcements Collection Rules
+    //-------------------------------------------------------------------------
+    match /announcements/{announcementId} {
+      allow get, list: if true;
+      allow create: if isSignedIn() && isNewOwner();
+      allow update: if isSignedIn() && isExistingOwner() && isUserIdImmutable();
+      allow delete: if isSignedIn() && isExistingOwner();
+    }
+    
+    //-------------------------------------------------------------------------
+    // Pending Approvals Collection Rules
+    // Stores approval requests for super admin review
+    //-------------------------------------------------------------------------
+    match /pendingApprovals/{approvalId} {
+      // Only super admin can read pending approvals
+      allow get, list: if isSuperAdmin();
+      
+      // Any signed-in user can create a pending approval (when creating new org)
+      allow create: if isSignedIn();
+      
+      // Only super admin can update or delete
+      allow update, delete: if isSuperAdmin();
+    }
+    
+    //-------------------------------------------------------------------------
+    // Super Admin Collection Rules
+    // Stores super admin settings and approval records
+    //-------------------------------------------------------------------------
+    match /superAdmin/{document=**} {
+      // Only super admin can read/write
+      allow read, write: if isSuperAdmin();
+    }
+  }
+}

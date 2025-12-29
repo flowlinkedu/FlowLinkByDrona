@@ -1,0 +1,27 @@
+{
+  "name": "flowlink-app",
+  "version": "1.0.0",
+  "description": "FlowLink - Hierarchical Problem Management System",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server -p 8000 -c-1",
+    "dev": "http-server -p 8000 -c-1 -o",
+    "build": "echo 'Build script for production deployment'",
+    "test": "echo 'No tests specified'"
+  },
+  "keywords": [
+    "problem-management",
+    "hierarchy",
+    "firebase",
+    "authentication",
+    "flowchart"
+  ],
+  "author": "FlowLink Team",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "dependencies": {
+    "firebase": "^10.7.1"
+  }
+}
