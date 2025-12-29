@@ -402,7 +402,10 @@
 
         let currentUser = null;
         let adminOrganizations = [];
+        let adminNodes = []; // Node-level admin access
         let selectedOrgId = null;
+        let selectedNodePath = null; // For node-level admins
+        let isNodeAdmin = false; // Flag to indicate node-level admin
         let allProblems = [];
         let allAnnouncements = [];
         let joinRequests = [];
@@ -424,23 +427,147 @@
                 const hierarchiesRef = collection(db, 'hierarchies');
                 const snapshot = await getDocs(hierarchiesRef);
                 adminOrganizations = [];
-                snapshot.forEach(docSnap => {
+                adminNodes = [];
+                
+                // Check for organization-level admin access
+                for (const docSnap of snapshot.docs) {
                     const data = docSnap.data();
                     if (data.adminEmails && data.adminEmails.includes(userEmail)) {
-                        adminOrganizations.push({ id: docSnap.id, ...data });
+                        adminOrganizations.push({ id: docSnap.id, ...data, adminLevel: 'organization' });
                     }
-                });
+                    
+                    // Check for node-level admin access within this org
+                    const nodeAdminAccess = await checkNodeAdminAccess(docSnap.id, userEmail);
+                    if (nodeAdminAccess.length > 0) {
+                        nodeAdminAccess.forEach(node => {
+                            adminNodes.push({
+                                orgId: docSnap.id,
+                                orgName: data.name,
+                                ...node,
+                                adminLevel: 'node'
+                            });
+                        });
+                    }
+                }
+                
                 document.getElementById('loadingSpinner').style.display = 'none';
-                if (adminOrganizations.length === 0) { document.getElementById('notAdminMessage').style.display = 'block'; return; }
+                
+                // Check if user has any admin access (org or node level)
+                if (adminOrganizations.length === 0 && adminNodes.length === 0) { 
+                    document.getElementById('notAdminMessage').style.display = 'block'; 
+                    return; 
+                }
+                
                 document.getElementById('adminContentWrapper').style.display = 'block';
+                
+                // Build org selector with both org-level and node-level admin access
                 const orgSelect = document.getElementById('orgSelect');
-                orgSelect.innerHTML = adminOrganizations.map(org => `<option value="${org.id}">${org.name}</option>`).join('');
-                selectedOrgId = adminOrganizations[0].id;
-                orgSelect.addEventListener('change', (e) => { selectedOrgId = e.target.value; loadOrganizationData(); });
+                let options = '';
+                
+                // Add organization-level admin options
+                adminOrganizations.forEach(org => {
+                    options += `<option value="org:${org.id}">${org.name} (Organization Admin)</option>`;
+                });
+                
+                // Add node-level admin options
+                adminNodes.forEach(node => {
+                    options += `<option value="node:${node.orgId}:${node.path}">${node.orgName} → ${node.name} (Node Admin)</option>`;
+                });
+                
+                orgSelect.innerHTML = options;
+                
+                // Set initial selection
+                if (adminOrganizations.length > 0) {
+                    selectedOrgId = adminOrganizations[0].id;
+                    selectedNodePath = null;
+                    isNodeAdmin = false;
+                } else if (adminNodes.length > 0) {
+                    selectedOrgId = adminNodes[0].orgId;
+                    selectedNodePath = adminNodes[0].path;
+                    isNodeAdmin = true;
+                }
+                
+                orgSelect.addEventListener('change', (e) => { 
+                    const value = e.target.value;
+                    if (value.startsWith('org:')) {
+                        selectedOrgId = value.replace('org:', '');
+                        selectedNodePath = null;
+                        isNodeAdmin = false;
+                    } else if (value.startsWith('node:')) {
+                        const parts = value.split(':');
+                        selectedOrgId = parts[1];
+                        selectedNodePath = parts.slice(2).join(':');
+                        isNodeAdmin = true;
+                    }
+                    updateAdminBadge();
+                    loadOrganizationData(); 
+                });
+                
+                updateAdminBadge();
                 setupNavigation();
                 setupEventListeners();
                 await loadOrganizationData();
-            } catch (error) { console.error('Error checking admin status:', error); showToast('Error loading admin data: ' + error.message, 'error'); }
+            } catch (error) { 
+                console.error('Error checking admin status:', error); 
+                showToast('Error loading admin data: ' + error.message, 'error'); 
+            }
+        }
+        
+        // Check for node-level admin access within an organization
+        async function checkNodeAdminAccess(orgId, userEmail) {
+            const nodeAdminAccess = [];
+            
+            async function checkNodesRecursive(parentPath) {
+                try {
+                    const subNodesRef = collection(db, parentPath, 'sub-nodes');
+                    const snapshot = await getDocs(subNodesRef);
+                    
+                    for (const docSnap of snapshot.docs) {
+                        const data = docSnap.data();
+                        const nodePath = `${parentPath}/sub-nodes/${docSnap.id}`;
+                        
+                        if (data.adminEmails && data.adminEmails.includes(userEmail)) {
+                            nodeAdminAccess.push({
+                                id: docSnap.id,
+                                path: nodePath,
+                                name: data.name,
+                                type: data.type || 'department',
+                                ...data
+                            });
+                        }
+                        
+                        // Check children
+                        await checkNodesRecursive(nodePath);
+                    }
+                } catch (e) {
+                    // No sub-nodes
+                }
+            }
+            
+            await checkNodesRecursive(`hierarchies/${orgId}`);
+            return nodeAdminAccess;
+        }
+        
+        // Update admin badge based on admin level
+        function updateAdminBadge() {
+            const badge = document.querySelector('.topbar-badge');
+            const roleText = document.querySelector('.admin-role');
+            const membersSectionTitle = document.querySelector('#membersPage .section-title');
+            const subnodesSectionTitle = document.querySelector('#subnodesPage .section-title');
+            
+            if (isNodeAdmin) {
+                badge.textContent = 'Node Admin';
+                badge.style.background = 'linear-gradient(135deg, #8B5CF6, #A78BFA)';
+                roleText.textContent = 'Node Admin';
+                if (membersSectionTitle) membersSectionTitle.textContent = 'Node Members';
+                if (subnodesSectionTitle) subnodesSectionTitle.textContent = 'Sub-Nodes (Your Scope)';
+            } else {
+                badge.textContent = 'Organization Admin';
+                badge.style.background = 'linear-gradient(135deg, var(--admin-accent), #29E2D0)';
+                roleText.textContent = 'Organization Admin';
+                if (membersSectionTitle) membersSectionTitle.textContent = 'Organization Members';
+                if (subnodesSectionTitle) subnodesSectionTitle.textContent = 'Sub-Nodes Management';
+            }
         }
 
         function setupNavigation() {
@@ -475,8 +602,24 @@
 
         async function loadOrganizationData() {
             const org = adminOrganizations.find(o => o.id === selectedOrgId);
-            if (!org) return;
-            document.getElementById('totalMembers').textContent = (org.members || []).length;
+            
+            // For node admins, get member count from their managed node
+            if (isNodeAdmin && selectedNodePath) {
+                try {
+                    const nodeDoc = await getDoc(doc(db, selectedNodePath));
+                    if (nodeDoc.exists()) {
+                        const nodeData = nodeDoc.data();
+                        document.getElementById('totalMembers').textContent = (nodeData.members || []).length;
+                    } else {
+                        document.getElementById('totalMembers').textContent = 0;
+                    }
+                } catch (e) {
+                    document.getElementById('totalMembers').textContent = 0;
+                }
+            } else if (org) {
+                document.getElementById('totalMembers').textContent = (org.members || []).length;
+            }
+            
             await Promise.all([loadJoinRequests(), loadBranchRequests(), loadSubNodes(), loadProblems(org), loadAnnouncements(org)]);
             updateBadges();
             renderAllSections(org);
@@ -502,11 +645,21 @@
                         const requestDoc = await getDoc(doc(db, 'pendingApprovals', requestId));
                         if (requestDoc.exists()) {
                             const data = requestDoc.data();
-                            // Only include if still pending and for this org
-                            if (data.status === 'pending' && 
-                                (data.targetOrgId === selectedOrgId || 
-                                 (data.targetNodePath && data.targetNodePath.startsWith(`hierarchies/${selectedOrgId}`)))) {
-                                joinRequests.push({ id: requestDoc.id, ...data });
+                            // Only include if still pending
+                            if (data.status === 'pending') {
+                                // For node admins, only show requests for their node and below
+                                if (isNodeAdmin && selectedNodePath) {
+                                    // Check if target node is under the managed node
+                                    if (data.targetNodePath && data.targetNodePath.startsWith(selectedNodePath)) {
+                                        joinRequests.push({ id: requestDoc.id, ...data });
+                                    }
+                                } else {
+                                    // Org admin - show all requests for this org
+                                    if (data.targetOrgId === selectedOrgId || 
+                                        (data.targetNodePath && data.targetNodePath.startsWith(`hierarchies/${selectedOrgId}`))) {
+                                        joinRequests.push({ id: requestDoc.id, ...data });
+                                    }
+                                }
                             }
                         }
                     } catch (e) {
@@ -515,23 +668,29 @@
                 }
                 
                 // FALLBACK: Also scan pendingApprovals for any requests assigned to this admin
-                // (for backward compatibility with existing requests before notification system)
                 if (joinRequests.length === 0) {
                     console.log('No requests from notifications, checking pendingApprovals directly...');
                     const pendingRef = collection(db, 'pendingApprovals');
                     const snapshot = await getDocs(pendingRef);
                     
-                    const currentOrg = adminOrganizations.find(o => o.id === selectedOrgId);
-                    const orgAdminEmails = currentOrg?.adminEmails || [];
-                    
                     snapshot.docs.forEach(docSnap => {
                         const data = docSnap.data();
                         if (data.requestType === 'join' && 
                             data.status === 'pending' &&
-                            (data.targetOrgId === selectedOrgId || 
-                             (data.targetNodePath && data.targetNodePath.startsWith(`hierarchies/${selectedOrgId}`))) &&
-                            (data.assignedAdminEmail === currentUser.email || orgAdminEmails.includes(currentUser.email))) {
-                            joinRequests.push({ id: docSnap.id, ...data });
+                            data.assignedAdminEmail === currentUser.email) {
+                            
+                            // For node admins, only show requests for their node and below
+                            if (isNodeAdmin && selectedNodePath) {
+                                if (data.targetNodePath && data.targetNodePath.startsWith(selectedNodePath)) {
+                                    joinRequests.push({ id: docSnap.id, ...data });
+                                }
+                            } else {
+                                // Org admin - show all requests for this org
+                                if (data.targetOrgId === selectedOrgId || 
+                                    (data.targetNodePath && data.targetNodePath.startsWith(`hierarchies/${selectedOrgId}`))) {
+                                    joinRequests.push({ id: docSnap.id, ...data });
+                                }
+                            }
                         }
                     });
                 }
@@ -564,11 +723,21 @@
                         const requestDoc = await getDoc(doc(db, 'pendingApprovals', requestId));
                         if (requestDoc.exists()) {
                             const data = requestDoc.data();
-                            // Only include if still pending and for this org
-                            if (data.status === 'pending' && 
-                                (data.parentOrgId === selectedOrgId || 
-                                 (data.parentNodePath && data.parentNodePath.startsWith(`hierarchies/${selectedOrgId}`)))) {
-                                branchRequests.push({ id: requestDoc.id, ...data });
+                            // Only include if still pending
+                            if (data.status === 'pending') {
+                                // For node admins, only show requests for their node and below
+                                if (isNodeAdmin && selectedNodePath) {
+                                    // Check if parent node is the managed node or under it
+                                    if (data.parentNodePath && (data.parentNodePath === selectedNodePath || data.parentNodePath.startsWith(selectedNodePath + '/sub-nodes/'))) {
+                                        branchRequests.push({ id: requestDoc.id, ...data });
+                                    }
+                                } else {
+                                    // Org admin - show all requests for this org
+                                    if (data.parentOrgId === selectedOrgId || 
+                                        (data.parentNodePath && data.parentNodePath.startsWith(`hierarchies/${selectedOrgId}`))) {
+                                        branchRequests.push({ id: requestDoc.id, ...data });
+                                    }
+                                }
                             }
                         }
                     } catch (e) {
@@ -577,23 +746,29 @@
                 }
                 
                 // FALLBACK: Also scan pendingApprovals for any requests assigned to this admin
-                // (for backward compatibility with existing requests before notification system)
                 if (branchRequests.length === 0) {
                     console.log('No requests from notifications, checking pendingApprovals directly...');
                     const pendingRef = collection(db, 'pendingApprovals');
                     const snapshot = await getDocs(pendingRef);
                     
-                    const currentOrg = adminOrganizations.find(o => o.id === selectedOrgId);
-                    const orgAdminEmails = currentOrg?.adminEmails || [];
-                    
                     snapshot.docs.forEach(docSnap => {
                         const data = docSnap.data();
                         if (data.requestType === 'branch' && 
                             data.status === 'pending' &&
-                            (data.parentOrgId === selectedOrgId || 
-                             (data.parentNodePath && data.parentNodePath.startsWith(`hierarchies/${selectedOrgId}`))) &&
-                            (data.assignedAdminEmail === currentUser.email || orgAdminEmails.includes(currentUser.email))) {
-                            branchRequests.push({ id: docSnap.id, ...data });
+                            data.assignedAdminEmail === currentUser.email) {
+                            
+                            // For node admins, only show requests for their node and below
+                            if (isNodeAdmin && selectedNodePath) {
+                                if (data.parentNodePath && (data.parentNodePath === selectedNodePath || data.parentNodePath.startsWith(selectedNodePath + '/sub-nodes/'))) {
+                                    branchRequests.push({ id: docSnap.id, ...data });
+                                }
+                            } else {
+                                // Org admin - show all requests for this org
+                                if (data.parentOrgId === selectedOrgId || 
+                                    (data.parentNodePath && data.parentNodePath.startsWith(`hierarchies/${selectedOrgId}`))) {
+                                    branchRequests.push({ id: docSnap.id, ...data });
+                                }
+                            }
                         }
                     });
                 }
@@ -609,10 +784,37 @@
         async function loadSubNodes() {
             try {
                 subNodes = [];
-                const orgRef = doc(db, 'hierarchies', selectedOrgId);
-                const subNodesRef = collection(orgRef, 'sub-nodes');
-                await fetchSubNodesRecursive(subNodesRef, `hierarchies/${selectedOrgId}`, 0);
-            } catch (error) { console.error('Error loading sub-nodes:', error); subNodes = []; }
+                
+                if (isNodeAdmin && selectedNodePath) {
+                    // Node admin - only load sub-nodes under their managed node
+                    const nodeRef = doc(db, selectedNodePath);
+                    const nodeDoc = await getDoc(nodeRef);
+                    
+                    if (nodeDoc.exists()) {
+                        const nodeData = nodeDoc.data();
+                        // Add the managed node itself at level 0
+                        subNodes.push({ 
+                            id: selectedNodePath.split('/').pop(), 
+                            path: selectedNodePath, 
+                            level: 0, 
+                            isManaged: true,
+                            ...nodeData 
+                        });
+                        
+                        // Load children under this node
+                        const subNodesRef = collection(nodeRef, 'sub-nodes');
+                        await fetchSubNodesRecursive(subNodesRef, selectedNodePath, 1);
+                    }
+                } else {
+                    // Organization admin - load all sub-nodes
+                    const orgRef = doc(db, 'hierarchies', selectedOrgId);
+                    const subNodesRef = collection(orgRef, 'sub-nodes');
+                    await fetchSubNodesRecursive(subNodesRef, `hierarchies/${selectedOrgId}`, 0);
+                }
+            } catch (error) { 
+                console.error('Error loading sub-nodes:', error); 
+                subNodes = []; 
+            }
         }
 
         async function fetchSubNodesRecursive(colRef, parentPath, level) {
@@ -662,7 +864,7 @@
             renderJoinRequests();
             renderBranchRequests();
             renderSubNodes();
-            renderMembers(org);
+            renderMembers(org); // Now async but we don't need to await
             renderProblems();
             renderAnnouncements();
         }
@@ -760,28 +962,85 @@
         function renderSubNodes() {
             const container = document.getElementById('subnodeTree');
             if (subNodes.length === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa-sitemap"></i><h3>No Sub-Nodes</h3><p>Create sub-nodes to organize your hierarchy.</p></div>'; return; }
-            container.innerHTML = subNodes.map(node => `<div class="subnode-item" style="margin-left:${node.level * 20}px;">
-                <div class="subnode-info">
-                    <div class="subnode-name">${node.level > 0 ? '└ ' : ''}${node.name}</div>
-                    <div class="subnode-meta">${node.type || 'department'} • ${(node.members || []).length} members • ${(node.adminEmails || []).length > 0 ? 'Admin: ' + node.adminEmails.join(', ') : 'No admin'}</div>
-                </div>
-                <div class="subnode-actions">
-                    <button class="action-btn assign" onclick="openAssignNodeAdminModal('${node.path}', '${node.name}')">Assign Admin</button>
-                    <button class="action-btn view" onclick="editSubnode('${node.id}', '${node.path}')">Edit</button>
-                    <button class="action-btn reject" onclick="deleteSubnode('${node.path}', '${node.name}')">Delete</button>
-                </div>
-            </div>`).join('');
+            
+            container.innerHTML = subNodes.map(node => {
+                // For node admins, check if this node is at or below their managed level
+                // Node admins can only edit/delete nodes at or below their managed node
+                const canModify = !isNodeAdmin || (selectedNodePath && node.path.startsWith(selectedNodePath));
+                const isRootManagedNode = isNodeAdmin && node.isManaged; // The node admin's own managed node
+                
+                // Node admin cannot delete their own managed node (root of their scope)
+                const canDelete = canModify && !isRootManagedNode;
+                
+                return `<div class="subnode-item" style="margin-left:${node.level * 20}px;">
+                    <div class="subnode-info">
+                        <div class="subnode-name">${node.level > 0 ? '└ ' : ''}${node.name}${isRootManagedNode ? ' <span style="color:#8B5CF6;font-size:0.75rem;">(Your Managed Node)</span>' : ''}</div>
+                        <div class="subnode-meta">${node.type || 'department'} • ${(node.members || []).length} members • ${(node.adminEmails || []).length > 0 ? 'Admin: ' + node.adminEmails.join(', ') : 'No admin'}</div>
+                    </div>
+                    <div class="subnode-actions">
+                        ${canModify ? `<button class="action-btn assign" onclick="openAssignNodeAdminModal('${node.path}', '${node.name}')">Assign Admin</button>` : ''}
+                        ${canModify ? `<button class="action-btn view" onclick="editSubnode('${node.id}', '${node.path}')">Edit</button>` : ''}
+                        ${canDelete ? `<button class="action-btn reject" onclick="deleteSubnode('${node.path}', '${node.name}')">Delete</button>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
         }
 
-        function renderMembers(org) {
+        async function renderMembers(org) {
             const container = document.getElementById('membersTable');
-            const members = org.members || [];
-            if (members.length === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><h3>No Members</h3><p>No members have joined yet.</p></div>'; return; }
-            container.innerHTML = `<table><thead><tr><th>Email</th><th>Role</th><th>Actions</th></tr></thead><tbody>${members.map(email => `<tr>
-                <td><strong>${email}</strong></td>
-                <td><span class="status-badge ${org.adminEmails?.includes(email) ? 'active' : 'pending'}">${org.adminEmails?.includes(email) ? 'Admin' : 'Member'}</span></td>
-                <td>${!org.adminEmails?.includes(email) ? `<button class="action-btn approve" onclick="makeAdmin('${email}')">Make Admin</button>` : `<button class="action-btn reject" onclick="removeAdmin('${email}')">Remove Admin</button>`}<button class="action-btn reject" onclick="removeMember('${email}')">Remove</button></td>
-            </tr>`).join('')}</tbody></table>`;
+            let members = [];
+            let adminEmails = [];
+            let scopeLabel = '';
+            
+            if (isNodeAdmin && selectedNodePath) {
+                // Node admin - show members from their managed node and all children
+                scopeLabel = ' (within your managed scope)';
+                const memberSet = new Set();
+                const adminSet = new Set();
+                
+                // Collect members from all nodes in scope
+                for (const node of subNodes) {
+                    if (node.members) {
+                        node.members.forEach(m => memberSet.add(m));
+                    }
+                    if (node.adminEmails) {
+                        node.adminEmails.forEach(a => adminSet.add(a));
+                    }
+                }
+                
+                members = Array.from(memberSet);
+                adminEmails = Array.from(adminSet);
+            } else if (org) {
+                // Organization admin - show all org members
+                members = org.members || [];
+                adminEmails = org.adminEmails || [];
+            }
+            
+            if (members.length === 0) { 
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-users"></i><h3>No Members${scopeLabel}</h3><p>No members have joined yet.</p></div>`; 
+                return; 
+            }
+            
+            // For node admins, disable org-level admin management
+            const canManageOrgAdmins = !isNodeAdmin;
+            
+            container.innerHTML = `<table><thead><tr><th>Email</th><th>Role</th><th>Actions</th></tr></thead><tbody>${members.map(email => {
+                const isOrgAdmin = org?.adminEmails?.includes(email);
+                const isNodeAdminUser = adminEmails.includes(email) && !isOrgAdmin;
+                const roleLabel = isOrgAdmin ? 'Org Admin' : (isNodeAdminUser ? 'Node Admin' : 'Member');
+                const roleClass = isOrgAdmin ? 'active' : (isNodeAdminUser ? 'join' : 'pending');
+                
+                return `<tr>
+                    <td><strong>${email}</strong></td>
+                    <td><span class="status-badge ${roleClass}">${roleLabel}</span></td>
+                    <td>
+                        ${canManageOrgAdmins && !isOrgAdmin ? `<button class="action-btn approve" onclick="makeAdmin('${email}')">Make Org Admin</button>` : ''}
+                        ${canManageOrgAdmins && isOrgAdmin ? `<button class="action-btn reject" onclick="removeAdmin('${email}')">Remove Org Admin</button>` : ''}
+                        ${canManageOrgAdmins ? `<button class="action-btn reject" onclick="removeMember('${email}')">Remove</button>` : ''}
+                        ${!canManageOrgAdmins ? '<span style="color:#6B7280;font-size:0.85rem;">View only</span>' : ''}
+                    </td>
+                </tr>`;
+            }).join('')}</tbody></table>`;
         }
 
         function renderProblems() {
@@ -823,9 +1082,17 @@
                     updatedAt: serverTimestamp() 
                 }, { merge: true });
                 
-                // Update user's personal hierarchy status to active
-                const userHierarchyRef = doc(db, 'users', request.requesterEmail, 'hierarchies', request.targetOrgId);
-                await setDoc(userHierarchyRef, { 
+                // First, ensure all PARENT nodes exist and are active in user's hierarchy
+                // This activates: IIIT BHOPAL -> 2029 -> CSE (parents of DS)
+                await ensureUserHierarchyPath(request.requesterEmail, request.targetNodePath);
+                
+                // Then update the TARGET node itself to active
+                // Convert global path to user path: hierarchies/org/sub-nodes/... -> users/email/hierarchies/org/sub-nodes/...
+                const userNodePath = request.targetNodePath.replace('hierarchies/', `users/${request.requesterEmail}/hierarchies/`);
+                console.log('Updating target user node at:', userNodePath);
+                
+                const userNodeRef = doc(db, userNodePath);
+                await setDoc(userNodeRef, { 
                     name: request.targetNodeName,
                     status: 'active',
                     approvedAt: serverTimestamp(),
@@ -893,10 +1160,14 @@
                     createdBy: request.requesterEmail,
                     createdAt: serverTimestamp()
                 });
-                console.log('Created global node');
+                console.log('Created global node at:', globalNodePath);
                 
-                // 2. Update user's personal hierarchy sub-node status to active (node was created when request was made)
-                const userNodePath = `users/${request.requesterEmail}/hierarchies/${orgId}/sub-nodes/${nodeId}`;
+                // 2. Convert global path to user hierarchy path
+                // Global: hierarchies/iiit-bhopal/sub-nodes/2029/sub-nodes/cse
+                // User:   users/{email}/hierarchies/iiit-bhopal/sub-nodes/2029/sub-nodes/cse
+                const userNodePath = globalNodePath.replace('hierarchies/', `users/${request.requesterEmail}/hierarchies/`);
+                console.log('User node path:', userNodePath);
+                
                 const userNodeRef = doc(db, userNodePath);
                 await setDoc(userNodeRef, {
                     name: request.proposedName,
@@ -907,22 +1178,23 @@
                 }, { merge: true });
                 console.log('Updated user node');
                 
-                // 3. Also ensure user's root hierarchy exists with active status
-                const userHierarchyRef = doc(db, 'users', request.requesterEmail, 'hierarchies', orgId);
-                const userHierarchyDoc = await getDoc(userHierarchyRef);
-                if (!userHierarchyDoc.exists()) {
-                    // Get org name from global hierarchy
-                    const orgDoc = await getDoc(doc(db, 'hierarchies', orgId));
-                    const orgName = orgDoc.exists() ? orgDoc.data().name : orgId;
-                    await setDoc(userHierarchyRef, {
-                        name: orgName,
-                        status: 'active',
-                        createdAt: serverTimestamp()
-                    });
-                }
-                console.log('Ensured user hierarchy exists');
+                // 3. Ensure all parent nodes exist in user's hierarchy
+                await ensureUserHierarchyPath(request.requesterEmail, request.parentNodePath);
+                console.log('Ensured user hierarchy path exists');
                 
-                // 4. Remove from admin's notifications (use assignedAdminEmail from request)
+                // 4. Delete the old pending node if it was created at wrong location
+                // The pending node might have been created at flat level, delete it
+                const oldFlatPath = `users/${request.requesterEmail}/hierarchies/${orgId}/sub-nodes/${nodeId}`;
+                if (oldFlatPath !== userNodePath) {
+                    try {
+                        await deleteDoc(doc(db, oldFlatPath));
+                        console.log('Deleted old flat node at:', oldFlatPath);
+                    } catch (e) {
+                        // Node might not exist at old location
+                    }
+                }
+                
+                // 5. Remove from admin's notifications (use assignedAdminEmail from request)
                 try {
                     const adminEmail = request.assignedAdminEmail || currentUser.email;
                     console.log('Removing from notifications for admin:', adminEmail, 'requestId:', requestId);
@@ -947,7 +1219,7 @@
                     // Continue anyway - don't block approval
                 }
                 
-                // 5. Delete the pending approval
+                // 6. Delete the pending approval
                 await deleteDoc(doc(db, 'pendingApprovals', requestId));
                 
                 showToast('Branch request approved! Sub-node created.', 'success');
@@ -957,6 +1229,60 @@
                 showToast('Error: ' + error.message, 'error'); 
             }
         };
+        
+        // Helper function to ensure all parent nodes exist in user's hierarchy AND are set to active
+        // When a child node is approved, all parent nodes should also become active
+        async function ensureUserHierarchyPath(userEmail, globalParentPath) {
+            // globalParentPath: hierarchies/iiit-bhopal/sub-nodes/2029
+            // We need to ensure: users/{email}/hierarchies/iiit-bhopal and users/{email}/hierarchies/iiit-bhopal/sub-nodes/2029 exist AND are active
+            
+            const parts = globalParentPath.split('/');
+            // parts: ['hierarchies', 'iiit-bhopal', 'sub-nodes', '2029', ...]
+            
+            if (parts[0] !== 'hierarchies' || parts.length < 2) return;
+            
+            const orgId = parts[1];
+            
+            // Ensure root hierarchy exists AND is active
+            const userHierarchyRef = doc(db, 'users', userEmail, 'hierarchies', orgId);
+            const userHierarchyDoc = await getDoc(userHierarchyRef);
+            const orgDoc = await getDoc(doc(db, 'hierarchies', orgId));
+            const orgName = orgDoc.exists() ? orgDoc.data().name : orgId;
+            const orgType = orgDoc.exists() ? orgDoc.data().type : 'organization';
+            
+            // Always update to active status (even if exists with pending/draft status)
+            await setDoc(userHierarchyRef, {
+                name: orgName,
+                type: orgType,
+                status: 'active',
+                updatedAt: serverTimestamp()
+            }, { merge: true });
+            console.log('Set root hierarchy to active:', `users/${userEmail}/hierarchies/${orgId}`);
+            
+            // Ensure each sub-node level exists AND is active
+            let currentPath = `users/${userEmail}/hierarchies/${orgId}`;
+            for (let i = 2; i < parts.length; i += 2) {
+                if (parts[i] === 'sub-nodes' && parts[i + 1]) {
+                    currentPath += `/sub-nodes/${parts[i + 1]}`;
+                    const nodeRef = doc(db, currentPath);
+                    
+                    // Get name from global hierarchy
+                    const globalPath = `hierarchies/${orgId}${currentPath.split(orgId)[1]}`;
+                    const globalDoc = await getDoc(doc(db, globalPath));
+                    const nodeName = globalDoc.exists() ? globalDoc.data().name : parts[i + 1];
+                    const nodeType = globalDoc.exists() ? globalDoc.data().type : 'department';
+                    
+                    // Always update to active status (even if exists with pending/draft status)
+                    await setDoc(nodeRef, {
+                        name: nodeName,
+                        type: nodeType,
+                        status: 'active',
+                        updatedAt: serverTimestamp()
+                    }, { merge: true });
+                    console.log('Set parent node to active:', currentPath);
+                }
+            }
+        }
 
         window.openRejectModal = function(requestId, type, requesterEmail) {
             currentRejectRequest = { id: requestId, type };
@@ -1043,8 +1369,26 @@
             // Populate parent node options
             const parentSelect = document.getElementById('parentNodeSelect');
             const org = adminOrganizations.find(o => o.id === selectedOrgId);
-            let options = `<option value="hierarchies/${selectedOrgId}">${org?.name || 'Organization'} (Root)</option>`;
-            subNodes.forEach(node => { options += `<option value="${node.path}">${'—'.repeat(node.level + 1)} ${node.name}</option>`; });
+            let options = '';
+            
+            if (isNodeAdmin && selectedNodePath) {
+                // Node admin - only show their managed node and its children as parent options
+                const managedNode = subNodes.find(n => n.isManaged);
+                if (managedNode) {
+                    options = `<option value="${managedNode.path}">${managedNode.name} (Your Managed Node)</option>`;
+                }
+                // Add child nodes under the managed node
+                subNodes.forEach(node => {
+                    if (!node.isManaged && node.path.startsWith(selectedNodePath)) {
+                        options += `<option value="${node.path}">${'—'.repeat(node.level)} ${node.name}</option>`;
+                    }
+                });
+            } else {
+                // Organization admin - show all nodes including root
+                options = `<option value="hierarchies/${selectedOrgId}">${org?.name || 'Organization'} (Root)</option>`;
+                subNodes.forEach(node => { options += `<option value="${node.path}">${'—'.repeat(node.level + 1)} ${node.name}</option>`; });
+            }
+            
             parentSelect.innerHTML = options;
             document.getElementById('addSubnodeModal').classList.add('show');
         }
@@ -1242,12 +1586,12 @@
                 }, { merge: true });
                 
                 // 3. Create/update user's hierarchy to point to the correct node
-                // Get the target node ID from path
-                const targetNodeId = targetPath.split('/').pop();
+                // Convert target global path to user path
+                const userTargetPath = targetPath.replace('hierarchies/', `users/${request.requesterEmail}/hierarchies/`);
                 const orgId = request.parentOrgId || selectedOrgId;
                 
-                // Update user's hierarchy with the correct sub-node
-                const userSubNodeRef = doc(db, 'users', request.requesterEmail, 'hierarchies', orgId, 'sub-nodes', targetNodeId);
+                // Update user's hierarchy with the correct sub-node at the correct nested path
+                const userSubNodeRef = doc(db, userTargetPath);
                 await setDoc(userSubNodeRef, {
                     name: targetName,
                     type: request.proposedType || 'department',
@@ -1257,26 +1601,32 @@
                     approvedBy: currentUser.email
                 }, { merge: true });
                 
-                // 4. Ensure user's root hierarchy exists
-                const userHierarchyRef = doc(db, 'users', request.requesterEmail, 'hierarchies', orgId);
-                const userHierarchyDoc = await getDoc(userHierarchyRef);
-                if (!userHierarchyDoc.exists()) {
-                    const org = adminOrganizations.find(o => o.id === orgId);
-                    await setDoc(userHierarchyRef, {
-                        name: org?.name || orgId,
-                        status: 'active',
-                        createdAt: serverTimestamp()
-                    });
-                }
+                // 4. Ensure all parent nodes exist in user's hierarchy
+                await ensureUserHierarchyPath(request.requesterEmail, request.parentNodePath);
                 
                 // 5. Delete the pending sub-node in user's hierarchy if it exists (the wrong one)
                 const wrongNodeId = request.proposedName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-                if (wrongNodeId !== targetNodeId) {
+                
+                // Delete from the correct parent path
+                const userParentPath = request.parentNodePath.replace('hierarchies/', `users/${request.requesterEmail}/hierarchies/`);
+                const wrongNodePath = `${userParentPath}/sub-nodes/${wrongNodeId}`;
+                if (wrongNodePath !== userTargetPath) {
                     try {
-                        const wrongNodeRef = doc(db, 'users', request.requesterEmail, 'hierarchies', orgId, 'sub-nodes', wrongNodeId);
-                        await deleteDoc(wrongNodeRef);
+                        await deleteDoc(doc(db, wrongNodePath));
+                        console.log('Deleted wrong node at:', wrongNodePath);
                     } catch (e) {
-                        // Node might not exist, that's fine
+                        // Node might not exist
+                    }
+                }
+                
+                // Also try to delete from flat location
+                const flatWrongPath = `users/${request.requesterEmail}/hierarchies/${orgId}/sub-nodes/${wrongNodeId}`;
+                if (flatWrongPath !== wrongNodePath && flatWrongPath !== userTargetPath) {
+                    try {
+                        await deleteDoc(doc(db, flatWrongPath));
+                        console.log('Deleted flat wrong node at:', flatWrongPath);
+                    } catch (e) {
+                        // Node might not exist
                     }
                 }
                 
@@ -1403,8 +1753,12 @@
                     createdAt: serverTimestamp()
                 });
                 
-                // 3. Update user's hierarchy - create intermediate node
-                const userMiddleNodeRef = doc(db, 'users', request.requesterEmail, 'hierarchies', orgId, 'sub-nodes', middleNodeId);
+                // 3. Convert global paths to user hierarchy paths
+                const userMiddleNodePath = middleNodePath.replace('hierarchies/', `users/${request.requesterEmail}/hierarchies/`);
+                const userFinalNodePath = finalNodePath.replace('hierarchies/', `users/${request.requesterEmail}/hierarchies/`);
+                
+                // Create intermediate node in user's hierarchy
+                const userMiddleNodeRef = doc(db, userMiddleNodePath);
                 await setDoc(userMiddleNodeRef, {
                     name: middleName,
                     type: middleType,
@@ -1413,7 +1767,7 @@
                 });
                 
                 // 4. Create final node under intermediate in user's hierarchy
-                const userFinalNodeRef = doc(db, 'users', request.requesterEmail, 'hierarchies', orgId, 'sub-nodes', middleNodeId, 'sub-nodes', finalNodeId);
+                const userFinalNodeRef = doc(db, userFinalNodePath);
                 await setDoc(userFinalNodeRef, {
                     name: request.proposedName,
                     type: request.proposedType || 'department',
@@ -1422,25 +1776,32 @@
                     approvedBy: currentUser.email
                 });
                 
-                // 5. Delete the old pending node in user's hierarchy (direct child of org)
-                try {
-                    const oldUserNodeRef = doc(db, 'users', request.requesterEmail, 'hierarchies', orgId, 'sub-nodes', finalNodeId);
-                    await deleteDoc(oldUserNodeRef);
-                } catch (e) {
-                    // Node might not exist at old location
+                // 5. Delete the old pending node in user's hierarchy
+                // It might be at the wrong flat location or at the parent level
+                const oldUserParentPath = request.parentNodePath.replace('hierarchies/', `users/${request.requesterEmail}/hierarchies/`);
+                const oldPendingNodePath = `${oldUserParentPath}/sub-nodes/${finalNodeId}`;
+                if (oldPendingNodePath !== userFinalNodePath) {
+                    try {
+                        await deleteDoc(doc(db, oldPendingNodePath));
+                        console.log('Deleted old pending node at:', oldPendingNodePath);
+                    } catch (e) {
+                        // Node might not exist at old location
+                    }
                 }
                 
-                // 6. Ensure user's root hierarchy exists
-                const userHierarchyRef = doc(db, 'users', request.requesterEmail, 'hierarchies', orgId);
-                const userHierarchyDoc = await getDoc(userHierarchyRef);
-                if (!userHierarchyDoc.exists()) {
-                    const org = adminOrganizations.find(o => o.id === orgId);
-                    await setDoc(userHierarchyRef, {
-                        name: org?.name || orgId,
-                        status: 'active',
-                        createdAt: serverTimestamp()
-                    });
+                // Also try to delete from flat location
+                const flatOldPath = `users/${request.requesterEmail}/hierarchies/${orgId}/sub-nodes/${finalNodeId}`;
+                if (flatOldPath !== userFinalNodePath && flatOldPath !== oldPendingNodePath) {
+                    try {
+                        await deleteDoc(doc(db, flatOldPath));
+                        console.log('Deleted old flat node at:', flatOldPath);
+                    } catch (e) {
+                        // Node might not exist
+                    }
                 }
+                
+                // 6. Ensure all parent nodes exist in user's hierarchy
+                await ensureUserHierarchyPath(request.requesterEmail, request.parentNodePath);
                 
                 // 7. Remove from admin's notifications
                 const adminEmail = request.assignedAdminEmail || currentUser.email;

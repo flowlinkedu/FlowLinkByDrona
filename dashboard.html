@@ -1125,6 +1125,246 @@
                 flex-direction: column;
             }
         }
+
+        /* Flowchart Tree Styles - Similar to Welcome Page */
+        .flowchart-section {
+            display: none;
+        }
+        .flowchart-section.active {
+            display: block;
+        }
+        .flowchart-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(41, 171, 226, 0.1);
+            overflow-x: auto;
+        }
+        .flowchart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .flowchart-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1F2933;
+        }
+        .flowchart-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+        .flowchart-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        .flowchart-btn.primary {
+            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            color: white;
+        }
+        .flowchart-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(41, 171, 226, 0.4);
+        }
+        .flowchart-btn.secondary {
+            background: rgba(139, 92, 246, 0.1);
+            color: #8B5CF6;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        .flowchart-btn.secondary:hover {
+            background: #8B5CF6;
+            color: white;
+        }
+        .flowchart-container {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            padding: 1rem 0;
+            min-height: 200px;
+        }
+        .flowchart-empty {
+            text-align: center;
+            padding: 3rem;
+            color: #6B7280;
+        }
+        .flowchart-empty i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+            color: #29ABE2;
+        }
+        .flowchart-empty h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #1F2933;
+        }
+        .flowchart-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .node-card {
+            min-width: 200px;
+            max-width: 260px;
+            background: white;
+            border: 2px solid #E5E7EB;
+            border-radius: 16px;
+            padding: 1rem 1.25rem;
+            text-align: left;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        .node-card:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #29ABE2;
+            transform: translateY(-4px);
+        }
+        .node-card.root {
+            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            color: white;
+            border: none;
+        }
+        .node-card.root .node-meta { color: rgba(255, 255, 255, 0.8); }
+        .node-card.pending {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(251, 191, 36, 0.1));
+            border: 2px dashed #F59E0B;
+        }
+        .node-card.rejected {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(248, 113, 113, 0.1));
+            border: 2px dashed #EF4444;
+        }
+        .node-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        .node-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 1.25;
+        }
+        .node-meta {
+            font-size: 0.8rem;
+            color: #6B7280;
+            margin-bottom: 0.75rem;
+        }
+        .node-status {
+            font-weight: 600;
+        }
+        .node-status.active { color: #10B981; }
+        .node-status.pending { color: #F59E0B; }
+        .node-status.rejected { color: #EF4444; }
+        .node-card.root .node-status { color: rgba(255, 255, 255, 0.9); }
+        .node-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .node-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.4rem 0.6rem;
+            border: none;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.05);
+            color: #4B5563;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.85rem;
+        }
+        .node-btn:hover {
+            background: rgba(41, 171, 226, 0.1);
+            color: #29ABE2;
+        }
+        .node-card.root .node-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        .node-card.root .node-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .tree-connector {
+            width: 2px;
+            height: 24px;
+            background: #D1D5DB;
+            margin: 0.5rem 0;
+        }
+        .children-wrapper {
+            position: relative;
+            margin-top: 0.5rem;
+        }
+        .children-horizontal-line {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 2px;
+            background: #D1D5DB;
+        }
+        .children-container {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            padding-top: 1.5rem;
+            position: relative;
+        }
+        .child-branch {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .child-branch::before {
+            content: '';
+            position: absolute;
+            top: -1.5rem;
+            left: 50%;
+            width: 2px;
+            height: 1.5rem;
+            background: #D1D5DB;
+        }
+        .flowchart-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+        }
+        .flowchart-loading i {
+            font-size: 2rem;
+            color: #29ABE2;
+            animation: spin 1s linear infinite;
+        }
+        @media (max-width: 768px) {
+            .children-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+            .child-branch::before { display: none; }
+            .children-horizontal-line { display: none; }
+            .node-card { min-width: 180px; }
+        }
     </style>
 </head>
 
@@ -1418,8 +1658,261 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Flowcharts Section (Hidden by default) -->
+            <section class="flowchart-section" id="flowchartsSection">
+                <!-- Browse Organizations Section -->
+                <div class="flowchart-card" id="browseSection" style="display: none; margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h2 class="flowchart-title">Discover Organizations</h2>
+                        <button class="node-btn" id="closeBrowseBtn" style="padding: 0.5rem;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <input type="text" class="search-input" id="searchOrgsInput" placeholder="Search organizations..." style="width: 100%; max-width: 400px;">
+                    </div>
+                    <div id="browseOrgsList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
+                        <div class="flowchart-loading">
+                            <i class="fas fa-spinner"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flowchart-card">
+                    <div class="flowchart-header">
+                        <h2 class="flowchart-title">My Network Hierarchy</h2>
+                        <div class="flowchart-actions">
+                            <button class="flowchart-btn secondary" id="browseOrgsBtn">
+                                <i class="fas fa-search"></i>
+                                Browse & Join
+                            </button>
+                            <button class="flowchart-btn primary" id="addNodeBtn">
+                                <i class="fas fa-plus"></i>
+                                Add Node
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flowchart-container" id="flowchartContainer">
+                        <div class="flowchart-loading">
+                            <i class="fas fa-spinner"></i>
+                            <p style="margin-top: 1rem; color: #6B7280;">Loading your hierarchy...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     </main>
+
+    <!-- Add/Edit Node Modal -->
+    <div class="modal-overlay" id="nodeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="nodeModalTitle">Add New Node</h2>
+                <button class="modal-close" id="closeNodeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Name <span style="color: #EF4444;">*</span></label>
+                    <input type="text" class="form-input" id="nodeName" placeholder="Enter node name">
+                    <p class="form-error" id="nodeNameError" style="display: none;"></p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Type</label>
+                    <select class="form-input" id="nodeType">
+                        <option value="organization">Organization</option>
+                        <option value="department">Department</option>
+                        <option value="team">Team</option>
+                        <option value="project">Project</option>
+                        <option value="academic">Academic</option>
+                        <option value="hostel">Hostel</option>
+                        <option value="sports">Sports</option>
+                        <option value="club">Club</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="flowchart-btn secondary" id="cancelNodeBtn">Cancel</button>
+                <button class="flowchart-btn primary" id="saveNodeBtn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Delete Node</h2>
+                <button class="modal-close" id="closeDeleteModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="deleteNodeName"></strong>?</p>
+                <p style="color: #EF4444; margin-top: 0.5rem; font-size: 0.875rem;">This will also delete all child nodes.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="flowchart-btn secondary" id="cancelDeleteBtn">Cancel</button>
+                <button class="flowchart-btn primary" style="background: linear-gradient(135deg, #EF4444, #DC2626);" id="confirmDeleteBtn">Delete</butt
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-notification" id="toastNotification">
+        <i class="fas fa-check-circle" id="toastIcon"></i>
+        <span id="toastMessage">Success!</span>
+    </div>
+
+    <style>
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 1rem;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 450px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalIn 0.2s ease;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        .modal-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1F2933;
+            margin: 0;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6B7280;
+            padding: 0.25rem;
+        }
+        .modal-close:hover { color: #1F2933; }
+        .modal-body { padding: 1.5rem; }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        .form-group { margin-bottom: 1rem; }
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1F2933;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            border: 2px solid rgba(41, 171, 226, 0.2);
+            border-radius: 10px;
+            background: white;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        .form-input:focus {
+            border-color: #29ABE2;
+            box-shadow: 0 0 0 4px rgba(41, 171, 226, 0.1);
+        }
+        .form-error {
+            font-size: 0.8rem;
+            color: #EF4444;
+            margin-top: 0.25rem;
+        }
+        /* Toast Notification */
+        .toast-notification {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 3000;
+            animation: toastIn 0.3s ease;
+        }
+        .toast-notification.show { display: flex; }
+        .toast-notification.success { border-left: 4px solid #10B981; }
+        .toast-notification.error { border-left: 4px solid #EF4444; }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(1rem); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Browse Organization Card */
+        .org-browse-card {
+            background: white;
+            border: 1px solid rgba(41, 171, 226, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+        .org-browse-card:hover {
+            border-color: #29ABE2;
+            box-shadow: 0 4px 15px rgba(41, 171, 226, 0.15);
+        }
+        .org-browse-name {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: #1F2933;
+            margin-bottom: 0.25rem;
+        }
+        .org-browse-meta {
+            font-size: 0.85rem;
+            color: #6B7280;
+            margin-bottom: 0.75rem;
+        }
+        .org-browse-btn {
+            width: 100%;
+            padding: 0.5rem;
+            background: linear-gradient(135deg, #8B5CF6, #A78BFA);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .org-browse-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+        }
+        .org-browse-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+    </style>
 
     <!-- Firebase and Dashboard Scripts -->
     <script type="module">
@@ -1436,12 +1929,14 @@
             doc,
             getDoc,
             setDoc,
+            deleteDoc,
             collection,
             getDocs,
-            serverTimestamp
+            serverTimestamp,
+            arrayUnion,
+            arrayRemove
         } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBsuZL4U2H66C9tUKN91KXMm-l5umOa1vY",
             authDomain: "flowlinkkiro.firebaseapp.com",
@@ -1636,6 +2131,831 @@
         // Create auth service instance
         const dashboardAuth = new DashboardAuth();
 
+        // Flowchart Data Manager - Full Featured Version
+        class FlowchartManager {
+            constructor() {
+                this.hierarchyData = [];
+                this.currentUser = null;
+                this.editingNode = null;
+                this.parentDocRef = null;
+                this.nodeToDelete = null;
+            }
+
+            async loadHierarchy(userEmail) {
+                this.currentUser = userEmail;
+                try {
+                    const hierarchiesRef = collection(db, 'users', userEmail, 'hierarchies');
+                    const basePath = `users/${userEmail}/hierarchies`;
+                    this.hierarchyData = await this.fetchNodesRecursive(hierarchiesRef, basePath);
+                    return this.hierarchyData;
+                } catch (error) {
+                    console.error('Error loading hierarchy:', error);
+                    return [];
+                }
+            }
+
+            async fetchNodesRecursive(colRef, basePath) {
+                const nodes = [];
+                try {
+                    const snapshot = await getDocs(colRef);
+                    for (const docSnap of snapshot.docs) {
+                        const data = docSnap.data();
+                        const nodePath = `${basePath}/${docSnap.id}`;
+                        let status = data.status || 'pending';
+                        let members = data.members || [];
+
+                        // Get members from global hierarchy
+                        try {
+                            const globalPath = this.getGlobalHierarchyPath(nodePath);
+                            const globalDocRef = doc(db, globalPath);
+                            const globalDoc = await getDoc(globalDocRef);
+                            if (globalDoc.exists()) {
+                                const globalData = globalDoc.data();
+                                members = globalData.members || members;
+                            }
+                        } catch (e) { }
+
+                        // Fetch children
+                        const childrenRef = collection(docSnap.ref, 'sub-nodes');
+                        const children = await this.fetchNodesRecursive(childrenRef, `${nodePath}/sub-nodes`);
+
+                        nodes.push({
+                            id: docSnap.id,
+                            name: data.name || docSnap.id,
+                            type: data.type || 'organization',
+                            admins: data.adminEmails || [],
+                            members: members,
+                            status: status,
+                            path: nodePath,
+                            docRef: docSnap.ref,
+                            children: children
+                        });
+                    }
+                } catch (e) { }
+                return nodes;
+            }
+
+            getGlobalHierarchyPath(userPath) {
+                const parts = userPath.split('/');
+                const hierarchiesIndex = parts.indexOf('hierarchies');
+                if (hierarchiesIndex !== -1) {
+                    return 'hierarchies/' + parts.slice(hierarchiesIndex + 1).join('/');
+                }
+                return userPath;
+            }
+
+            sanitizeName(name) {
+                return name.toLowerCase().trim()
+                    .replace(/\s+/g, '-')
+                    .replace(/[^a-z0-9-_]/g, '')
+                    .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '');
+            }
+
+            showToast(message, type = 'success') {
+                const toast = document.getElementById('toastNotification');
+                const toastIcon = document.getElementById('toastIcon');
+                const toastMessage = document.getElementById('toastMessage');
+                
+                if (!toast) return;
+                
+                toastMessage.textContent = message;
+                toastIcon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+                toastIcon.style.color = type === 'success' ? '#10B981' : '#EF4444';
+                toast.style.borderLeft = `4px solid ${type === 'success' ? '#10B981' : '#EF4444'}`;
+                toast.style.display = 'flex';
+                
+                setTimeout(() => { toast.style.display = 'none'; }, 3000);
+            }
+
+            // Find approver for a node
+            async findApproverForNode(orgId, nodePath) {
+                try {
+                    const nodeDoc = await getDoc(doc(db, nodePath));
+                    if (nodeDoc.exists() && nodeDoc.data().adminEmails?.length > 0) {
+                        return nodeDoc.data().adminEmails[0];
+                    }
+                    
+                    const pathParts = nodePath.split('/sub-nodes/');
+                    for (let i = pathParts.length - 1; i > 0; i--) {
+                        const parentPath = pathParts.slice(0, i).join('/sub-nodes/');
+                        const parentDoc = await getDoc(doc(db, parentPath));
+                        if (parentDoc.exists() && parentDoc.data().adminEmails?.length > 0) {
+                            return parentDoc.data().adminEmails[0];
+                        }
+                    }
+                    
+                    const orgDoc = await getDoc(doc(db, 'hierarchies', orgId));
+                    if (orgDoc.exists() && orgDoc.data().adminEmails?.length > 0) {
+                        return orgDoc.data().adminEmails[0];
+                    }
+                    return null;
+                } catch (error) {
+                    console.error('Error finding approver:', error);
+                    return null;
+                }
+            }
+
+            // Check existing organization
+            async checkExistingOrganization(name) {
+                const sanitizedName = this.sanitizeName(name);
+                try {
+                    const hierarchiesRef = collection(db, 'hierarchies');
+                    const snapshot = await getDocs(hierarchiesRef);
+                    
+                    for (const docSnap of snapshot.docs) {
+                        const data = docSnap.data();
+                        const orgName = data.name || '';
+                        const aliases = data.nameAliases || [];
+                        
+                        const nameMatches = orgName.toLowerCase() === name.toLowerCase() || docSnap.id === sanitizedName;
+                        const aliasMatch = aliases.find(a => a.toLowerCase() === name.toLowerCase());
+                        
+                        if (nameMatches || aliasMatch) {
+                            return {
+                                exists: true,
+                                type: 'approved',
+                                orgId: docSnap.id,
+                                orgName: data.name,
+                                hasAdmin: (data.adminEmails || []).length > 0,
+                                isMember: (data.members || []).includes(this.currentUser)
+                            };
+                        }
+                    }
+                } catch (e) { console.error('Error checking hierarchies:', e); }
+                
+                try {
+                    const pendingRef = collection(db, 'pendingApprovals');
+                    const snapshot = await getDocs(pendingRef);
+                    
+                    for (const docSnap of snapshot.docs) {
+                        const data = docSnap.data();
+                        if (data.requestType === 'organization' && data.status === 'pending') {
+                            const pendingName = data.organizationName || data.name || '';
+                            if (pendingName.toLowerCase() === name.toLowerCase()) {
+                                return {
+                                    exists: true,
+                                    type: 'pending',
+                                    isOwnRequest: data.requesterEmail === this.currentUser
+                                };
+                            }
+                        }
+                    }
+                } catch (e) { console.error('Error checking pending:', e); }
+                
+                return { exists: false };
+            }
+
+            // Create organization request
+            async createOrganizationRequest(name, type) {
+                const existing = await this.checkExistingOrganization(name);
+                
+                if (existing.exists) {
+                    if (existing.type === 'approved') {
+                        if (existing.isMember) throw new Error(`You are already a member of "${existing.orgName}".`);
+                        if (!existing.hasAdmin) throw new Error(`"${existing.orgName}" exists but has no admin. Wait for Super Admin to assign one.`);
+                        throw new Error(`"${existing.orgName}" already exists! Use "Browse & Join" instead.`);
+                    } else if (existing.type === 'pending') {
+                        if (existing.isOwnRequest) throw new Error(`You already have a pending request for "${name}".`);
+                        throw new Error(`"${name}" is already pending approval.`);
+                    }
+                }
+                
+                const sanitizedName = this.sanitizeName(name);
+                const approvalId = `org-${sanitizedName}-${Date.now()}`;
+                
+                await setDoc(doc(db, 'pendingApprovals', approvalId), {
+                    requestType: 'organization',
+                    status: 'pending',
+                    requesterEmail: this.currentUser,
+                    organizationName: name,
+                    organizationType: type,
+                    createdAt: serverTimestamp()
+                });
+                
+                return approvalId;
+            }
+
+            // Create join request
+            async createJoinRequest(orgId, nodePath, nodeName) {
+                const approverEmail = await this.findApproverForNode(orgId, nodePath);
+                if (!approverEmail) throw new Error('No admin found for this organization.');
+                
+                const approvalId = `join-${Date.now()}`;
+                await setDoc(doc(db, 'pendingApprovals', approvalId), {
+                    requestType: 'join',
+                    status: 'pending',
+                    requesterEmail: this.currentUser,
+                    targetOrgId: orgId,
+                    targetNodePath: nodePath,
+                    targetNodeName: nodeName,
+                    assignedAdminEmail: approverEmail,
+                    createdAt: serverTimestamp()
+                });
+                
+                const adminNotifRef = doc(db, 'users', approverEmail, 'notifications', 'pending');
+                await setDoc(adminNotifRef, {
+                    joinRequests: arrayUnion(approvalId),
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+                
+                return approvalId;
+            }
+
+            // Check if node exists in global hierarchy (by name or alias)
+            async checkExistingNode(parentPath, proposedName) {
+                const sanitizedName = this.sanitizeName(proposedName);
+                const subNodesPath = `${parentPath}/sub-nodes`;
+                
+                try {
+                    const subNodesRef = collection(db, subNodesPath);
+                    const snapshot = await getDocs(subNodesRef);
+                    
+                    for (const docSnap of snapshot.docs) {
+                        const data = docSnap.data();
+                        const nodeName = data.name || '';
+                        const aliases = data.nameAliases || [];
+                        
+                        // Check if name matches (case-insensitive)
+                        const nameMatches = nodeName.toLowerCase() === proposedName.toLowerCase() || 
+                                           docSnap.id === sanitizedName;
+                        
+                        // Check if name matches any alias
+                        const aliasMatch = aliases.some(a => a.toLowerCase() === proposedName.toLowerCase());
+                        
+                        if (nameMatches || aliasMatch) {
+                            return {
+                                exists: true,
+                                nodeId: docSnap.id,
+                                nodeName: data.name,
+                                nodePath: `${subNodesPath}/${docSnap.id}`,
+                                nodeData: data,
+                                isMember: (data.members || []).includes(this.currentUser)
+                            };
+                        }
+                    }
+                } catch (e) {
+                    console.log('No sub-nodes found or error:', e);
+                }
+                
+                return { exists: false };
+            }
+
+            // Smart branch request - converts to join if node exists
+            async createBranchRequest(orgId, parentPath, parentName, proposedName, proposedType) {
+                // First check if this node already exists in global hierarchy
+                const existingNode = await this.checkExistingNode(parentPath, proposedName);
+                
+                if (existingNode.exists) {
+                    // Node already exists - check if user is already a member
+                    if (existingNode.isMember) {
+                        throw new Error(`You are already a member of "${existingNode.nodeName}".`);
+                    }
+                    
+                    // Check if user already has pending join request
+                    const hasPendingJoin = await this.checkPendingRequest(existingNode.nodePath, 'join');
+                    if (hasPendingJoin) {
+                        throw new Error(`You already have a pending join request for "${existingNode.nodeName}".`);
+                    }
+                    
+                    // Convert to join request instead of branch request
+                    console.log(`Node "${proposedName}" already exists at ${existingNode.nodePath}. Converting to join request.`);
+                    
+                    await this.createJoinRequest(orgId, existingNode.nodePath, existingNode.nodeName);
+                    
+                    // Also add to user's hierarchy with pending status (for join)
+                    const userParentPath = parentPath.replace('hierarchies/', `users/${this.currentUser}/hierarchies/`);
+                    const userNodePath = `${userParentPath}/sub-nodes/${existingNode.nodeId}`;
+                    
+                    await setDoc(doc(db, userNodePath), {
+                        name: existingNode.nodeName,
+                        type: existingNode.nodeData.type || proposedType || 'department',
+                        status: 'pending',
+                        pendingJoinRequest: true,
+                        createdAt: serverTimestamp()
+                    });
+                    
+                    return { type: 'join', nodeName: existingNode.nodeName };
+                }
+                
+                // Node doesn't exist - create branch request
+                const approverEmail = await this.findApproverForNode(orgId, parentPath);
+                if (!approverEmail) throw new Error('No admin found for this organization.');
+                
+                const approvalId = `branch-${Date.now()}`;
+                await setDoc(doc(db, 'pendingApprovals', approvalId), {
+                    requestType: 'branch',
+                    status: 'pending',
+                    requesterEmail: this.currentUser,
+                    parentOrgId: orgId,
+                    parentNodePath: parentPath,
+                    parentNodeName: parentName,
+                    proposedName: proposedName,
+                    proposedType: proposedType,
+                    assignedAdminEmail: approverEmail,
+                    createdAt: serverTimestamp()
+                });
+                
+                const adminNotifRef = doc(db, 'users', approverEmail, 'notifications', 'pending');
+                await setDoc(adminNotifRef, {
+                    branchRequests: arrayUnion(approvalId),
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+                
+                // Create pending node in user's hierarchy
+                const nodeId = this.sanitizeName(proposedName);
+                const userParentPath = parentPath.replace('hierarchies/', `users/${this.currentUser}/hierarchies/`);
+                const userNodePath = `${userParentPath}/sub-nodes/${nodeId}`;
+                
+                await setDoc(doc(db, userNodePath), {
+                    name: proposedName,
+                    type: proposedType || 'department',
+                    status: 'pending',
+                    pendingApprovalId: approvalId,
+                    createdAt: serverTimestamp()
+                });
+                
+                return { type: 'branch', approvalId };
+            }
+
+            // Check pending request
+            async checkPendingRequest(nodePath, requestType) {
+                try {
+                    const pendingRef = collection(db, 'pendingApprovals');
+                    const snapshot = await getDocs(pendingRef);
+                    
+                    for (const docSnap of snapshot.docs) {
+                        const data = docSnap.data();
+                        if (data.requesterEmail === this.currentUser && data.status === 'pending' && data.requestType === requestType) {
+                            if (requestType === 'join' && data.targetNodePath === nodePath) return true;
+                            if (requestType === 'branch' && data.parentNodePath === nodePath) return true;
+                        }
+                    }
+                    return false;
+                } catch (error) { return false; }
+            }
+
+            renderFlowchart(container) {
+                if (this.hierarchyData.length === 0) {
+                    container.innerHTML = `
+                        <div class="flowchart-empty">
+                            <i class="fas fa-sitemap"></i>
+                            <h3>No Network Setup Yet</h3>
+                            <p>You haven't set up your network yet. Browse organizations or create your own.</p>
+                            <div style="display: flex; gap: 0.75rem; justify-content: center; margin-top: 1rem;">
+                                <button class="flowchart-btn secondary" onclick="flowchartManager.showBrowseSection()">
+                                    <i class="fas fa-search"></i> Browse Organizations
+                                </button>
+                                <button class="flowchart-btn primary" onclick="flowchartManager.openAddNodeModal()">
+                                    <i class="fas fa-plus"></i> Create New
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = '';
+                this.hierarchyData.forEach(node => {
+                    const nodeEl = this.createNodeElement(node, true);
+                    container.appendChild(nodeEl);
+                });
+            }
+
+            createNodeElement(node, isRoot = false) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'flowchart-node';
+
+                const statusClass = node.status === 'active' ? 'active' : (node.status === 'rejected' ? 'rejected' : 'pending');
+                const statusText = node.status === 'active' ? 'Approved' : (node.status === 'rejected' ? 'Rejected' : 'Pending');
+                const isMember = node.members?.includes(this.currentUser);
+
+                const card = document.createElement('div');
+                card.className = `node-card ${isRoot ? 'root' : ''} ${statusClass !== 'active' ? statusClass : ''}`;
+                card.innerHTML = `
+                    <div class="node-header">
+                        <span class="node-title">${node.name}</span>
+                    </div>
+                    <div class="node-meta">
+                        ${node.type} • <span class="node-status ${statusClass}">${statusText}</span>
+                    </div>
+                    <div class="node-actions">
+                        ${node.status === 'active' ? `
+                            <button class="node-btn add-child-btn" title="Add Sub-Node">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            ${!isMember ? `
+                                <button class="node-btn join-btn" title="Request to Join" style="color: #8B5CF6;">
+                                    <i class="fas fa-user-plus"></i>
+                                </button>
+                            ` : ''}
+                        ` : ''}
+                        <button class="node-btn edit-btn" title="Edit">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                        <button class="node-btn delete-btn" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+
+                // Add event listeners
+                const addChildBtn = card.querySelector('.add-child-btn');
+                if (addChildBtn) {
+                    addChildBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.openAddChildModal(node);
+                    });
+                }
+
+                const joinBtn = card.querySelector('.join-btn');
+                if (joinBtn) {
+                    joinBtn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        await this.handleJoinRequest(node);
+                    });
+                }
+
+                const editBtn = card.querySelector('.edit-btn');
+                if (editBtn) {
+                    editBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.openEditModal(node);
+                    });
+                }
+
+                const deleteBtn = card.querySelector('.delete-btn');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.openDeleteModal(node);
+                    });
+                }
+
+                wrapper.appendChild(card);
+
+                // Render children
+                if (node.children && node.children.length > 0) {
+                    const connector = document.createElement('div');
+                    connector.className = 'tree-connector';
+                    wrapper.appendChild(connector);
+
+                    const childrenWrapper = document.createElement('div');
+                    childrenWrapper.className = 'children-wrapper';
+
+                    const horizontalLine = document.createElement('div');
+                    horizontalLine.className = 'children-horizontal-line';
+                    const totalWidth = (node.children.length - 1) * 220;
+                    horizontalLine.style.width = `${totalWidth}px`;
+                    childrenWrapper.appendChild(horizontalLine);
+
+                    const childrenContainer = document.createElement('div');
+                    childrenContainer.className = 'children-container';
+
+                    node.children.forEach(child => {
+                        const childBranch = document.createElement('div');
+                        childBranch.className = 'child-branch';
+                        const childEl = this.createNodeElement(child, false);
+                        childBranch.appendChild(childEl);
+                        childrenContainer.appendChild(childBranch);
+                    });
+
+                    childrenWrapper.appendChild(childrenContainer);
+                    wrapper.appendChild(childrenWrapper);
+                }
+
+                return wrapper;
+            }
+
+            // Handle join request
+            async handleJoinRequest(node) {
+                const pathParts = node.path.split('/');
+                const orgId = pathParts[pathParts.indexOf('hierarchies') + 1];
+                const globalPath = this.getGlobalHierarchyPath(node.path);
+                
+                const hasPending = await this.checkPendingRequest(globalPath, 'join');
+                if (hasPending) {
+                    this.showToast('You already have a pending join request for this node.', 'error');
+                    return;
+                }
+                
+                if (!confirm(`Request to join "${node.name}"? An admin will review your request.`)) return;
+                
+                try {
+                    await this.createJoinRequest(orgId, globalPath, node.name);
+                    this.showToast('Join request submitted! Waiting for admin approval.', 'success');
+                } catch (error) {
+                    this.showToast(error.message, 'error');
+                }
+            }
+
+            // Modal functions
+            openAddNodeModal() {
+                this.editingNode = null;
+                this.parentDocRef = null;
+                document.getElementById('nodeModalTitle').textContent = 'Request New Organization';
+                document.getElementById('nodeName').value = '';
+                document.getElementById('nodeType').value = 'organization';
+                document.getElementById('nodeNameError').style.display = 'none';
+                document.getElementById('nodeModal').classList.add('show');
+            }
+
+            openAddChildModal(parentNode) {
+                this.editingNode = null;
+                this.parentDocRef = parentNode.docRef;
+                this.parentNode = parentNode;
+                document.getElementById('nodeModalTitle').textContent = 'Request New Sub-Node';
+                document.getElementById('nodeName').value = '';
+                document.getElementById('nodeType').value = 'department';
+                document.getElementById('nodeNameError').style.display = 'none';
+                document.getElementById('nodeModal').classList.add('show');
+            }
+
+            openEditModal(node) {
+                this.editingNode = node;
+                this.parentDocRef = null;
+                document.getElementById('nodeModalTitle').textContent = 'Edit Node';
+                document.getElementById('nodeName').value = node.name;
+                document.getElementById('nodeType').value = node.type;
+                document.getElementById('nodeNameError').style.display = 'none';
+                document.getElementById('nodeModal').classList.add('show');
+            }
+
+            openDeleteModal(node) {
+                this.nodeToDelete = node;
+                document.getElementById('deleteNodeName').textContent = node.name;
+                document.getElementById('deleteModal').classList.add('show');
+            }
+
+            closeNodeModal() {
+                document.getElementById('nodeModal').classList.remove('show');
+                this.editingNode = null;
+                this.parentDocRef = null;
+                this.parentNode = null;
+            }
+
+            closeDeleteModal() {
+                document.getElementById('deleteModal').classList.remove('show');
+                this.nodeToDelete = null;
+            }
+
+            // Save node
+            async saveNode() {
+                const name = document.getElementById('nodeName').value.trim();
+                if (!name) {
+                    document.getElementById('nodeNameError').textContent = 'Name is required';
+                    document.getElementById('nodeNameError').style.display = 'block';
+                    return;
+                }
+
+                const sanitizedName = this.sanitizeName(name);
+                const nodeType = document.getElementById('nodeType').value;
+                const saveBtn = document.getElementById('saveNodeBtn');
+                
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Saving...';
+
+                try {
+                    if (this.editingNode) {
+                        // Update existing node
+                        await setDoc(this.editingNode.docRef, {
+                            name: name,
+                            type: nodeType,
+                            updatedAt: serverTimestamp()
+                        }, { merge: true });
+                        
+                        this.showToast('Node updated successfully!', 'success');
+                    } else if (this.parentDocRef) {
+                        // Create branch request (or join if node exists)
+                        const parentPath = this.parentNode.path;
+                        const globalParentPath = this.getGlobalHierarchyPath(parentPath);
+                        
+                        let orgId;
+                        const pathParts = globalParentPath.split('/');
+                        orgId = pathParts[0] === 'hierarchies' ? pathParts[1] : pathParts[0];
+                        
+                        const orgDoc = await getDoc(doc(db, 'hierarchies', orgId));
+                        if (!orgDoc.exists() || !orgDoc.data().adminEmails?.length) {
+                            this.showToast('This organization has no admin yet.', 'error');
+                            return;
+                        }
+                        
+                        const result = await this.createBranchRequest(orgId, globalParentPath, this.parentNode.name, name, nodeType);
+                        
+                        // Show appropriate message based on whether it was converted to join
+                        if (result.type === 'join') {
+                            this.showToast(`"${result.nodeName}" already exists! Join request submitted instead.`, 'success');
+                        } else {
+                            this.showToast('Branch request submitted! Waiting for admin approval.', 'success');
+                        }
+                    } else {
+                        // Create organization request
+                        await this.createOrganizationRequest(name, nodeType);
+                        
+                        // Create in user's hierarchies with pending status
+                        const hierarchiesRef = collection(db, 'users', this.currentUser, 'hierarchies');
+                        const newDocRef = doc(hierarchiesRef, sanitizedName);
+                        await setDoc(newDocRef, {
+                            name: name,
+                            type: nodeType,
+                            status: 'pending',
+                            createdAt: serverTimestamp(),
+                            createdBy: this.currentUser
+                        });
+                        
+                        this.showToast('Organization request submitted! Waiting for Super Admin approval.', 'success');
+                    }
+
+                    this.closeNodeModal();
+                    await this.loadHierarchy(this.currentUser);
+                    this.renderFlowchart(document.getElementById('flowchartContainer'));
+                } catch (error) {
+                    console.error('Error saving node:', error);
+                    this.showToast(error.message, 'error');
+                } finally {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Save';
+                }
+            }
+
+            // Delete node
+            async deleteNode() {
+                if (!this.nodeToDelete) return;
+                
+                const confirmBtn = document.getElementById('confirmDeleteBtn');
+                confirmBtn.disabled = true;
+                confirmBtn.textContent = 'Deleting...';
+
+                try {
+                    await this.deleteNodeRecursive(this.nodeToDelete.docRef);
+                    this.showToast('Node deleted successfully!', 'success');
+                    this.closeDeleteModal();
+                    await this.loadHierarchy(this.currentUser);
+                    this.renderFlowchart(document.getElementById('flowchartContainer'));
+                } catch (error) {
+                    console.error('Error deleting node:', error);
+                    this.showToast('Failed to delete node', 'error');
+                } finally {
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = 'Delete';
+                }
+            }
+
+            async deleteNodeRecursive(docRef) {
+                // Delete children first
+                const childrenRef = collection(docRef, 'sub-nodes');
+                try {
+                    const snapshot = await getDocs(childrenRef);
+                    for (const docSnap of snapshot.docs) {
+                        await this.deleteNodeRecursive(docSnap.ref);
+                    }
+                } catch (e) { }
+                
+                // Delete the node
+                await deleteDoc(docRef);
+            }
+
+            // Browse organizations
+            showBrowseSection() {
+                const browseSection = document.getElementById('browseSection');
+                if (browseSection) {
+                    browseSection.style.display = 'block';
+                    this.loadOrganizations();
+                }
+            }
+
+            hideBrowseSection() {
+                const browseSection = document.getElementById('browseSection');
+                if (browseSection) {
+                    browseSection.style.display = 'none';
+                }
+            }
+
+            async loadOrganizations() {
+                const browseList = document.getElementById('browseOrgsList');
+                if (!browseList) return;
+                
+                browseList.innerHTML = '<div class="flowchart-loading"><i class="fas fa-spinner"></i></div>';
+                
+                try {
+                    const hierarchiesRef = collection(db, 'hierarchies');
+                    const snapshot = await getDocs(hierarchiesRef);
+                    
+                    if (snapshot.empty) {
+                        browseList.innerHTML = '<p style="text-align: center; color: #6B7280; grid-column: 1/-1;">No organizations found.</p>';
+                        return;
+                    }
+                    
+                    browseList.innerHTML = '';
+                    this.allOrganizations = [];
+                    
+                    for (const docSnap of snapshot.docs) {
+                        const data = docSnap.data();
+                        const org = {
+                            id: docSnap.id,
+                            name: data.name || docSnap.id,
+                            type: data.type || 'organization',
+                            members: data.members || [],
+                            adminEmails: data.adminEmails || [],
+                            status: data.status || 'pending'
+                        };
+                        this.allOrganizations.push(org);
+                        
+                        const card = this.createOrgCard(org);
+                        browseList.appendChild(card);
+                    }
+                } catch (error) {
+                    console.error('Error loading organizations:', error);
+                    browseList.innerHTML = '<p style="text-align: center; color: #EF4444; grid-column: 1/-1;">Failed to load organizations.</p>';
+                }
+            }
+
+            createOrgCard(org) {
+                const isMember = org.members.includes(this.currentUser);
+                const hasAdmin = org.adminEmails.length > 0;
+                
+                const card = document.createElement('div');
+                card.className = 'node-card';
+                card.style.cssText = 'cursor: pointer; transition: all 0.3s ease;';
+                card.innerHTML = `
+                    <div class="node-header">
+                        <span class="node-title">${org.name}</span>
+                    </div>
+                    <div class="node-meta">${org.type} • ${org.members.length} members</div>
+                    <div class="node-actions" style="margin-top: 0.75rem;">
+                        ${isMember ? `
+                            <span style="color: #10B981; font-size: 0.85rem; font-weight: 600;">
+                                <i class="fas fa-check-circle"></i> Member
+                            </span>
+                        ` : hasAdmin ? `
+                            <button class="flowchart-btn secondary join-org-btn" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                                <i class="fas fa-user-plus"></i> Join
+                            </button>
+                        ` : `
+                            <span style="color: #F59E0B; font-size: 0.85rem;">
+                                <i class="fas fa-clock"></i> No admin yet
+                            </span>
+                        `}
+                    </div>
+                `;
+                
+                const joinBtn = card.querySelector('.join-org-btn');
+                if (joinBtn) {
+                    joinBtn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        await this.handleOrgJoinRequest(org);
+                    });
+                }
+                
+                return card;
+            }
+
+            async handleOrgJoinRequest(org) {
+                const globalPath = `hierarchies/${org.id}`;
+                
+                const hasPending = await this.checkPendingRequest(globalPath, 'join');
+                if (hasPending) {
+                    this.showToast('You already have a pending join request.', 'error');
+                    return;
+                }
+                
+                if (!confirm(`Request to join "${org.name}"?`)) return;
+                
+                try {
+                    await this.createJoinRequest(org.id, globalPath, org.name);
+                    this.showToast('Join request submitted!', 'success');
+                    this.loadOrganizations();
+                } catch (error) {
+                    this.showToast(error.message, 'error');
+                }
+            }
+
+            filterOrganizations(searchTerm) {
+                if (!this.allOrganizations) return;
+                
+                const browseList = document.getElementById('browseOrgsList');
+                if (!browseList) return;
+                
+                browseList.innerHTML = '';
+                const filtered = this.allOrganizations.filter(org => 
+                    org.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    org.type.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+                
+                if (filtered.length === 0) {
+                    browseList.innerHTML = '<p style="text-align: center; color: #6B7280; grid-column: 1/-1;">No matching organizations.</p>';
+                    return;
+                }
+                
+                filtered.forEach(org => {
+                    const card = this.createOrgCard(org);
+                    browseList.appendChild(card);
+                });
+            }
+        }
+
+        const flowchartManager = new FlowchartManager();
+
         // Dashboard Controller
         class DashboardController {
             constructor() {
@@ -1705,6 +3025,43 @@
                 // Card interactions
                 this.setupCardInteractions();
 
+                // Flowchart buttons
+                const browseOrgsBtn = document.getElementById('browseOrgsBtn');
+                const addNodeBtn = document.getElementById('addNodeBtn');
+                const closeBrowseBtn = document.getElementById('closeBrowseBtn');
+                const searchOrgsInput = document.getElementById('searchOrgsInput');
+                
+                browseOrgsBtn?.addEventListener('click', () => {
+                    flowchartManager.showBrowseSection();
+                });
+                
+                addNodeBtn?.addEventListener('click', () => {
+                    flowchartManager.openAddNodeModal();
+                });
+                
+                closeBrowseBtn?.addEventListener('click', () => {
+                    flowchartManager.hideBrowseSection();
+                });
+                
+                searchOrgsInput?.addEventListener('input', (e) => {
+                    flowchartManager.filterOrganizations(e.target.value);
+                });
+
+                // Modal buttons
+                const saveNodeBtn = document.getElementById('saveNodeBtn');
+                const cancelNodeBtn = document.getElementById('cancelNodeBtn');
+                const closeNodeModal = document.getElementById('closeNodeModal');
+                const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+                const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+                const closeDeleteModal = document.getElementById('closeDeleteModal');
+                
+                saveNodeBtn?.addEventListener('click', () => flowchartManager.saveNode());
+                cancelNodeBtn?.addEventListener('click', () => flowchartManager.closeNodeModal());
+                closeNodeModal?.addEventListener('click', () => flowchartManager.closeNodeModal());
+                confirmDeleteBtn?.addEventListener('click', () => flowchartManager.deleteNode());
+                cancelDeleteBtn?.addEventListener('click', () => flowchartManager.closeDeleteModal());
+                closeDeleteModal?.addEventListener('click', () => flowchartManager.closeDeleteModal());
+
                 // Window resize
                 window.addEventListener('resize', () => this.handleResize());
             }
@@ -1726,6 +3083,11 @@
 
                 const link = e.currentTarget;
                 const page = link.dataset.page;
+                
+                // Skip if it's the admin panel link (it has href)
+                if (link.getAttribute('href') && link.getAttribute('href') !== '#') {
+                    return;
+                }
 
                 // Update active state
                 document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
@@ -1738,10 +3100,47 @@
                     pageTitle.textContent = navText;
                 }
 
+                // Show/hide sections based on page
+                const dashboardGrid = document.querySelector('.dashboard-grid');
+                const filtersSection = document.querySelector('.filters-section');
+                const flowchartsSection = document.getElementById('flowchartsSection');
+                
+                if (page === 'flowcharts') {
+                    // Show flowcharts, hide dashboard
+                    if (dashboardGrid) dashboardGrid.style.display = 'none';
+                    if (filtersSection) filtersSection.style.display = 'none';
+                    if (flowchartsSection) {
+                        flowchartsSection.classList.add('active');
+                        this.loadFlowcharts();
+                    }
+                } else {
+                    // Show dashboard, hide flowcharts
+                    if (dashboardGrid) dashboardGrid.style.display = 'grid';
+                    if (filtersSection) filtersSection.style.display = 'block';
+                    if (flowchartsSection) flowchartsSection.classList.remove('active');
+                }
+
                 // Close mobile menu
                 this.closeMobileMenu();
 
                 console.log('Navigating to:', page);
+            }
+
+            async loadFlowcharts() {
+                const container = document.getElementById('flowchartContainer');
+                const user = dashboardAuth.getCurrentUser();
+                
+                if (!user || !container) return;
+                
+                container.innerHTML = `
+                    <div class="flowchart-loading">
+                        <i class="fas fa-spinner"></i>
+                        <p style="margin-top: 1rem; color: #6B7280;">Loading your hierarchy...</p>
+                    </div>
+                `;
+                
+                await flowchartManager.loadHierarchy(user.email);
+                flowchartManager.renderFlowchart(container);
             }
 
             handleFilter(e) {

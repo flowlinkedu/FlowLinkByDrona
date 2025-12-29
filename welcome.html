@@ -266,6 +266,16 @@
             color: rgba(255, 255, 255, 0.8);
         }
 
+        /* Draft node styling */
+        .node-card.draft {
+            border: 2px dashed #9CA3AF;
+            background: #F9FAFB;
+        }
+
+        .node-card.draft .node-title {
+            color: #6B7280;
+        }
+
         .node-header {
             display: flex;
             align-items: flex-start;
@@ -590,8 +600,8 @@
                     Add Node
                 </button>
                 <button class="btn btn-success" id="doneBtn">
-                    <i data-lucide="check" style="width: 16px; height: 16px;"></i>
-                    Done
+                    <i data-lucide="send" style="width: 16px; height: 16px;"></i>
+                    Submit for Approval
                 </button>
             </div>
         </div>
@@ -812,6 +822,7 @@
                     admins: data.adminEmails || [],
                     members: members,
                     status: status,
+                    joinExisting: data.joinExisting || false, // Flag for joining existing org
                     path: nodePath,
                     docRef: docSnap.ref,
                     children: children
@@ -868,30 +879,33 @@
         wrapper.className = 'flowchart-node';
 
         // Determine status display
-        const statusClass = node.status === 'active' ? 'active' : (node.status === 'rejected' ? 'rejected' : 'pending');
-        const statusText = node.status === 'active' ? 'Approved' : (node.status === 'rejected' ? 'Rejected' : 'Pending Approval');
-        const statusColor = node.status === 'active' ? '#10B981' : (node.status === 'rejected' ? '#EF4444' : '#F59E0B');
+        const statusClass = node.status === 'active' ? 'active' : (node.status === 'rejected' ? 'rejected' : (node.status === 'draft' ? 'draft' : 'pending'));
+        const statusText = node.status === 'active' ? 'Approved' : (node.status === 'rejected' ? 'Rejected' : (node.status === 'draft' ? 'Draft' : 'Pending Approval'));
+        const statusColor = node.status === 'active' ? '#10B981' : (node.status === 'rejected' ? '#EF4444' : (node.status === 'draft' ? '#6B7280' : '#F59E0B'));
 
         // Check if user is already a member
         const isMember = node.members && node.members.includes(currentUser.email);
 
+        // Determine card classes
+        const cardClasses = ['node-card'];
+        if (isRoot) cardClasses.push('root');
+        if (node.status === 'draft') cardClasses.push('draft');
+
         const card = document.createElement('div');
-        card.className = `node-card ${isRoot ? 'root' : ''}`;
+        card.className = cardClasses.join(' ');
         card.innerHTML = `
                 <div class="node-header">
                     <span class="node-title">${node.name}</span>
                 </div>
                 <div class="node-meta">${node.type} • <span style="color: ${statusColor}; font-weight: 600;">${statusText}</span></div>
                 <div class="node-actions">
-                    ${node.status === 'active' ? `
-                        <button class="btn btn-ghost btn-sm add-child-btn" title="Request Sub-Node">
-                            <i data-lucide="plus" style="width: 14px; height: 14px;"></i>
+                    <button class="btn btn-ghost btn-sm add-child-btn" title="Add Sub-Node">
+                        <i data-lucide="plus" style="width: 14px; height: 14px;"></i>
+                    </button>
+                    ${node.status === 'active' && !isMember ? `
+                        <button class="btn btn-ghost btn-sm join-btn" title="Request to Join" style="color: #8B5CF6;">
+                            <i data-lucide="user-plus" style="width: 14px; height: 14px;"></i>
                         </button>
-                        ${!isMember ? `
-                            <button class="btn btn-ghost btn-sm join-btn" title="Request to Join" style="color: #8B5CF6;">
-                                <i data-lucide="user-plus" style="width: 14px; height: 14px;"></i>
-                            </button>
-                        ` : ''}
                     ` : ''}
                     <button class="btn btn-ghost btn-sm edit-btn" title="Edit">
                         <i data-lucide="pencil" style="width: 14px; height: 14px;"></i>
@@ -902,7 +916,7 @@
                 </div>
             `;
 
-        // Event listeners
+        // Event listeners - Add child button always available (creates branch request)
         const addChildBtn = card.querySelector('.add-child-btn');
         if (addChildBtn) {
             addChildBtn.addEventListener('click', (e) => {
@@ -1001,7 +1015,7 @@
     function openAddModal() {
         editingNode = null;
         parentDocRef = null; // Root level - will create organization request
-        document.getElementById('modalTitle').textContent = 'Request New Organization';
+        document.getElementById('modalTitle').textContent = 'Add Organization';
         document.getElementById('nodeName').value = '';
         document.getElementById('nodeType').value = 'organization';
         document.getElementById('nodeNameError').style.display = 'none';
@@ -1012,7 +1026,7 @@
     function openAddChildModal(parentNode) {
         editingNode = null;
         parentDocRef = parentNode.docRef; // Will create branch request
-        document.getElementById('modalTitle').textContent = 'Request New Sub-Node';
+        document.getElementById('modalTitle').textContent = 'Add Sub-Node';
         document.getElementById('nodeName').value = '';
         document.getElementById('nodeType').value = 'department';
         document.getElementById('nodeNameError').style.display = 'none';
@@ -1067,32 +1081,46 @@
         return `hierarchies/${userPath}`;
     }
 
-    // Find the appropriate admin for a node (approval chain)
+    // Find the appropriate admin for a node (single approval at destination)
+    // Approval chain: Target node admin → Parent node admin → ... → Org admin → Super admin
+    // Only ONE admin approves - the closest one to the target node
     async function findApproverForNode(orgId, nodePath) {
         try {
-            // Check if target node has an admin
+            // First check if target node itself has an admin
             const nodeDoc = await getDoc(doc(db, nodePath));
             if (nodeDoc.exists() && nodeDoc.data().adminEmails?.length > 0) {
-                return nodeDoc.data().adminEmails[0];
+                return {
+                    email: nodeDoc.data().adminEmails[0],
+                    nodePath: nodePath,
+                    nodeName: nodeDoc.data().name || 'Target Node'
+                };
             }
             
-            // Traverse up to parent nodes
+            // Traverse up to parent nodes - find the CLOSEST admin
             const pathParts = nodePath.split('/sub-nodes/');
             for (let i = pathParts.length - 1; i > 0; i--) {
                 const parentPath = pathParts.slice(0, i).join('/sub-nodes/');
                 const parentDoc = await getDoc(doc(db, parentPath));
                 if (parentDoc.exists() && parentDoc.data().adminEmails?.length > 0) {
-                    return parentDoc.data().adminEmails[0];
+                    return {
+                        email: parentDoc.data().adminEmails[0],
+                        nodePath: parentPath,
+                        nodeName: parentDoc.data().name || 'Parent Node'
+                    };
                 }
             }
             
             // Fall back to organization admin
             const orgDoc = await getDoc(doc(db, 'hierarchies', orgId));
             if (orgDoc.exists() && orgDoc.data().adminEmails?.length > 0) {
-                return orgDoc.data().adminEmails[0];
+                return {
+                    email: orgDoc.data().adminEmails[0],
+                    nodePath: `hierarchies/${orgId}`,
+                    nodeName: orgDoc.data().name || 'Organization'
+                };
             }
             
-            return null; // No admin found
+            return null; // No admin found - will need Super Admin
         } catch (error) {
             console.error('Error finding approver:', error);
             return null;
@@ -1210,11 +1238,11 @@
         return approvalId;
     }
 
-    // Create join request (for Node/Org Admin)
+    // Create join request (for Node/Org Admin) - Single approval at destination
     async function createJoinRequest(orgId, nodePath, nodeName) {
-        const approverEmail = await findApproverForNode(orgId, nodePath);
+        const approver = await findApproverForNode(orgId, nodePath);
         
-        if (!approverEmail) {
+        if (!approver) {
             throw new Error('No admin found for this organization. Please wait for an admin to be assigned.');
         }
         
@@ -1226,12 +1254,14 @@
             targetOrgId: orgId,
             targetNodePath: nodePath,
             targetNodeName: nodeName,
-            assignedAdminEmail: approverEmail,
+            assignedAdminEmail: approver.email,
+            assignedAdminNodePath: approver.nodePath,
+            assignedAdminNodeName: approver.nodeName,
             createdAt: serverTimestamp()
         });
         
         // Add to admin's notifications
-        const adminNotifRef = doc(db, 'users', approverEmail, 'notifications', 'pending');
+        const adminNotifRef = doc(db, 'users', approver.email, 'notifications', 'pending');
         await setDoc(adminNotifRef, {
             joinRequests: arrayUnion(approvalId),
             updatedAt: serverTimestamp()
@@ -1240,11 +1270,88 @@
         return approvalId;
     }
 
-    // Create branch request (for Node/Org Admin)
-    async function createBranchRequest(orgId, parentPath, parentName, proposedName, proposedType) {
-        const approverEmail = await findApproverForNode(orgId, parentPath);
+    // Check if node exists in global hierarchy (by name or alias)
+    async function checkExistingNode(parentPath, proposedName) {
+        const sanitizedName = sanitizeName(proposedName);
+        const subNodesPath = `${parentPath}/sub-nodes`;
         
-        if (!approverEmail) {
+        try {
+            const subNodesRef = collection(db, subNodesPath);
+            const snapshot = await getDocs(subNodesRef);
+            
+            for (const docSnap of snapshot.docs) {
+                const data = docSnap.data();
+                const nodeName = data.name || '';
+                const aliases = data.nameAliases || [];
+                
+                // Check if name matches (case-insensitive)
+                const nameMatches = nodeName.toLowerCase() === proposedName.toLowerCase() || 
+                                   docSnap.id === sanitizedName;
+                
+                // Check if name matches any alias
+                const aliasMatch = aliases.some(a => a.toLowerCase() === proposedName.toLowerCase());
+                
+                if (nameMatches || aliasMatch) {
+                    return {
+                        exists: true,
+                        nodeId: docSnap.id,
+                        nodeName: data.name,
+                        nodePath: `${subNodesPath}/${docSnap.id}`,
+                        nodeData: data,
+                        isMember: (data.members || []).includes(currentUser.email)
+                    };
+                }
+            }
+        } catch (e) {
+            console.log('No sub-nodes found or error:', e);
+        }
+        
+        return { exists: false };
+    }
+
+    // Create branch request (for Node/Org Admin) - Smart version that converts to join if node exists
+    // Single approval at destination - only the closest admin approves
+    async function createBranchRequest(orgId, parentPath, parentName, proposedName, proposedType) {
+        // First check if this node already exists in global hierarchy
+        const existingNode = await checkExistingNode(parentPath, proposedName);
+        
+        if (existingNode.exists) {
+            // Node already exists - check if user is already a member
+            if (existingNode.isMember) {
+                throw new Error(`You are already a member of "${existingNode.nodeName}".`);
+            }
+            
+            // Check if user already has pending join request
+            const hasPendingJoin = await checkPendingRequest(existingNode.nodePath, 'join');
+            if (hasPendingJoin) {
+                throw new Error(`You already have a pending join request for "${existingNode.nodeName}".`);
+            }
+            
+            // Convert to join request instead of branch request
+            console.log(`Node "${proposedName}" already exists at ${existingNode.nodePath}. Converting to join request.`);
+            
+            await createJoinRequest(orgId, existingNode.nodePath, existingNode.nodeName);
+            
+            // Also add to user's hierarchy with pending status (for join)
+            const userParentPath = parentPath.replace('hierarchies/', `users/${currentUser.email}/hierarchies/`);
+            const userNodePath = `${userParentPath}/sub-nodes/${existingNode.nodeId}`;
+            
+            await setDoc(doc(db, userNodePath), {
+                name: existingNode.nodeName,
+                type: existingNode.nodeData.type || proposedType || 'department',
+                status: 'pending',
+                pendingJoinRequest: true,
+                createdAt: serverTimestamp()
+            });
+            
+            return { type: 'join', nodeName: existingNode.nodeName };
+        }
+        
+        // Node doesn't exist - create branch request
+        // Find the closest admin to the parent node (single approval)
+        const approver = await findApproverForNode(orgId, parentPath);
+        
+        if (!approver) {
             throw new Error('No admin found for this organization. Please wait for an admin to be assigned.');
         }
         
@@ -1258,20 +1365,27 @@
             parentNodeName: parentName,
             proposedName: proposedName,
             proposedType: proposedType,
-            assignedAdminEmail: approverEmail,
+            assignedAdminEmail: approver.email,
+            assignedAdminNodePath: approver.nodePath,
+            assignedAdminNodeName: approver.nodeName,
             createdAt: serverTimestamp()
         });
         
         // Add to admin's notifications
-        const adminNotifRef = doc(db, 'users', approverEmail, 'notifications', 'pending');
+        const adminNotifRef = doc(db, 'users', approver.email, 'notifications', 'pending');
         await setDoc(adminNotifRef, {
             branchRequests: arrayUnion(approvalId),
             updatedAt: serverTimestamp()
         }, { merge: true });
         
-        // Create unapproved node in user's hierarchy
+        // Create unapproved node in user's hierarchy at the correct nested path
         const nodeId = proposedName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-        const userSubNodeRef = doc(db, 'users', currentUser.email, 'hierarchies', orgId, 'sub-nodes', nodeId);
+        const userParentPath = parentPath.replace('hierarchies/', `users/${currentUser.email}/hierarchies/`);
+        const userNodePath = `${userParentPath}/sub-nodes/${nodeId}`;
+        
+        console.log('Creating pending node at:', userNodePath);
+        
+        const userSubNodeRef = doc(db, userNodePath);
         await setDoc(userSubNodeRef, {
             name: proposedName,
             type: proposedType || 'department',
@@ -1280,7 +1394,7 @@
             createdAt: serverTimestamp()
         });
         
-        return approvalId;
+        return { type: 'branch', approvalId };
     }
 
     // Check if user has pending request for a node
@@ -1490,7 +1604,7 @@
         }
     }
 
-    // Save node - now creates requests instead of direct creation
+    // Save node - now creates DRAFT nodes locally, approval requests sent on "Done"
     async function saveNode() {
         const name = document.getElementById('nodeName').value.trim();
 
@@ -1516,73 +1630,54 @@
                     updatedAt: serverTimestamp()
                 }, { merge: true });
 
-                // Sync update to global hierarchy
-                const nodeData = { name, type: nodeType };
-                const globalPath = getGlobalHierarchyPath(editingNode.path);
-                
-                try {
-                    const globalDocRef = doc(db, globalPath);
-                    const globalDoc = await getDoc(globalDocRef);
-                    if (globalDoc.exists()) {
-                        await setDoc(globalDocRef, {
-                            name: name,
-                            type: nodeType,
-                            updatedAt: serverTimestamp()
-                        }, { merge: true });
-                        console.log('Global hierarchy updated:', globalPath);
+                // Sync update to global hierarchy if node is active
+                if (editingNode.status === 'active') {
+                    const globalPath = getGlobalHierarchyPath(editingNode.path);
+                    try {
+                        const globalDocRef = doc(db, globalPath);
+                        const globalDoc = await getDoc(globalDocRef);
+                        if (globalDoc.exists()) {
+                            await setDoc(globalDocRef, {
+                                name: name,
+                                type: nodeType,
+                                updatedAt: serverTimestamp()
+                            }, { merge: true });
+                        }
+                    } catch (e) {
+                        console.error('Error syncing edit to global:', e);
                     }
-                } catch (e) {
-                    console.error('Error syncing edit to global:', e);
                 }
                 
                 showToast('Node updated successfully!', 'success');
             } else if (parentDocRef) {
-                // Creating child node - create BRANCH REQUEST instead of direct creation
+                // Creating child node - save as DRAFT locally (no approval request yet)
                 const parentPath = parentDocRef.path;
-                const globalParentPath = getGlobalHierarchyPath(parentPath);
+                const nodeId = sanitizedName;
                 
-                // Get org ID from path - handle both formats
-                // Format 1: hierarchies/{orgId}/sub-nodes/...
-                // Format 2: {orgId}/sub-nodes/...
-                let orgId;
-                const pathParts = globalParentPath.split('/');
-                if (pathParts[0] === 'hierarchies') {
-                    orgId = pathParts[1];
-                } else {
-                    orgId = pathParts[0];
-                }
+                // Create in user's hierarchy with 'draft' status
+                const childRef = doc(collection(parentDocRef, 'sub-nodes'), nodeId);
+                await setDoc(childRef, {
+                    name: name,
+                    type: nodeType,
+                    status: 'draft', // Draft until "Done" is clicked
+                    createdAt: serverTimestamp(),
+                    createdBy: currentUser.email
+                });
                 
-                console.log('Creating branch request - parentPath:', parentPath, 'globalParentPath:', globalParentPath, 'orgId:', orgId);
-                
-                // Get parent name
-                const parentDoc = await getDoc(parentDocRef);
-                const parentName = parentDoc.exists() ? parentDoc.data().name : 'Organization';
-                
-                // Check if org has admin
-                const orgDoc = await getDoc(doc(db, 'hierarchies', orgId));
-                if (!orgDoc.exists() || !orgDoc.data().adminEmails?.length) {
-                    showToast('This organization has no admin yet. Please wait for Super Admin to assign one.', 'error');
-                    return;
-                }
-                
-                await createBranchRequest(orgId, globalParentPath, parentName, name, nodeType);
-                showToast('Branch request submitted! Waiting for admin approval.', 'success');
+                showToast('Node added! Click "Done" when you\'re ready to submit for approval.', 'success');
             } else {
-                // Creating root organization - create ORGANIZATION REQUEST for Super Admin
-                await createOrganizationRequest(name, nodeType);
-                
-                // Also create in user's personal hierarchies with pending status
+                // Creating root organization - save as DRAFT locally
                 const hierarchiesRef = collection(db, 'users', currentUser.email, 'hierarchies');
                 const newDocRef = doc(hierarchiesRef, sanitizedName);
                 await setDoc(newDocRef, {
                     name: name,
                     type: nodeType,
-                    status: 'pending',
+                    status: 'draft', // Draft until "Done" is clicked
                     createdAt: serverTimestamp(),
                     createdBy: currentUser.email
                 });
                 
-                showToast('Organization request submitted! Waiting for Super Admin approval.', 'success');
+                showToast('Organization added! Click "Done" when you\'re ready to submit for approval.', 'success');
             }
 
             closeNodeModal();
@@ -1811,24 +1906,46 @@
         });
     }
     
-    // Handle joining an organization
+    // Handle joining an organization - creates draft node, request sent on "Done"
     async function handleJoinOrganization(orgId, orgPath, orgName) {
-        // Check if already has pending request
-        const hasPending = await checkPendingRequest(orgPath, 'join');
-        if (hasPending) {
-            showToast('You already have a pending join request for this organization.', 'error');
+        // Check if user already has this org in their hierarchy
+        const userHierarchyRef = doc(db, 'users', currentUser.email, 'hierarchies', orgId);
+        const existingDoc = await getDoc(userHierarchyRef);
+        
+        if (existingDoc.exists()) {
+            const status = existingDoc.data().status;
+            if (status === 'active') {
+                showToast('You are already a member of this organization.', 'error');
+            } else if (status === 'pending') {
+                showToast('You already have a pending request for this organization.', 'error');
+            } else if (status === 'draft') {
+                showToast('This organization is already in your draft. Click "Done" to submit.', 'error');
+            }
             return;
         }
         
-        if (!confirm(`Request to join "${orgName}"? An admin will review your request.`)) return;
+        if (!confirm(`Add "${orgName}" to your network? Click "Done" when ready to submit for approval.`)) return;
         
         try {
-            await createJoinRequest(orgId, orgPath, orgName);
-            showToast('Join request submitted! Waiting for admin approval.', 'success');
+            // Get org details from global hierarchy
+            const orgDoc = await getDoc(doc(db, 'hierarchies', orgId));
+            const orgData = orgDoc.exists() ? orgDoc.data() : {};
             
-            // Refresh the browse list
-            await loadAvailableOrganizations();
-            renderBrowseOrganizations(allAvailableOrgs, document.getElementById('searchOrgsInput').value);
+            // Create draft node in user's hierarchy
+            await setDoc(userHierarchyRef, {
+                name: orgName,
+                type: orgData.type || 'organization',
+                status: 'draft', // Draft until "Done" is clicked
+                joinExisting: true, // Flag to indicate this is joining existing org
+                createdAt: serverTimestamp(),
+                createdBy: currentUser.email
+            });
+            
+            showToast(`"${orgName}" added to your network! Click "Done" to submit for approval.`, 'success');
+            
+            // Close browse section and refresh hierarchy
+            toggleBrowseSection(false);
+            await loadHierarchy();
         } catch (error) {
             showToast(error.message, 'error');
         }
@@ -1861,16 +1978,334 @@
     }
     // ==================== END BROWSE ORGANIZATIONS FEATURE ====================
 
-    // Done button
-    function handleDone() {
+    // Done button - process all draft nodes and send approval requests
+    async function handleDone() {
         if (hierarchyData.length === 0) {
             showToast('Please create at least one node before continuing.', 'error');
             return;
         }
-        showToast('Network setup complete! Redirecting...', 'success');
-        setTimeout(() => {
-            window.location.href = 'dashboard.html';
-        }, 1500);
+        
+        // Find all draft nodes that need approval
+        const draftNodes = findDraftNodes(hierarchyData);
+        
+        if (draftNodes.length === 0) {
+            // No draft nodes - all nodes are already active or pending
+            showToast('Network setup complete! Redirecting...', 'success');
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+            return;
+        }
+        
+        // Show processing message
+        showToast('Submitting approval requests...', 'success');
+        
+        try {
+            // Process each draft tree - send ONE request for the deepest node in each branch
+            for (const draftTree of draftNodes) {
+                await processDraftTree(draftTree);
+            }
+            
+            showToast('Approval requests submitted! Redirecting...', 'success');
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+        } catch (error) {
+            console.error('Error processing draft nodes:', error);
+            showToast('Error: ' + error.message, 'error');
+        }
+    }
+    
+    // Find all draft nodes in the hierarchy (nodes with status 'draft')
+    function findDraftNodes(nodes) {
+        const draftTrees = [];
+        
+        for (const node of nodes) {
+            if (node.status === 'draft') {
+                // This is a draft root - collect the entire tree
+                draftTrees.push(node);
+            } else if (node.children && node.children.length > 0) {
+                // Check children for draft nodes
+                const childDrafts = findDraftNodes(node.children);
+                draftTrees.push(...childDrafts);
+            }
+        }
+        
+        return draftTrees;
+    }
+    
+    // Find the deepest leaf nodes in a tree
+    function findDeepestLeaves(node, leaves = []) {
+        if (!node.children || node.children.length === 0) {
+            // This is a leaf node
+            leaves.push(node);
+        } else {
+            // Recurse into children
+            for (const child of node.children) {
+                findDeepestLeaves(child, leaves);
+            }
+        }
+        return leaves;
+    }
+    
+    // Process a draft tree - send approval request for the deepest node only
+    async function processDraftTree(rootNode) {
+        const globalPath = getGlobalHierarchyPath(rootNode.path);
+        const pathParts = globalPath.split('/');
+        
+        // Check if this is a root organization or a sub-node
+        const isRootOrg = pathParts.length === 2 && pathParts[0] === 'hierarchies';
+        
+        // Check if this is joining an existing organization (from Browse & Join)
+        if (rootNode.joinExisting && isRootOrg) {
+            const orgId = pathParts[1];
+            const leaves = findDeepestLeaves(rootNode);
+            
+            for (const leaf of leaves) {
+                // If leaf is the root itself (no children), create join request for org
+                if (leaf.path === rootNode.path) {
+                    await createJoinRequest(orgId, `hierarchies/${orgId}`, rootNode.name);
+                } else {
+                    // Has children - process as branch request
+                    await processLeafNode(rootNode, leaf);
+                }
+            }
+            
+            // Update status to pending
+            await updateTreeStatus(rootNode, 'pending');
+            return;
+        }
+        
+        if (isRootOrg) {
+            // Root organization - find deepest leaf and send org request with full path
+            const leaves = findDeepestLeaves(rootNode);
+            
+            // Build the full path for the deepest node
+            for (const leaf of leaves) {
+                await processLeafNode(rootNode, leaf);
+            }
+        } else {
+            // Sub-node under existing org - find deepest leaf
+            const leaves = findDeepestLeaves(rootNode);
+            
+            for (const leaf of leaves) {
+                await processLeafNode(rootNode, leaf);
+            }
+        }
+    }
+    
+    // Process a leaf node - send the appropriate approval request
+    async function processLeafNode(rootNode, leafNode) {
+        const globalRootPath = getGlobalHierarchyPath(rootNode.path);
+        const globalLeafPath = getGlobalHierarchyPath(leafNode.path);
+        const pathParts = globalRootPath.split('/');
+        
+        // Check if root is an organization or sub-node
+        const isRootOrg = pathParts.length === 2 && pathParts[0] === 'hierarchies';
+        
+        if (isRootOrg) {
+            // This is a new organization request
+            const orgId = pathParts[1];
+            
+            // Check if org already exists in global hierarchy
+            const orgDoc = await getDoc(doc(db, 'hierarchies', orgId));
+            
+            if (orgDoc.exists()) {
+                // Org exists - this becomes a join/branch request
+                await processExistingOrgRequest(rootNode, leafNode, orgId);
+            } else {
+                // New org - create organization request with full tree info
+                await createOrganizationRequestWithTree(rootNode, leafNode);
+            }
+        } else {
+            // This is a branch request under existing org
+            // Get org ID from path
+            const orgId = pathParts[1];
+            
+            // Find the parent path (the active node this branch is under)
+            const parentPath = findActiveParentPath(rootNode);
+            const parentDoc = await getDoc(doc(db, parentPath));
+            const parentName = parentDoc.exists() ? parentDoc.data().name : 'Organization';
+            
+            // Create branch request for the deepest node
+            await createBranchRequestForTree(orgId, parentPath, parentName, rootNode, leafNode);
+        }
+        
+        // Update all nodes in the path from root to leaf as 'pending'
+        await updateTreeStatus(rootNode, 'pending');
+    }
+    
+    // Find the active parent path for a draft node
+    function findActiveParentPath(node) {
+        const userPath = node.path;
+        const parts = userPath.split('/sub-nodes/');
+        
+        // Remove the last part (the draft node itself)
+        parts.pop();
+        const parentUserPath = parts.join('/sub-nodes/');
+        
+        return getGlobalHierarchyPath(parentUserPath);
+    }
+    
+    // Process request when org already exists
+    async function processExistingOrgRequest(rootNode, leafNode, orgId) {
+        // Check if user wants to join existing org or create branch
+        const orgDoc = await getDoc(doc(db, 'hierarchies', orgId));
+        const orgData = orgDoc.data();
+        
+        // Build the full path from root to leaf
+        const fullPath = buildPathFromRootToLeaf(rootNode, leafNode);
+        
+        // Check if the deepest node exists in global hierarchy
+        const globalLeafPath = getGlobalHierarchyPath(leafNode.path);
+        const leafDoc = await getDoc(doc(db, globalLeafPath));
+        
+        if (leafDoc.exists()) {
+            // Node exists - create join request
+            await createJoinRequest(orgId, globalLeafPath, leafNode.name);
+        } else {
+            // Node doesn't exist - find where the path diverges and create branch request
+            const divergePoint = await findDivergencePoint(orgId, fullPath);
+            
+            if (divergePoint.parentPath) {
+                const parentDoc = await getDoc(doc(db, divergePoint.parentPath));
+                const parentName = parentDoc.exists() ? parentDoc.data().name : 'Organization';
+                
+                // Create branch request for the remaining path
+                await createBranchRequestForTree(orgId, divergePoint.parentPath, parentName, divergePoint.remainingRoot, leafNode);
+            } else {
+                // All nodes are new under org root
+                const parentName = orgData.name || orgId;
+                await createBranchRequestForTree(orgId, `hierarchies/${orgId}`, parentName, rootNode, leafNode);
+            }
+        }
+    }
+    
+    // Build path array from root to leaf
+    function buildPathFromRootToLeaf(rootNode, leafNode, path = []) {
+        path.push(rootNode);
+        
+        if (rootNode.path === leafNode.path) {
+            return path;
+        }
+        
+        if (rootNode.children) {
+            for (const child of rootNode.children) {
+                if (leafNode.path.startsWith(child.path.replace('/sub-nodes/', '/sub-nodes/'))) {
+                    return buildPathFromRootToLeaf(child, leafNode, path);
+                }
+            }
+        }
+        
+        return path;
+    }
+    
+    // Find where user's path diverges from existing global hierarchy
+    async function findDivergencePoint(orgId, pathNodes) {
+        let lastExistingPath = `hierarchies/${orgId}`;
+        let remainingRoot = null;
+        
+        for (let i = 0; i < pathNodes.length; i++) {
+            const node = pathNodes[i];
+            const globalPath = getGlobalHierarchyPath(node.path);
+            
+            const nodeDoc = await getDoc(doc(db, globalPath));
+            
+            if (!nodeDoc.exists()) {
+                // This node doesn't exist - divergence point found
+                remainingRoot = node;
+                break;
+            }
+            
+            lastExistingPath = globalPath;
+        }
+        
+        return {
+            parentPath: lastExistingPath,
+            remainingRoot: remainingRoot
+        };
+    }
+    
+    // Create organization request with full tree info
+    async function createOrganizationRequestWithTree(rootNode, leafNode) {
+        // Build the full path description
+        const pathNodes = buildPathFromRootToLeaf(rootNode, leafNode);
+        const pathDescription = pathNodes.map(n => n.name).join(' → ');
+        
+        const approvalId = `org-${Date.now()}`;
+        await setDoc(doc(db, 'pendingApprovals', approvalId), {
+            requestType: 'organization',
+            status: 'pending',
+            requesterEmail: currentUser.email,
+            organizationName: rootNode.name,
+            organizationType: rootNode.type,
+            fullTreePath: pathDescription,
+            deepestNodeName: leafNode.name,
+            deepestNodeType: leafNode.type,
+            treeDepth: pathNodes.length,
+            createdAt: serverTimestamp()
+        });
+        
+        console.log('Created organization request:', approvalId, 'path:', pathDescription);
+    }
+    
+    // Create branch request for a tree (from root draft to leaf)
+    async function createBranchRequestForTree(orgId, parentPath, parentName, rootDraftNode, leafNode) {
+        // Build the full path description from draft root to leaf
+        const pathNodes = buildPathFromRootToLeaf(rootDraftNode, leafNode);
+        const pathDescription = pathNodes.map(n => n.name).join(' → ');
+        
+        // Find the approver for the parent node
+        const approver = await findApproverForNode(orgId, parentPath);
+        
+        if (!approver) {
+            throw new Error('No admin found for this organization. Please wait for an admin to be assigned.');
+        }
+        
+        const approvalId = `branch-${Date.now()}`;
+        await setDoc(doc(db, 'pendingApprovals', approvalId), {
+            requestType: 'branch',
+            status: 'pending',
+            requesterEmail: currentUser.email,
+            parentOrgId: orgId,
+            parentNodePath: parentPath,
+            parentNodeName: parentName,
+            proposedName: rootDraftNode.name,
+            proposedType: rootDraftNode.type,
+            fullTreePath: pathDescription,
+            deepestNodeName: leafNode.name,
+            deepestNodeType: leafNode.type,
+            treeDepth: pathNodes.length,
+            assignedAdminEmail: approver.email,
+            assignedAdminNodePath: approver.nodePath,
+            assignedAdminNodeName: approver.nodeName,
+            createdAt: serverTimestamp()
+        });
+        
+        // Add to admin's notifications
+        const adminNotifRef = doc(db, 'users', approver.email, 'notifications', 'pending');
+        await setDoc(adminNotifRef, {
+            branchRequests: arrayUnion(approvalId),
+            updatedAt: serverTimestamp()
+        }, { merge: true });
+        
+        console.log('Created branch request:', approvalId, 'path:', pathDescription, 'admin:', approver.email);
+    }
+    
+    // Update all nodes in a tree to a new status
+    async function updateTreeStatus(node, newStatus) {
+        // Update this node
+        await setDoc(node.docRef, {
+            status: newStatus,
+            updatedAt: serverTimestamp()
+        }, { merge: true });
+        
+        // Update children
+        if (node.children) {
+            for (const child of node.children) {
+                await updateTreeStatus(child, newStatus);
+            }
+        }
     }
 
     // Event listeners

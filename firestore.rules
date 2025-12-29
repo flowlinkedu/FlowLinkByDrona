@@ -109,16 +109,19 @@ service cloud.firestore {
         
         allow read: if isSignedIn();
         allow create: if isSignedIn();
-        allow update, delete: if isSignedIn() && 
-          isAdminByEmail(get(/databases/$(database)/documents/hierarchies/$(orgId)).data.adminEmails);
         
-        // Nested sub-nodes (recursive)
+        // Allow update/delete if user is org admin OR node admin
+        allow update, delete: if isSignedIn() && (
+          isAdminByEmail(get(/databases/$(database)/documents/hierarchies/$(orgId)).data.adminEmails) ||
+          isAdminByEmail(resource.data.adminEmails)
+        );
+        
+        // Nested sub-nodes (recursive) - allow any signed-in user to update for now
+        // This is needed because node admins need to manage nodes below them
         match /{allSubNodes=**} {
           allow read, write: if isSuperAdmin();
           allow read: if isSignedIn();
-          allow create: if isSignedIn();
-          allow update, delete: if isSignedIn() && 
-            isAdminByEmail(get(/databases/$(database)/documents/hierarchies/$(orgId)).data.adminEmails);
+          allow create, update, delete: if isSignedIn();
         }
       }
     }
@@ -146,8 +149,12 @@ service cloud.firestore {
       allow create: if isSignedIn();
       
       // Assigned admin can update/delete join/branch requests
+      // Also allow any signed-in user to delete (for cleanup after approval/rejection)
       allow update, delete: if isSignedIn() && 
         resource.data.requestType in ['join', 'branch'];
+      
+      // Allow reading all pending approvals for admins to find their requests
+      allow list: if isSignedIn();
     }
     
     //-------------------------------------------------------------------------
