@@ -2033,19 +2033,61 @@
 
             async checkIfUserIsAdmin(userEmail) {
                 try {
-                    // Check all global hierarchies to see if user is an admin
+                    console.log('Checking admin status for:', userEmail);
+                    
+                    // Check all global hierarchies to see if user is an org admin
                     const hierarchiesRef = collection(db, 'hierarchies');
                     const snapshot = await getDocs(hierarchiesRef);
                     
                     for (const docSnap of snapshot.docs) {
                         const data = docSnap.data();
+                        // Check if user is org-level admin
                         if (data.adminEmails && data.adminEmails.includes(userEmail)) {
+                            console.log('User is org-level admin of:', docSnap.id);
+                            return true;
+                        }
+                        
+                        // Check if user is node-level admin (check sub-nodes recursively)
+                        const isNodeAdmin = await this.checkNodeAdminRecursive(docSnap.id, userEmail);
+                        if (isNodeAdmin) {
+                            console.log('User is node-level admin in org:', docSnap.id);
+                            return true;
+                        }
+                    }
+                    console.log('User is not an admin');
+                    return false;
+                } catch (error) {
+                    console.error('Error checking admin status:', error);
+                    return false;
+                }
+            }
+            
+            // Recursively check if user is admin of any sub-node
+            async checkNodeAdminRecursive(orgId, userEmail, parentPath = null) {
+                try {
+                    const basePath = parentPath || `hierarchies/${orgId}`;
+                    const subNodesRef = collection(db, basePath, 'sub-nodes');
+                    const snapshot = await getDocs(subNodesRef);
+                    
+                    for (const docSnap of snapshot.docs) {
+                        const data = docSnap.data();
+                        const nodePath = `${basePath}/sub-nodes/${docSnap.id}`;
+                        
+                        // Check if user is admin of this node
+                        if (data.adminEmails && data.adminEmails.includes(userEmail)) {
+                            console.log('Found node admin at:', nodePath);
+                            return true;
+                        }
+                        
+                        // Check children recursively
+                        const isChildAdmin = await this.checkNodeAdminRecursive(orgId, userEmail, nodePath);
+                        if (isChildAdmin) {
                             return true;
                         }
                     }
                     return false;
                 } catch (error) {
-                    console.error('Error checking admin status:', error);
+                    // No sub-nodes or error - this is normal for leaf nodes
                     return false;
                 }
             }
@@ -3079,15 +3121,19 @@
             }
 
             handleNavigation(e) {
-                e.preventDefault();
-
                 const link = e.currentTarget;
                 const page = link.dataset.page;
+                const href = link.getAttribute('href');
                 
-                // Skip if it's the admin panel link (it has href)
-                if (link.getAttribute('href') && link.getAttribute('href') !== '#') {
+                // If it's the admin panel link (has actual href, not #), allow normal navigation
+                if (href && href !== '#') {
+                    console.log('Admin Panel link clicked, navigating to:', href);
+                    // Don't prevent default - let the browser navigate
                     return;
                 }
+                
+                // Prevent default for internal navigation
+                e.preventDefault();
 
                 // Update active state
                 document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
