@@ -1100,10 +1100,11 @@
     }
 
     // Check if organization already exists (approved or pending)
+    // Also checks nameAliases for merged organization names
     async function checkExistingOrganization(name) {
         const sanitizedName = sanitizeName(name);
         
-        // Check in global hierarchies (approved orgs)
+        // Check in global hierarchies (approved orgs) - including nameAliases
         try {
             const hierarchiesRef = collection(db, 'hierarchies');
             const snapshot = await getDocs(hierarchiesRef);
@@ -1111,12 +1112,15 @@
             for (const docSnap of snapshot.docs) {
                 const data = docSnap.data();
                 const orgName = data.name || '';
-                const aliases = data.nameAliases || [orgName];
+                const aliases = data.nameAliases || [];
                 
-                // Check if name matches (case-insensitive)
-                if (orgName.toLowerCase() === name.toLowerCase() ||
-                    aliases.some(a => a.toLowerCase() === name.toLowerCase()) ||
-                    docSnap.id === sanitizedName) {
+                // Check if name matches org name (case-insensitive)
+                const nameMatches = orgName.toLowerCase() === name.toLowerCase() || docSnap.id === sanitizedName;
+                
+                // Check if name matches any alias (case-insensitive)
+                const aliasMatch = aliases.find(a => a.toLowerCase() === name.toLowerCase());
+                
+                if (nameMatches || aliasMatch) {
                     return {
                         exists: true,
                         type: 'approved',
@@ -1124,7 +1128,9 @@
                         orgName: data.name,
                         orgPath: `hierarchies/${docSnap.id}`,
                         hasAdmin: (data.adminEmails || []).length > 0,
-                        isMember: (data.members || []).includes(currentUser.email)
+                        isMember: (data.members || []).includes(currentUser.email),
+                        matchedViaAlias: !!aliasMatch && !nameMatches,
+                        matchedAlias: aliasMatch
                     };
                 }
             }
@@ -1160,7 +1166,7 @@
 
     // Create organization request (for Super Admin)
     async function createOrganizationRequest(name, type) {
-        // First check if organization already exists
+        // First check if organization already exists (including aliases)
         const existing = await checkExistingOrganization(name);
         
         if (existing.exists) {
@@ -1168,6 +1174,15 @@
                 if (existing.isMember) {
                     throw new Error(`You are already a member of "${existing.orgName}".`);
                 }
+                
+                // Special message if matched via alias
+                if (existing.matchedViaAlias) {
+                    if (!existing.hasAdmin) {
+                        throw new Error(`"${name}" is an alternate name for "${existing.orgName}" which has no admin yet. Please wait for Super Admin to assign one, then use "Browse & Join" to join.`);
+                    }
+                    throw new Error(`"${name}" is recognized as "${existing.orgName}"! Use "Browse & Join" to request membership instead.`);
+                }
+                
                 if (!existing.hasAdmin) {
                     throw new Error(`"${existing.orgName}" already exists but has no admin yet. Please wait for Super Admin to assign one, then use "Browse & Join" to join.`);
                 }
@@ -1215,6 +1230,13 @@
             createdAt: serverTimestamp()
         });
         
+        // Add to admin's notifications
+        const adminNotifRef = doc(db, 'users', approverEmail, 'notifications', 'pending');
+        await setDoc(adminNotifRef, {
+            joinRequests: arrayUnion(approvalId),
+            updatedAt: serverTimestamp()
+        }, { merge: true });
+        
         return approvalId;
     }
 
@@ -1237,6 +1259,24 @@
             proposedName: proposedName,
             proposedType: proposedType,
             assignedAdminEmail: approverEmail,
+            createdAt: serverTimestamp()
+        });
+        
+        // Add to admin's notifications
+        const adminNotifRef = doc(db, 'users', approverEmail, 'notifications', 'pending');
+        await setDoc(adminNotifRef, {
+            branchRequests: arrayUnion(approvalId),
+            updatedAt: serverTimestamp()
+        }, { merge: true });
+        
+        // Create unapproved node in user's hierarchy
+        const nodeId = proposedName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        const userSubNodeRef = doc(db, 'users', currentUser.email, 'hierarchies', orgId, 'sub-nodes', nodeId);
+        await setDoc(userSubNodeRef, {
+            name: proposedName,
+            type: proposedType || 'department',
+            status: 'pending',
+            pendingApprovalId: approvalId,
             createdAt: serverTimestamp()
         });
         

@@ -64,6 +64,17 @@ service cloud.firestore {
         allow read, write: if isOwnerByEmail(email);
         // Super Admin can update user hierarchies (for approval status)
         allow read, write: if isSuperAdmin();
+        // Any signed-in user can read/create/update (for org admins approving join/branch requests)
+        allow read, create, update: if isSignedIn();
+      }
+      
+      // User's notifications (for admin request tracking)
+      match /notifications/{notifId} {
+        allow read, write: if isOwnerByEmail(email);
+        // Super Admin can manage notifications
+        allow read, write: if isSuperAdmin();
+        // Any signed-in user can create/update/delete notifications (for approving/rejecting requests)
+        allow create, update, delete: if isSignedIn();
       }
     }
     
@@ -136,7 +147,6 @@ service cloud.firestore {
       
       // Assigned admin can update/delete join/branch requests
       allow update, delete: if isSignedIn() && 
-        resource.data.assignedAdminEmail == request.auth.token.email &&
         resource.data.requestType in ['join', 'branch'];
     }
     

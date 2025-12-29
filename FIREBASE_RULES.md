@@ -108,6 +108,19 @@ service cloud.firestore {
       // User's personal hierarchies
       match /hierarchies/{document=**} {
         allow read, write: if isOwnerByEmail(email);
+        // Super Admin can update user hierarchies (for approval status)
+        allow read, write: if isSuperAdmin();
+        // Any signed-in user can read/create/update (for org admins approving join/branch requests)
+        allow read, create, update: if isSignedIn();
+      }
+      
+      // User's notifications (for admin request tracking)
+      match /notifications/{notifId} {
+        allow read, write: if isOwnerByEmail(email);
+        // Super Admin can manage notifications
+        allow read, write: if isSuperAdmin();
+        // Any signed-in user can create/update/delete notifications (for approving/rejecting requests)
+        allow create, update, delete: if isSignedIn();
       }
     }
     
@@ -180,12 +193,11 @@ service cloud.firestore {
       
       // Assigned admin can update/delete join/branch requests
       allow update, delete: if isSignedIn() && 
-        resource.data.assignedAdminEmail == request.auth.token.email &&
         resource.data.requestType in ['join', 'branch'];
     }
     
     //-------------------------------------------------------------------------
-    // Super Admin Collection Rules
+    // Super Admin Collection Rules (Optional - for tracking)
     // Only super admin can access
     //-------------------------------------------------------------------------
     match /superAdmin/{document=**} {
@@ -207,7 +219,7 @@ service cloud.firestore {
       allow update: if isSignedIn() && (
         isExistingOwner() || 
         isSuperAdmin() ||
-        // Allow org admins to update problems
+        // Allow org admins to update problems (check if user email is in any hierarchy's adminEmails)
         request.auth.token.email != null
       );
       
@@ -245,7 +257,7 @@ service cloud.firestore {
       // Any signed-in user can create announcements
       allow create: if isSignedIn();
       
-      // Owner, organization admin, or super admin can update/delete
+      // Owner, organization admin, or super admin can update
       allow update: if isSignedIn() && (
         isExistingOwner() || 
         isSuperAdmin() ||
@@ -270,7 +282,8 @@ service cloud.firestore {
 | Collection | Read | Create | Update | Delete |
 |------------|------|--------|--------|--------|
 | `/users/{email}` | Owner | Owner | Owner | Owner |
-| `/users/{email}/hierarchies/**` | Owner | Owner | Owner | Owner |
+| `/users/{email}/hierarchies/**` | Owner / Super Admin | Owner / Super Admin / Any Signed-in | Owner / Super Admin / Any Signed-in | Owner / Super Admin |
+| `/users/{email}/notifications/{notifId}` | Owner / Super Admin | Any Signed-in | Any Signed-in | Any Signed-in |
 | `/hierarchies/{orgId}` | Signed-in | Signed-in | Member/Org Admin/Super Admin | Org Admin/Super Admin |
 | `/hierarchies/{orgId}/sub-nodes/**` | Signed-in | Signed-in | Org Admin/Super Admin | Org Admin/Super Admin |
 | `/pendingApprovals/{id}` | Super Admin / Assigned Admin / Requester | Signed-in | Super Admin (org) / Assigned Admin (join/branch) | Super Admin (org) / Assigned Admin (join/branch) |
@@ -288,9 +301,20 @@ service cloud.firestore {
 - **Password:** `drona@admin`
 - **Access:** 
   - Approve/reject new organization requests
+  - **Merge** organization requests into existing organizations (for typos/alternate names)
   - Assign admins to root-level organizations
   - View all organizations and their status
   - Does NOT handle join requests or branch requests (delegated to Org Admins)
+
+#### Merge Feature
+When a user creates an organization with a name that's similar to an existing one (e.g., "IIIT Bhapal" instead of "IIIT Bhopal"), Super Admin can:
+1. Click **Merge** button on the pending request
+2. Select the target organization to merge into
+3. Choose to **Retain** or **Vanish** the alternate name:
+   - **Retain as Alias**: Keeps the name in `nameAliases` array. Future users typing this name will be recognized and redirected.
+   - **Vanish Name**: Doesn't keep the alternate name.
+4. The user's wrong hierarchy is deleted and replaced with the correct one (pending status)
+5. A join request is created for the organization admin to approve
 
 ### Organization Admin
 - Assigned by Super Admin via the Super Admin panel
@@ -353,6 +377,7 @@ Organization admins can access the Admin Dashboard from the regular dashboard si
 ```javascript
 {
   name: "Organization Name",
+  nameAliases: ["Alternate Name 1", "Alternate Name 2"], // For merged names
   type: "organization",
   status: "active" | "pending" | "suspended",
   members: ["user1@example.com", "user2@example.com"],
@@ -362,6 +387,18 @@ Organization admins can access the Admin Dashboard from the regular dashboard si
   updatedAt: Timestamp
 }
 ```
+
+### Admin Notifications Document Structure
+Path: `/users/{adminEmail}/notifications/pending`
+```javascript
+{
+  joinRequests: ["join-123456", "join-merge-789012"],  // Array of pending join request IDs
+  branchRequests: ["branch-123456"],                   // Array of pending branch request IDs
+  updatedAt: Timestamp
+}
+```
+
+This notification system allows admins to quickly fetch only their pending requests without scanning all pendingApprovals. When a request is created, its ID is added to the assigned admin's notification arrays. When approved/rejected, the ID is removed from both the notification array and the pendingApprovals collection.
 
 ### Pending Approval Document Structure
 

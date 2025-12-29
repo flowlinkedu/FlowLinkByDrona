@@ -234,6 +234,40 @@
         .subnode-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
         @media (max-width: 768px) { .admin-sidebar { transform: translateX(-100%); } .admin-sidebar.show { transform: translateX(0); } .admin-main { margin-left: 0; } .mobile-menu-btn { display: block; } .metrics-grid { grid-template-columns: repeat(2, 1fr); } .admin-topbar { padding: 1rem; } .topbar-right { gap: 0.5rem; } .back-btn span, .sign-out-btn span { display: none; } }
         @media (max-width: 480px) { .metrics-grid { grid-template-columns: 1fr; } }
+        
+        /* Tree View Styles for Branch Requests */
+        .branch-tree-container { background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); margin-bottom: 1.5rem; }
+        .branch-tree-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(0,0,0,0.1); }
+        .branch-tree-title { font-family: 'Poppins', sans-serif; font-weight: 600; color: #1F2933; }
+        .branch-tree-requester { font-size: 0.85rem; color: #6B7280; }
+        .tree-view { display: flex; flex-direction: column; align-items: center; padding: 1rem 0; overflow-x: auto; }
+        .tree-node { display: flex; flex-direction: column; align-items: center; }
+        .tree-node-card { min-width: 180px; max-width: 220px; background: white; border: 2px solid #E5E7EB; border-radius: 12px; padding: 0.75rem 1rem; text-align: center; transition: all 0.3s ease; }
+        .tree-node-card.root { background: linear-gradient(135deg, var(--admin-accent), #29E2D0); color: white; border: none; }
+        .tree-node-card.root .tree-node-type { color: rgba(255,255,255,0.8); }
+        .tree-node-card.existing { background: #F9FAFB; border-color: #D1D5DB; }
+        .tree-node-card.pending-request { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(251, 191, 36, 0.1)); border: 2px dashed #F59E0B; animation: pulse-border 2s infinite; }
+        @keyframes pulse-border { 0%, 100% { border-color: #F59E0B; } 50% { border-color: #FBBF24; } }
+        .tree-node-name { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.25rem; }
+        .tree-node-type { font-size: 0.75rem; color: #6B7280; text-transform: capitalize; }
+        .tree-node-badge { display: inline-block; background: #F59E0B; color: white; font-size: 0.65rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 10px; margin-top: 0.5rem; }
+        .tree-connector { width: 2px; height: 20px; background: #D1D5DB; }
+        .tree-children { display: flex; justify-content: center; gap: 1rem; position: relative; padding-top: 20px; }
+        .tree-children::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: calc(100% - 100px); height: 2px; background: #D1D5DB; }
+        .tree-child { display: flex; flex-direction: column; align-items: center; position: relative; }
+        .tree-child::before { content: ''; position: absolute; top: -20px; left: 50%; width: 2px; height: 20px; background: #D1D5DB; }
+        .tree-actions { display: flex; gap: 0.5rem; margin-top: 1rem; justify-content: center; flex-wrap: wrap; }
+        .action-btn.merge { background: rgba(139, 92, 246, 0.1); color: #7C3AED; }
+        .action-btn.merge:hover { background: #7C3AED; color: white; }
+        .action-btn.restructure { background: rgba(236, 72, 153, 0.1); color: #DB2777; }
+        .action-btn.restructure:hover { background: #DB2777; color: white; }
+        .restructure-preview { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+        .restructure-preview .preview-title { font-weight: 600; margin-bottom: 0.5rem; color: #1F2933; }
+        .restructure-preview .preview-path { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.9rem; }
+        .restructure-preview .preview-node { background: white; border: 1px solid #D1D5DB; padding: 0.25rem 0.75rem; border-radius: 6px; }
+        .restructure-preview .preview-node.new { background: rgba(16, 185, 129, 0.1); border-color: #10B981; color: #059669; }
+        .restructure-preview .preview-node.moved { background: rgba(245, 158, 11, 0.1); border-color: #F59E0B; color: #D97706; }
+        .restructure-preview .preview-arrow { color: #9CA3AF; }
     </style>
 
     <!-- Details Modal -->
@@ -279,6 +313,73 @@
         </div>
     </div>
     <div class="toast" id="toast"><i class="fas fa-check-circle" style="color:#10B981;"></i><span id="toastMessage">Success!</span></div>
+
+    <!-- Branch Merge Modal -->
+    <div class="modal-overlay" id="branchMergeModal">
+        <div class="modal">
+            <div class="modal-header"><h2 class="modal-title">Merge Branch Request</h2><button class="modal-close" onclick="closeModal('branchMergeModal')">&times;</button></div>
+            <div class="modal-body">
+                <p style="margin-bottom:1rem;">Merging branch request: <strong id="mergeBranchName"></strong></p>
+                <p style="margin-bottom:1rem; color:#6B7280; font-size:0.9rem;">Requested by: <span id="mergeBranchRequester"></span></p>
+                <div class="form-group">
+                    <label class="form-label">Select Existing Sub-Node to Merge Into</label>
+                    <select class="form-input" id="mergeBranchTarget">
+                        <option value="">-- Select a sub-node --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Name Handling</label>
+                    <select class="form-input" id="mergeBranchNameOption">
+                        <option value="alias">Retain as Alias (recommended)</option>
+                        <option value="vanish">Vanish Name</option>
+                    </select>
+                    <p class="form-hint">Alias: Future users typing this name will be redirected to the target node.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('branchMergeModal')">Cancel</button>
+                <button class="btn-primary" id="confirmBranchMergeBtn" style="background:linear-gradient(135deg, #8B5CF6, #A78BFA);">Merge</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Restructure Modal -->
+    <div class="modal-overlay" id="restructureModal">
+        <div class="modal" style="max-width: 600px;">
+            <div class="modal-header"><h2 class="modal-title">Restructure Branch</h2><button class="modal-close" onclick="closeModal('restructureModal')">&times;</button></div>
+            <div class="modal-body">
+                <p style="margin-bottom:1rem;">Insert a missing intermediate node between parent and the requested branch.</p>
+                <p style="margin-bottom:1rem; color:#6B7280; font-size:0.9rem;">Original request: <strong id="restructureOriginalName"></strong> by <span id="restructureRequester"></span></p>
+                
+                <div class="form-group">
+                    <label class="form-label">Missing Intermediate Node Name</label>
+                    <input type="text" class="form-input" id="restructureMiddleName" placeholder="e.g., CSE, Engineering, etc.">
+                    <p class="form-hint">This node will be created between the parent and the requested node.</p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Intermediate Node Type</label>
+                    <select class="form-input" id="restructureMiddleType">
+                        <option value="department">Department</option>
+                        <option value="team">Team</option>
+                        <option value="project">Project</option>
+                        <option value="academic">Academic</option>
+                        <option value="hostel">Hostel</option>
+                        <option value="sports">Sports</option>
+                        <option value="club">Club</option>
+                    </select>
+                </div>
+                
+                <div class="restructure-preview" id="restructurePreview" style="display:none;">
+                    <div class="preview-title">New Structure Preview:</div>
+                    <div class="preview-path" id="restructurePreviewPath"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('restructureModal')">Cancel</button>
+                <button class="btn-primary" id="confirmRestructureBtn" style="background:linear-gradient(135deg, #EC4899, #F472B6);">Restructure</button>
+            </div>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -383,64 +484,126 @@
 
         async function loadJoinRequests() {
             try {
-                const pendingRef = collection(db, 'pendingApprovals');
-                const snapshot = await getDocs(pendingRef);
-                console.log('Loading join requests for org:', selectedOrgId, 'admin:', currentUser.email);
-                console.log('Total pending approvals:', snapshot.docs.length);
+                // First, try to load from admin's notifications for faster lookup
+                const notifRef = doc(db, 'users', currentUser.email, 'notifications', 'pending');
+                const notifDoc = await getDoc(notifRef);
                 
-                joinRequests = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
-                    .filter(r => {
-                        const isJoin = r.requestType === 'join';
-                        const isPending = r.status === 'pending';
-                        // Check both targetOrgId and if the targetNodePath starts with the org
-                        const isForOrg = r.targetOrgId === selectedOrgId || 
-                                         (r.targetNodePath && r.targetNodePath.startsWith(`hierarchies/${selectedOrgId}`));
-                        const isAssignedToMe = r.assignedAdminEmail === currentUser.email;
-                        
-                        console.log('Join request:', r.id, { 
-                            isJoin, isPending, isForOrg, isAssignedToMe, 
-                            targetOrgId: r.targetOrgId, 
-                            targetNodePath: r.targetNodePath,
-                            assignedAdmin: r.assignedAdminEmail,
-                            selectedOrgId: selectedOrgId
-                        });
-                        
-                        return isJoin && isPending && isForOrg && isAssignedToMe;
+                let joinRequestIds = [];
+                if (notifDoc.exists()) {
+                    joinRequestIds = notifDoc.data().joinRequests || [];
+                }
+                
+                console.log('Join request IDs from notifications:', joinRequestIds);
+                
+                // Fetch the actual join requests from notifications
+                joinRequests = [];
+                for (const requestId of joinRequestIds) {
+                    try {
+                        const requestDoc = await getDoc(doc(db, 'pendingApprovals', requestId));
+                        if (requestDoc.exists()) {
+                            const data = requestDoc.data();
+                            // Only include if still pending and for this org
+                            if (data.status === 'pending' && 
+                                (data.targetOrgId === selectedOrgId || 
+                                 (data.targetNodePath && data.targetNodePath.startsWith(`hierarchies/${selectedOrgId}`)))) {
+                                joinRequests.push({ id: requestDoc.id, ...data });
+                            }
+                        }
+                    } catch (e) {
+                        console.log('Request not found:', requestId);
+                    }
+                }
+                
+                // FALLBACK: Also scan pendingApprovals for any requests assigned to this admin
+                // (for backward compatibility with existing requests before notification system)
+                if (joinRequests.length === 0) {
+                    console.log('No requests from notifications, checking pendingApprovals directly...');
+                    const pendingRef = collection(db, 'pendingApprovals');
+                    const snapshot = await getDocs(pendingRef);
+                    
+                    const currentOrg = adminOrganizations.find(o => o.id === selectedOrgId);
+                    const orgAdminEmails = currentOrg?.adminEmails || [];
+                    
+                    snapshot.docs.forEach(docSnap => {
+                        const data = docSnap.data();
+                        if (data.requestType === 'join' && 
+                            data.status === 'pending' &&
+                            (data.targetOrgId === selectedOrgId || 
+                             (data.targetNodePath && data.targetNodePath.startsWith(`hierarchies/${selectedOrgId}`))) &&
+                            (data.assignedAdminEmail === currentUser.email || orgAdminEmails.includes(currentUser.email))) {
+                            joinRequests.push({ id: docSnap.id, ...data });
+                        }
                     });
-                console.log('Filtered join requests:', joinRequests.length);
+                }
+                
+                console.log('Total join requests:', joinRequests.length);
                 document.getElementById('joinRequestCount').textContent = joinRequests.length;
-            } catch (error) { console.error('Error loading join requests:', error); joinRequests = []; }
+            } catch (error) { 
+                console.error('Error loading join requests:', error); 
+                joinRequests = []; 
+            }
         }
 
         async function loadBranchRequests() {
             try {
-                const pendingRef = collection(db, 'pendingApprovals');
-                const snapshot = await getDocs(pendingRef);
-                console.log('Loading branch requests for org:', selectedOrgId, 'admin:', currentUser.email);
-                console.log('Total pending approvals:', snapshot.docs.length);
+                // First, try to load from admin's notifications for faster lookup
+                const notifRef = doc(db, 'users', currentUser.email, 'notifications', 'pending');
+                const notifDoc = await getDoc(notifRef);
                 
-                branchRequests = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
-                    .filter(r => {
-                        const isBranch = r.requestType === 'branch';
-                        const isPending = r.status === 'pending';
-                        // Check both parentOrgId and if the parentNodePath starts with the org
-                        const isForOrg = r.parentOrgId === selectedOrgId || 
-                                         (r.parentNodePath && r.parentNodePath.startsWith(`hierarchies/${selectedOrgId}`));
-                        const isAssignedToMe = r.assignedAdminEmail === currentUser.email;
-                        
-                        console.log('Branch request:', r.id, { 
-                            isBranch, isPending, isForOrg, isAssignedToMe, 
-                            parentOrgId: r.parentOrgId, 
-                            parentNodePath: r.parentNodePath,
-                            assignedAdmin: r.assignedAdminEmail,
-                            selectedOrgId: selectedOrgId
-                        });
-                        
-                        return isBranch && isPending && isForOrg && isAssignedToMe;
+                let branchRequestIds = [];
+                if (notifDoc.exists()) {
+                    branchRequestIds = notifDoc.data().branchRequests || [];
+                }
+                
+                console.log('Branch request IDs from notifications:', branchRequestIds);
+                
+                // Fetch the actual branch requests from notifications
+                branchRequests = [];
+                for (const requestId of branchRequestIds) {
+                    try {
+                        const requestDoc = await getDoc(doc(db, 'pendingApprovals', requestId));
+                        if (requestDoc.exists()) {
+                            const data = requestDoc.data();
+                            // Only include if still pending and for this org
+                            if (data.status === 'pending' && 
+                                (data.parentOrgId === selectedOrgId || 
+                                 (data.parentNodePath && data.parentNodePath.startsWith(`hierarchies/${selectedOrgId}`)))) {
+                                branchRequests.push({ id: requestDoc.id, ...data });
+                            }
+                        }
+                    } catch (e) {
+                        console.log('Request not found:', requestId);
+                    }
+                }
+                
+                // FALLBACK: Also scan pendingApprovals for any requests assigned to this admin
+                // (for backward compatibility with existing requests before notification system)
+                if (branchRequests.length === 0) {
+                    console.log('No requests from notifications, checking pendingApprovals directly...');
+                    const pendingRef = collection(db, 'pendingApprovals');
+                    const snapshot = await getDocs(pendingRef);
+                    
+                    const currentOrg = adminOrganizations.find(o => o.id === selectedOrgId);
+                    const orgAdminEmails = currentOrg?.adminEmails || [];
+                    
+                    snapshot.docs.forEach(docSnap => {
+                        const data = docSnap.data();
+                        if (data.requestType === 'branch' && 
+                            data.status === 'pending' &&
+                            (data.parentOrgId === selectedOrgId || 
+                             (data.parentNodePath && data.parentNodePath.startsWith(`hierarchies/${selectedOrgId}`))) &&
+                            (data.assignedAdminEmail === currentUser.email || orgAdminEmails.includes(currentUser.email))) {
+                            branchRequests.push({ id: docSnap.id, ...data });
+                        }
                     });
-                console.log('Filtered branch requests:', branchRequests.length);
+                }
+                
+                console.log('Total branch requests:', branchRequests.length);
                 document.getElementById('branchRequestCount').textContent = branchRequests.length;
-            } catch (error) { console.error('Error loading branch requests:', error); branchRequests = []; }
+            } catch (error) { 
+                console.error('Error loading branch requests:', error); 
+                branchRequests = []; 
+            }
         }
 
         async function loadSubNodes() {
@@ -521,9 +684,10 @@
         function renderJoinRequests() {
             const container = document.getElementById('joinRequestsTable');
             if (joinRequests.length === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa-user-plus"></i><h3>No Pending Join Requests</h3><p>All join requests have been processed.</p></div>'; return; }
-            container.innerHTML = `<table><thead><tr><th>Requester</th><th>Target Node</th><th>Date</th><th>Actions</th></tr></thead><tbody>${joinRequests.map(r => `<tr>
+            container.innerHTML = `<table><thead><tr><th>Requester</th><th>Target Node</th><th>Source</th><th>Date</th><th>Actions</th></tr></thead><tbody>${joinRequests.map(r => `<tr>
                 <td><strong>${r.requesterEmail}</strong></td>
                 <td>${r.targetNodeName || 'Organization Root'}</td>
+                <td>${r.mergedFrom ? `<span style="color:#8B5CF6;font-size:0.85rem;"><i class="fas fa-code-merge"></i> Merged from "${r.mergedFrom}"</span>` : '<span style="color:#6B7280;font-size:0.85rem;">Direct request</span>'}</td>
                 <td>${r.createdAt ? new Date(r.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</td>
                 <td><button class="action-btn approve" onclick="approveJoinRequest('${r.id}')">Approve</button><button class="action-btn reject" onclick="openRejectModal('${r.id}', 'join', '${r.requesterEmail}')">Reject</button></td>
             </tr>`).join('')}</tbody></table>`;
@@ -532,14 +696,65 @@
         function renderBranchRequests() {
             const container = document.getElementById('branchRequestsTable');
             if (branchRequests.length === 0) { container.innerHTML = '<div class="empty-state"><i class="fas fa-code-branch"></i><h3>No Pending Branch Requests</h3><p>All branch requests have been processed.</p></div>'; return; }
-            container.innerHTML = `<table><thead><tr><th>Requester</th><th>Proposed Name</th><th>Type</th><th>Parent Node</th><th>Date</th><th>Actions</th></tr></thead><tbody>${branchRequests.map(r => `<tr>
-                <td><strong>${r.requesterEmail}</strong></td>
-                <td>${r.proposedName}</td>
-                <td>${r.proposedType || 'department'}</td>
-                <td>${r.parentNodeName || 'Organization Root'}</td>
-                <td>${r.createdAt ? new Date(r.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</td>
-                <td><button class="action-btn approve" onclick="approveBranchRequest('${r.id}')">Approve</button><button class="action-btn reject" onclick="openRejectModal('${r.id}', 'branch', '${r.requesterEmail}')">Reject</button></td>
-            </tr>`).join('')}</tbody></table>`;
+            
+            // Group branch requests by parent node for tree view
+            let html = '';
+            branchRequests.forEach(request => {
+                const org = adminOrganizations.find(o => o.id === selectedOrgId);
+                const orgName = org?.name || selectedOrgId;
+                
+                // Find existing siblings (other sub-nodes under same parent)
+                const existingSiblings = subNodes.filter(node => {
+                    // Check if this node is a direct child of the parent
+                    const parentPath = request.parentNodePath || `hierarchies/${selectedOrgId}`;
+                    return node.path.startsWith(parentPath + '/sub-nodes/') && 
+                           node.path.split('/sub-nodes/').length === parentPath.split('/sub-nodes/').length + 1;
+                });
+                
+                html += `
+                <div class="branch-tree-container">
+                    <div class="branch-tree-header">
+                        <div>
+                            <div class="branch-tree-title">Branch Request: ${request.proposedName}</div>
+                            <div class="branch-tree-requester">Requested by: ${request.requesterEmail} • ${request.createdAt ? new Date(request.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</div>
+                        </div>
+                    </div>
+                    <div class="tree-view">
+                        <div class="tree-node">
+                            <div class="tree-node-card root">
+                                <div class="tree-node-name">${request.parentNodeName || orgName}</div>
+                                <div class="tree-node-type">${request.parentNodeName ? 'Parent Node' : 'Organization'}</div>
+                            </div>
+                            <div class="tree-connector"></div>
+                            <div class="tree-children">
+                                ${existingSiblings.map(sibling => `
+                                    <div class="tree-child">
+                                        <div class="tree-node-card existing">
+                                            <div class="tree-node-name">${sibling.name}</div>
+                                            <div class="tree-node-type">${sibling.type || 'department'}</div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                                <div class="tree-child">
+                                    <div class="tree-node-card pending-request">
+                                        <div class="tree-node-name">${request.proposedName}</div>
+                                        <div class="tree-node-type">${request.proposedType || 'department'}</div>
+                                        <div class="tree-node-badge">Pending Approval</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tree-actions">
+                        <button class="action-btn approve" onclick="approveBranchRequest('${request.id}')"><i class="fas fa-check"></i> Approve</button>
+                        <button class="action-btn merge" onclick="openBranchMergeModal('${request.id}')"><i class="fas fa-code-merge"></i> Merge</button>
+                        <button class="action-btn restructure" onclick="openRestructureModal('${request.id}')"><i class="fas fa-project-diagram"></i> Restructure</button>
+                        <button class="action-btn reject" onclick="openRejectModal('${request.id}', 'branch', '${request.requesterEmail}')"><i class="fas fa-times"></i> Reject</button>
+                    </div>
+                </div>`;
+            });
+            
+            container.innerHTML = html;
         }
 
         function renderSubNodes() {
@@ -598,29 +813,78 @@
             try {
                 const request = joinRequests.find(r => r.id === requestId);
                 if (!request) return;
-                // Add user to target node's members
+                
+                console.log('Approving join request:', request);
+                
+                // Add user to target node's members in global hierarchy
                 const targetRef = doc(db, request.targetNodePath);
-                await setDoc(targetRef, { members: arrayUnion(request.requesterEmail), updatedAt: serverTimestamp() }, { merge: true });
-                // Also add to user's personal hierarchies
+                await setDoc(targetRef, { 
+                    members: arrayUnion(request.requesterEmail), 
+                    updatedAt: serverTimestamp() 
+                }, { merge: true });
+                
+                // Update user's personal hierarchy status to active
                 const userHierarchyRef = doc(db, 'users', request.requesterEmail, 'hierarchies', request.targetOrgId);
-                await setDoc(userHierarchyRef, { name: request.targetNodeName, joinedAt: serverTimestamp() }, { merge: true });
-                // Update request status
-                await setDoc(doc(db, 'pendingApprovals', requestId), { status: 'approved', processedBy: currentUser.email, processedAt: serverTimestamp() }, { merge: true });
+                await setDoc(userHierarchyRef, { 
+                    name: request.targetNodeName,
+                    status: 'active',
+                    approvedAt: serverTimestamp(),
+                    approvedBy: currentUser.email
+                }, { merge: true });
+                
+                // Remove from admin's notifications (use assignedAdminEmail from request)
+                try {
+                    const adminEmail = request.assignedAdminEmail || currentUser.email;
+                    console.log('Removing from notifications for admin:', adminEmail, 'requestId:', requestId);
+                    const adminNotifRef = doc(db, 'users', adminEmail, 'notifications', 'pending');
+                    await setDoc(adminNotifRef, {
+                        joinRequests: arrayRemove(requestId),
+                        updatedAt: serverTimestamp()
+                    }, { merge: true });
+                    console.log('Removed from admin notifications');
+                    
+                    // Also remove from current user's notifications if different
+                    if (adminEmail !== currentUser.email) {
+                        const currentUserNotifRef = doc(db, 'users', currentUser.email, 'notifications', 'pending');
+                        await setDoc(currentUserNotifRef, {
+                            joinRequests: arrayRemove(requestId),
+                            updatedAt: serverTimestamp()
+                        }, { merge: true });
+                        console.log('Removed from current user notifications');
+                    }
+                } catch (notifError) {
+                    console.error('Error removing from notifications:', notifError);
+                    // Continue anyway - don't block approval
+                }
+                
+                // Delete the pending approval
                 await deleteDoc(doc(db, 'pendingApprovals', requestId));
-                showToast('Join request approved!', 'success');
+                
+                showToast('Join request approved! User is now a member.', 'success');
                 await loadOrganizationData();
-            } catch (error) { showToast('Error: ' + error.message, 'error'); }
+            } catch (error) { 
+                console.error('Error approving join request:', error);
+                showToast('Error: ' + error.message, 'error'); 
+            }
         };
 
         window.approveBranchRequest = async function(requestId) {
             try {
                 const request = branchRequests.find(r => r.id === requestId);
                 if (!request) return;
-                // Create the new sub-node
+                
+                console.log('Approving branch request:', request);
+                
+                // Create the new sub-node ID
                 const nodeId = request.proposedName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-                const newNodePath = `${request.parentNodePath}/sub-nodes/${nodeId}`;
-                const newNodeRef = doc(db, newNodePath);
-                await setDoc(newNodeRef, {
+                const orgId = request.parentOrgId || selectedOrgId;
+                
+                console.log('Creating node with ID:', nodeId, 'orgId:', orgId);
+                
+                // 1. Create in global hierarchy
+                const globalNodePath = `${request.parentNodePath}/sub-nodes/${nodeId}`;
+                const globalNodeRef = doc(db, globalNodePath);
+                await setDoc(globalNodeRef, {
                     name: request.proposedName,
                     type: request.proposedType || 'department',
                     status: 'active',
@@ -629,12 +893,69 @@
                     createdBy: request.requesterEmail,
                     createdAt: serverTimestamp()
                 });
-                // Update request status
-                await setDoc(doc(db, 'pendingApprovals', requestId), { status: 'approved', processedBy: currentUser.email, processedAt: serverTimestamp() }, { merge: true });
+                console.log('Created global node');
+                
+                // 2. Update user's personal hierarchy sub-node status to active (node was created when request was made)
+                const userNodePath = `users/${request.requesterEmail}/hierarchies/${orgId}/sub-nodes/${nodeId}`;
+                const userNodeRef = doc(db, userNodePath);
+                await setDoc(userNodeRef, {
+                    name: request.proposedName,
+                    type: request.proposedType || 'department',
+                    status: 'active',
+                    approvedAt: serverTimestamp(),
+                    approvedBy: currentUser.email
+                }, { merge: true });
+                console.log('Updated user node');
+                
+                // 3. Also ensure user's root hierarchy exists with active status
+                const userHierarchyRef = doc(db, 'users', request.requesterEmail, 'hierarchies', orgId);
+                const userHierarchyDoc = await getDoc(userHierarchyRef);
+                if (!userHierarchyDoc.exists()) {
+                    // Get org name from global hierarchy
+                    const orgDoc = await getDoc(doc(db, 'hierarchies', orgId));
+                    const orgName = orgDoc.exists() ? orgDoc.data().name : orgId;
+                    await setDoc(userHierarchyRef, {
+                        name: orgName,
+                        status: 'active',
+                        createdAt: serverTimestamp()
+                    });
+                }
+                console.log('Ensured user hierarchy exists');
+                
+                // 4. Remove from admin's notifications (use assignedAdminEmail from request)
+                try {
+                    const adminEmail = request.assignedAdminEmail || currentUser.email;
+                    console.log('Removing from notifications for admin:', adminEmail, 'requestId:', requestId);
+                    const adminNotifRef = doc(db, 'users', adminEmail, 'notifications', 'pending');
+                    await setDoc(adminNotifRef, {
+                        branchRequests: arrayRemove(requestId),
+                        updatedAt: serverTimestamp()
+                    }, { merge: true });
+                    console.log('Removed from admin notifications');
+                    
+                    // Also remove from current user's notifications if different
+                    if (adminEmail !== currentUser.email) {
+                        const currentUserNotifRef = doc(db, 'users', currentUser.email, 'notifications', 'pending');
+                        await setDoc(currentUserNotifRef, {
+                            branchRequests: arrayRemove(requestId),
+                            updatedAt: serverTimestamp()
+                        }, { merge: true });
+                        console.log('Removed from current user notifications');
+                    }
+                } catch (notifError) {
+                    console.error('Error removing from notifications:', notifError);
+                    // Continue anyway - don't block approval
+                }
+                
+                // 5. Delete the pending approval
                 await deleteDoc(doc(db, 'pendingApprovals', requestId));
+                
                 showToast('Branch request approved! Sub-node created.', 'success');
                 await loadOrganizationData();
-            } catch (error) { showToast('Error: ' + error.message, 'error'); }
+            } catch (error) { 
+                console.error('Error approving branch request:', error);
+                showToast('Error: ' + error.message, 'error'); 
+            }
         };
 
         window.openRejectModal = function(requestId, type, requesterEmail) {
@@ -648,17 +969,70 @@
             if (!currentRejectRequest) return;
             const reason = document.getElementById('rejectReason').value.trim();
             try {
-                await setDoc(doc(db, 'pendingApprovals', currentRejectRequest.id), {
-                    status: 'rejected',
-                    processedBy: currentUser.email,
-                    processedAt: serverTimestamp(),
-                    rejectionReason: reason || 'No reason provided'
+                // Get the request details
+                const request = currentRejectRequest.type === 'join' 
+                    ? joinRequests.find(r => r.id === currentRejectRequest.id)
+                    : branchRequests.find(r => r.id === currentRejectRequest.id);
+                
+                if (request && currentRejectRequest.type === 'join') {
+                    // Update user's personal hierarchy status to rejected
+                    const userHierarchyRef = doc(db, 'users', request.requesterEmail, 'hierarchies', request.targetOrgId);
+                    const userHierarchyDoc = await getDoc(userHierarchyRef);
+                    if (userHierarchyDoc.exists()) {
+                        await setDoc(userHierarchyRef, {
+                            status: 'rejected',
+                            rejectedAt: serverTimestamp(),
+                            rejectedBy: currentUser.email,
+                            rejectionReason: reason || 'No reason provided'
+                        }, { merge: true });
+                    }
+                }
+                
+                if (request && currentRejectRequest.type === 'branch') {
+                    // Update user's pending sub-node status to rejected
+                    const nodeId = request.proposedName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                    const orgId = request.parentOrgId || selectedOrgId;
+                    const userSubNodeRef = doc(db, 'users', request.requesterEmail, 'hierarchies', orgId, 'sub-nodes', nodeId);
+                    try {
+                        await setDoc(userSubNodeRef, {
+                            status: 'rejected',
+                            rejectedAt: serverTimestamp(),
+                            rejectedBy: currentUser.email,
+                            rejectionReason: reason || 'No reason provided'
+                        }, { merge: true });
+                    } catch (e) {
+                        // Node might not exist, that's fine
+                    }
+                }
+                
+                // Remove from admin's notifications (use assignedAdminEmail from request)
+                const adminEmail = request?.assignedAdminEmail || currentUser.email;
+                const adminNotifRef = doc(db, 'users', adminEmail, 'notifications', 'pending');
+                const arrayField = currentRejectRequest.type === 'join' ? 'joinRequests' : 'branchRequests';
+                await setDoc(adminNotifRef, {
+                    [arrayField]: arrayRemove(currentRejectRequest.id),
+                    updatedAt: serverTimestamp()
                 }, { merge: true });
+                
+                // Also remove from current user if different
+                if (adminEmail !== currentUser.email) {
+                    const currentUserNotifRef = doc(db, 'users', currentUser.email, 'notifications', 'pending');
+                    await setDoc(currentUserNotifRef, {
+                        [arrayField]: arrayRemove(currentRejectRequest.id),
+                        updatedAt: serverTimestamp()
+                    }, { merge: true });
+                }
+                
+                // Delete the pending approval
                 await deleteDoc(doc(db, 'pendingApprovals', currentRejectRequest.id));
+                
                 closeModal('rejectModal');
                 showToast('Request rejected', 'success');
                 await loadOrganizationData();
-            } catch (error) { showToast('Error: ' + error.message, 'error'); }
+            } catch (error) { 
+                console.error('Error rejecting request:', error);
+                showToast('Error: ' + error.message, 'error'); 
+            }
         }
 
         // Sub-Node Management
@@ -800,6 +1174,296 @@
         };
 
         window.closeModal = function(modalId) { document.getElementById(modalId).classList.remove('show'); };
+
+        // Branch Merge Functions
+        let currentBranchMergeRequest = null;
+        
+        window.openBranchMergeModal = function(requestId) {
+            const request = branchRequests.find(r => r.id === requestId);
+            if (!request) return;
+            
+            currentBranchMergeRequest = request;
+            document.getElementById('mergeBranchName').textContent = request.proposedName;
+            document.getElementById('mergeBranchRequester').textContent = request.requesterEmail;
+            
+            // Populate target sub-nodes dropdown (existing sub-nodes under same parent)
+            const targetSelect = document.getElementById('mergeBranchTarget');
+            const parentPath = request.parentNodePath || `hierarchies/${selectedOrgId}`;
+            
+            // Get all sub-nodes that could be merge targets
+            let options = '<option value="">-- Select a sub-node --</option>';
+            subNodes.forEach(node => {
+                // Include nodes under the same parent
+                if (node.path.startsWith(parentPath + '/sub-nodes/')) {
+                    options += `<option value="${node.path}" data-name="${node.name}">${node.name} (${node.type || 'department'})</option>`;
+                }
+            });
+            
+            // If no siblings, show all sub-nodes
+            if (subNodes.length > 0 && options === '<option value="">-- Select a sub-node --</option>') {
+                subNodes.forEach(node => {
+                    options += `<option value="${node.path}" data-name="${node.name}">${node.name} (${node.type || 'department'})</option>`;
+                });
+            }
+            
+            targetSelect.innerHTML = options;
+            document.getElementById('mergeBranchNameOption').value = 'alias';
+            document.getElementById('branchMergeModal').classList.add('show');
+        };
+        
+        async function confirmBranchMerge() {
+            if (!currentBranchMergeRequest) return;
+            
+            const targetPath = document.getElementById('mergeBranchTarget').value;
+            const nameOption = document.getElementById('mergeBranchNameOption').value;
+            
+            if (!targetPath) {
+                showToast('Please select a target sub-node', 'error');
+                return;
+            }
+            
+            try {
+                const request = currentBranchMergeRequest;
+                const targetSelect = document.getElementById('mergeBranchTarget');
+                const targetName = targetSelect.options[targetSelect.selectedIndex].dataset.name;
+                
+                // 1. If alias option, add the proposed name to target's nameAliases
+                if (nameOption === 'alias') {
+                    await setDoc(doc(db, targetPath), {
+                        nameAliases: arrayUnion(request.proposedName),
+                        updatedAt: serverTimestamp()
+                    }, { merge: true });
+                }
+                
+                // 2. Add user to target node's members
+                await setDoc(doc(db, targetPath), {
+                    members: arrayUnion(request.requesterEmail),
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+                
+                // 3. Create/update user's hierarchy to point to the correct node
+                // Get the target node ID from path
+                const targetNodeId = targetPath.split('/').pop();
+                const orgId = request.parentOrgId || selectedOrgId;
+                
+                // Update user's hierarchy with the correct sub-node
+                const userSubNodeRef = doc(db, 'users', request.requesterEmail, 'hierarchies', orgId, 'sub-nodes', targetNodeId);
+                await setDoc(userSubNodeRef, {
+                    name: targetName,
+                    type: request.proposedType || 'department',
+                    status: 'active',
+                    mergedFrom: request.proposedName,
+                    mergedAt: serverTimestamp(),
+                    approvedBy: currentUser.email
+                }, { merge: true });
+                
+                // 4. Ensure user's root hierarchy exists
+                const userHierarchyRef = doc(db, 'users', request.requesterEmail, 'hierarchies', orgId);
+                const userHierarchyDoc = await getDoc(userHierarchyRef);
+                if (!userHierarchyDoc.exists()) {
+                    const org = adminOrganizations.find(o => o.id === orgId);
+                    await setDoc(userHierarchyRef, {
+                        name: org?.name || orgId,
+                        status: 'active',
+                        createdAt: serverTimestamp()
+                    });
+                }
+                
+                // 5. Delete the pending sub-node in user's hierarchy if it exists (the wrong one)
+                const wrongNodeId = request.proposedName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                if (wrongNodeId !== targetNodeId) {
+                    try {
+                        const wrongNodeRef = doc(db, 'users', request.requesterEmail, 'hierarchies', orgId, 'sub-nodes', wrongNodeId);
+                        await deleteDoc(wrongNodeRef);
+                    } catch (e) {
+                        // Node might not exist, that's fine
+                    }
+                }
+                
+                // 6. Remove from admin's notifications
+                const adminEmail = request.assignedAdminEmail || currentUser.email;
+                const adminNotifRef = doc(db, 'users', adminEmail, 'notifications', 'pending');
+                await setDoc(adminNotifRef, {
+                    branchRequests: arrayRemove(request.id),
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+                
+                // Also remove from current user if different
+                if (adminEmail !== currentUser.email) {
+                    const currentUserNotifRef = doc(db, 'users', currentUser.email, 'notifications', 'pending');
+                    await setDoc(currentUserNotifRef, {
+                        branchRequests: arrayRemove(request.id),
+                        updatedAt: serverTimestamp()
+                    }, { merge: true });
+                }
+                
+                // 7. Delete the pending approval
+                await deleteDoc(doc(db, 'pendingApprovals', request.id));
+                
+                closeModal('branchMergeModal');
+                showToast(`Branch merged into "${targetName}"!`, 'success');
+                await loadOrganizationData();
+            } catch (error) {
+                console.error('Error merging branch:', error);
+                showToast('Error: ' + error.message, 'error');
+            }
+        }
+        
+        // Event listener for branch merge confirm button
+        document.getElementById('confirmBranchMergeBtn').addEventListener('click', confirmBranchMerge);
+
+        // Restructure Functions
+        let currentRestructureRequest = null;
+        
+        window.openRestructureModal = function(requestId) {
+            const request = branchRequests.find(r => r.id === requestId);
+            if (!request) return;
+            
+            currentRestructureRequest = request;
+            document.getElementById('restructureOriginalName').textContent = request.proposedName;
+            document.getElementById('restructureRequester').textContent = request.requesterEmail;
+            document.getElementById('restructureMiddleName').value = '';
+            document.getElementById('restructureMiddleType').value = 'department';
+            document.getElementById('restructurePreview').style.display = 'none';
+            
+            document.getElementById('restructureModal').classList.add('show');
+            
+            // Add input listener for live preview
+            document.getElementById('restructureMiddleName').addEventListener('input', updateRestructurePreview);
+        };
+        
+        function updateRestructurePreview() {
+            const middleName = document.getElementById('restructureMiddleName').value.trim();
+            const previewDiv = document.getElementById('restructurePreview');
+            const previewPath = document.getElementById('restructurePreviewPath');
+            
+            if (!middleName || !currentRestructureRequest) {
+                previewDiv.style.display = 'none';
+                return;
+            }
+            
+            const org = adminOrganizations.find(o => o.id === selectedOrgId);
+            const parentName = currentRestructureRequest.parentNodeName || org?.name || 'Organization';
+            const requestedName = currentRestructureRequest.proposedName;
+            
+            previewPath.innerHTML = `
+                <span class="preview-node">${parentName}</span>
+                <span class="preview-arrow">→</span>
+                <span class="preview-node new">${middleName} (NEW)</span>
+                <span class="preview-arrow">→</span>
+                <span class="preview-node moved">${requestedName}</span>
+            `;
+            previewDiv.style.display = 'block';
+        }
+        
+        async function confirmRestructure() {
+            if (!currentRestructureRequest) return;
+            
+            const middleName = document.getElementById('restructureMiddleName').value.trim();
+            const middleType = document.getElementById('restructureMiddleType').value;
+            
+            if (!middleName) {
+                showToast('Please enter the intermediate node name', 'error');
+                return;
+            }
+            
+            try {
+                const request = currentRestructureRequest;
+                const orgId = request.parentOrgId || selectedOrgId;
+                
+                // Create IDs
+                const middleNodeId = middleName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                const finalNodeId = request.proposedName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                
+                // 1. Create the intermediate node in global hierarchy
+                const middleNodePath = `${request.parentNodePath}/sub-nodes/${middleNodeId}`;
+                const middleNodeRef = doc(db, middleNodePath);
+                await setDoc(middleNodeRef, {
+                    name: middleName,
+                    type: middleType,
+                    status: 'active',
+                    members: [],
+                    adminEmails: [],
+                    nameAliases: [middleName],
+                    createdBy: currentUser.email,
+                    createdAt: serverTimestamp()
+                });
+                
+                // 2. Create the final node under the intermediate node in global hierarchy
+                const finalNodePath = `${middleNodePath}/sub-nodes/${finalNodeId}`;
+                const finalNodeRef = doc(db, finalNodePath);
+                await setDoc(finalNodeRef, {
+                    name: request.proposedName,
+                    type: request.proposedType || 'department',
+                    status: 'active',
+                    members: [request.requesterEmail],
+                    adminEmails: [],
+                    nameAliases: [request.proposedName],
+                    createdBy: request.requesterEmail,
+                    createdAt: serverTimestamp()
+                });
+                
+                // 3. Update user's hierarchy - create intermediate node
+                const userMiddleNodeRef = doc(db, 'users', request.requesterEmail, 'hierarchies', orgId, 'sub-nodes', middleNodeId);
+                await setDoc(userMiddleNodeRef, {
+                    name: middleName,
+                    type: middleType,
+                    status: 'active',
+                    createdAt: serverTimestamp()
+                });
+                
+                // 4. Create final node under intermediate in user's hierarchy
+                const userFinalNodeRef = doc(db, 'users', request.requesterEmail, 'hierarchies', orgId, 'sub-nodes', middleNodeId, 'sub-nodes', finalNodeId);
+                await setDoc(userFinalNodeRef, {
+                    name: request.proposedName,
+                    type: request.proposedType || 'department',
+                    status: 'active',
+                    restructuredAt: serverTimestamp(),
+                    approvedBy: currentUser.email
+                });
+                
+                // 5. Delete the old pending node in user's hierarchy (direct child of org)
+                try {
+                    const oldUserNodeRef = doc(db, 'users', request.requesterEmail, 'hierarchies', orgId, 'sub-nodes', finalNodeId);
+                    await deleteDoc(oldUserNodeRef);
+                } catch (e) {
+                    // Node might not exist at old location
+                }
+                
+                // 6. Ensure user's root hierarchy exists
+                const userHierarchyRef = doc(db, 'users', request.requesterEmail, 'hierarchies', orgId);
+                const userHierarchyDoc = await getDoc(userHierarchyRef);
+                if (!userHierarchyDoc.exists()) {
+                    const org = adminOrganizations.find(o => o.id === orgId);
+                    await setDoc(userHierarchyRef, {
+                        name: org?.name || orgId,
+                        status: 'active',
+                        createdAt: serverTimestamp()
+                    });
+                }
+                
+                // 7. Remove from admin's notifications
+                const adminEmail = request.assignedAdminEmail || currentUser.email;
+                const adminNotifRef = doc(db, 'users', adminEmail, 'notifications', 'pending');
+                await setDoc(adminNotifRef, {
+                    branchRequests: arrayRemove(request.id),
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+                
+                // 8. Delete the pending approval
+                await deleteDoc(doc(db, 'pendingApprovals', request.id));
+                
+                closeModal('restructureModal');
+                showToast(`Restructured: ${request.parentNodeName || 'Org'} → ${middleName} → ${request.proposedName}`, 'success');
+                await loadOrganizationData();
+            } catch (error) {
+                console.error('Error restructuring branch:', error);
+                showToast('Error: ' + error.message, 'error');
+            }
+        }
+        
+        // Event listener for restructure confirm button
+        document.getElementById('confirmRestructureBtn').addEventListener('click', confirmRestructure);
 
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');

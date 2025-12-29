@@ -984,6 +984,53 @@
         </div>
     </div>
 
+    <!-- Merge Organization Modal -->
+    <div class="modal-overlay" id="mergeOrgModal">
+        <div class="modal" style="max-width: 550px;">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-code-merge" style="color:#8B5CF6;margin-right:0.5rem;"></i>Merge Organization</h2>
+                <button class="modal-close" onclick="closeModal('mergeOrgModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom:1rem;color:#6B7280;">Merge <strong id="mergeSourceName" style="color:#1F2933;"></strong> into an existing organization.</p>
+                <p style="margin-bottom:1rem;font-size:0.85rem;color:#6B7280;">The user will be added as a pending member and will need approval from the organization admin.</p>
+                
+                <div class="form-group">
+                    <label class="form-label">Select Target Organization</label>
+                    <select class="form-input" id="mergeTargetOrg">
+                        <option value="">-- Select Organization --</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Name Handling</label>
+                    <div style="display:flex;flex-direction:column;gap:0.75rem;margin-top:0.5rem;">
+                        <label style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.75rem;border:2px solid var(--border);border-radius:8px;cursor:pointer;transition:all 0.2s;" class="merge-option" data-value="retain">
+                            <input type="radio" name="nameHandling" value="retain" checked style="margin-top:3px;">
+                            <div>
+                                <strong style="color:#1F2933;">Retain as Alias</strong>
+                                <p style="font-size:0.8rem;color:#6B7280;margin-top:0.25rem;">Keep "<span id="retainNamePreview"></span>" as an alternate name. Future users typing this name will be redirected to the target organization.</p>
+                            </div>
+                        </label>
+                        <label style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.75rem;border:2px solid var(--border);border-radius:8px;cursor:pointer;transition:all 0.2s;" class="merge-option" data-value="vanish">
+                            <input type="radio" name="nameHandling" value="vanish" style="margin-top:3px;">
+                            <div>
+                                <strong style="color:#1F2933;">Vanish Name</strong>
+                                <p style="font-size:0.8rem;color:#6B7280;margin-top:0.25rem;">Don't keep the alternate name. The name will not be recognized in future.</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('mergeOrgModal')">Cancel</button>
+                <button class="btn-primary" style="background:linear-gradient(135deg, #8B5CF6, #A78BFA);" id="confirmMergeBtn">
+                    <i class="fas fa-code-merge"></i> Merge & Create Join Request
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast -->
     <div class="toast" id="toast"><i class="fas fa-check-circle" style="color:#10B981;"></i><span
             id="toastMessage">Success!</span></div>
@@ -1195,7 +1242,7 @@
                 container.innerHTML = '<div class="empty-state"><i class="fas fa-check-circle"></i><h3>No Pending Organization Requests</h3><p>All organization requests have been reviewed.</p><p style="color:#6B7280;font-size:0.85rem;margin-top:0.5rem;">Note: Join and branch requests are handled by Organization Admins.</p></div>';
                 return;
             }
-            container.innerHTML = `<table><thead><tr><th>Organization Name</th><th>Type</th><th>Requested By</th><th>Date</th><th>Actions</th></tr></thead><tbody>${pendingApprovals.map(p => `<tr><td><strong>${p.organizationName || p.name || p.orgName || 'Unknown'}</strong></td><td>${p.organizationType || p.type || 'organization'}</td><td>${p.requesterEmail || p.createdBy || p.requestedBy || 'Unknown'}</td><td>${p.createdAt ? new Date(p.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</td><td><button class="action-btn approve" onclick="approveOrg('${p.id}')">Approve</button><button class="action-btn reject" onclick="rejectOrg('${p.id}')">Reject</button></td></tr>`).join('')}</tbody></table>`;
+            container.innerHTML = `<table><thead><tr><th>Organization Name</th><th>Type</th><th>Requested By</th><th>Date</th><th>Actions</th></tr></thead><tbody>${pendingApprovals.map(p => `<tr><td><strong>${p.organizationName || p.name || p.orgName || 'Unknown'}</strong></td><td>${p.organizationType || p.type || 'organization'}</td><td>${p.requesterEmail || p.createdBy || p.requestedBy || 'Unknown'}</td><td>${p.createdAt ? new Date(p.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</td><td><button class="action-btn approve" onclick="approveOrg('${p.id}')">Approve</button><button class="action-btn" style="background:rgba(139,92,246,0.1);color:#7C3AED;" onclick="openMergeModal('${p.id}')">Merge</button><button class="action-btn reject" onclick="rejectOrg('${p.id}')">Reject</button></td></tr>`).join('')}</tbody></table>`;
         }
 
         function renderOrganizations() {
@@ -1386,6 +1433,133 @@
                 showToast('Failed to reject: ' + error.message, 'error');
             }
         };
+
+        // ==================== MERGE ORGANIZATION FUNCTIONALITY ====================
+        let currentMergeApproval = null;
+        
+        window.openMergeModal = function(approvalId) {
+            const approval = pendingApprovals.find(p => p.id === approvalId);
+            if (!approval) return;
+            
+            currentMergeApproval = approval;
+            const sourceName = approval.organizationName || approval.name || approval.orgName || 'Unknown';
+            
+            document.getElementById('mergeSourceName').textContent = sourceName;
+            document.getElementById('retainNamePreview').textContent = sourceName;
+            
+            // Populate target organization dropdown with active organizations
+            const targetSelect = document.getElementById('mergeTargetOrg');
+            const activeOrgs = organizations.filter(o => o.level === 0 && o.status === 'active');
+            
+            targetSelect.innerHTML = '<option value="">-- Select Organization --</option>' + 
+                activeOrgs.map(org => `<option value="${org.id}" data-name="${org.name}" data-path="hierarchies/${org.id}">${org.name}</option>`).join('');
+            
+            // Reset radio selection
+            document.querySelector('input[name="nameHandling"][value="retain"]').checked = true;
+            
+            document.getElementById('mergeOrgModal').classList.add('show');
+        };
+        
+        // Add event listener for merge confirmation
+        document.getElementById('confirmMergeBtn').addEventListener('click', async function() {
+            if (!currentMergeApproval) return;
+            
+            const targetSelect = document.getElementById('mergeTargetOrg');
+            const targetOrgId = targetSelect.value;
+            const selectedOption = targetSelect.options[targetSelect.selectedIndex];
+            
+            if (!targetOrgId) {
+                showToast('Please select a target organization', 'error');
+                return;
+            }
+            
+            const targetOrgName = selectedOption.dataset.name;
+            const retainName = document.querySelector('input[name="nameHandling"]:checked').value === 'retain';
+            const sourceName = currentMergeApproval.organizationName || currentMergeApproval.name || currentMergeApproval.orgName;
+            const sourceOrgId = sourceName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+            const userEmail = currentMergeApproval.requesterEmail || currentMergeApproval.createdBy;
+            
+            try {
+                // 1. If retain name, add to nameAliases array in target organization
+                if (retainName) {
+                    const targetOrgRef = doc(db, 'hierarchies', targetOrgId);
+                    await setDoc(targetOrgRef, {
+                        nameAliases: arrayUnion(sourceName),
+                        updatedAt: serverTimestamp()
+                    }, { merge: true });
+                }
+                
+                // 2. Delete the wrong user hierarchy (with the alternate name)
+                const wrongUserHierarchyRef = doc(db, 'users', userEmail, 'hierarchies', sourceOrgId);
+                const wrongHierarchyDoc = await getDoc(wrongUserHierarchyRef);
+                if (wrongHierarchyDoc.exists()) {
+                    await deleteDoc(wrongUserHierarchyRef);
+                }
+                
+                // 3. Create correct user hierarchy with pending status (waiting for org admin approval)
+                const correctUserHierarchyRef = doc(db, 'users', userEmail, 'hierarchies', targetOrgId);
+                await setDoc(correctUserHierarchyRef, {
+                    name: targetOrgName,
+                    type: 'organization',
+                    status: 'pending',
+                    mergedFrom: sourceName,
+                    createdAt: serverTimestamp()
+                });
+                
+                // 4. Find the org admin to assign the join request
+                const targetOrgRef = doc(db, 'hierarchies', targetOrgId);
+                const targetOrgDoc = await getDoc(targetOrgRef);
+                let assignedAdmin = null;
+                
+                if (targetOrgDoc.exists()) {
+                    const targetOrgData = targetOrgDoc.data();
+                    if (targetOrgData.adminEmails && targetOrgData.adminEmails.length > 0) {
+                        assignedAdmin = targetOrgData.adminEmails[0];
+                    }
+                }
+                
+                // 5. Create join request for org admin to approve
+                const joinRequestId = `join-merge-${Date.now()}`;
+                await setDoc(doc(db, 'pendingApprovals', joinRequestId), {
+                    requestType: 'join',
+                    status: 'pending',
+                    requesterEmail: userEmail,
+                    targetOrgId: targetOrgId,
+                    targetNodePath: `hierarchies/${targetOrgId}`,
+                    targetNodeName: targetOrgName,
+                    assignedAdminEmail: assignedAdmin,
+                    mergedFrom: sourceName,
+                    mergedBy: SUPER_ADMIN_EMAIL,
+                    createdAt: serverTimestamp()
+                });
+                
+                // 6. Add to admin's notifications
+                if (assignedAdmin) {
+                    const adminNotifRef = doc(db, 'users', assignedAdmin, 'notifications', 'pending');
+                    await setDoc(adminNotifRef, {
+                        joinRequests: arrayUnion(joinRequestId),
+                        updatedAt: serverTimestamp()
+                    }, { merge: true });
+                }
+                
+                // 7. Delete the original pending approval
+                await deleteDoc(doc(db, 'pendingApprovals', currentMergeApproval.id));
+                
+                closeModal('mergeOrgModal');
+                
+                if (assignedAdmin) {
+                    showToast(`Merged! Join request sent to ${assignedAdmin} for approval.`, 'success');
+                } else {
+                    showToast('Merged! But no admin found - please assign an admin to the target organization.', 'success');
+                }
+                
+                await loadAllData();
+            } catch (error) {
+                console.error('Error merging:', error);
+                showToast('Failed to merge: ' + error.message, 'error');
+            }
+        });
+        // ==================== END MERGE FUNCTIONALITY ====================
 
         window.approveOrgDirect = async function (orgPath) {
             try {
