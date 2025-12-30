@@ -1371,6 +1371,24 @@
         .item-action-btn.secondary:hover {
             background: rgba(107, 114, 128, 0.2);
         }
+        .item-action-btn.bookmarked {
+            background: rgba(245, 158, 11, 0.1);
+            color: #F59E0B;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        .item-action-btn.bookmarked:hover {
+            background: rgba(245, 158, 11, 0.2);
+        }
+        .bookmark-announcement-btn {
+            background: rgba(107, 114, 128, 0.1);
+            color: #4B5563;
+            border: 1px solid rgba(107, 114, 128, 0.2);
+        }
+        .bookmark-announcement-btn:hover {
+            background: rgba(245, 158, 11, 0.1);
+            color: #F59E0B;
+            border-color: rgba(245, 158, 11, 0.3);
+        }
         
         /* Vote Section Styles */
         .vote-section {
@@ -3331,6 +3349,10 @@
                 <div class="section-header">
                     <h2 class="section-header-title">Announcements</h2>
                     <div class="section-actions">
+                        <button class="action-btn-primary" id="postAnnouncementBtn" style="display: none;">
+                            <i class="fas fa-bullhorn"></i>
+                            Post Announcement
+                        </button>
                         <button class="action-btn-secondary" id="refreshAnnouncementsBtn">
                             <i class="fas fa-sync-alt"></i>
                             Refresh
@@ -3360,6 +3382,11 @@
                         <i class="fas fa-star"></i>
                         Important
                         <span class="tab-count" id="importantAnnouncementsTabCount">0</span>
+                    </button>
+                    <button class="tab-btn" data-tab="bookmarked-announcements">
+                        <i class="fas fa-bookmark"></i>
+                        Bookmarked
+                        <span class="tab-count" id="bookmarkedAnnouncementsTabCount">0</span>
                     </button>
                 </div>
                 
@@ -3502,6 +3529,55 @@
             <div class="modal-footer">
                 <button class="flowchart-btn secondary" id="cancelDeleteBtn">Cancel</button>
                 <button class="flowchart-btn primary" style="background: linear-gradient(135deg, #EF4444, #DC2626);" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Post Announcement Modal -->
+    <div class="modal-overlay" id="postAnnouncementModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header" style="background: linear-gradient(135deg, rgba(41, 171, 226, 0.1), rgba(41, 226, 208, 0.1));">
+                <h2 class="modal-title" style="color: #29ABE2;"><i class="fas fa-bullhorn"></i> Post Announcement</h2>
+                <button class="modal-close" id="closePostAnnouncementModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Title <span style="color: #EF4444;">*</span></label>
+                    <input type="text" class="form-input" id="announcementTitle" placeholder="Announcement title" maxlength="150">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Content <span style="color: #EF4444;">*</span></label>
+                    <textarea class="form-input" id="announcementContent" placeholder="Write your announcement here..." rows="5" maxlength="2000" style="resize: vertical;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select class="form-input" id="announcementCategory">
+                        <option value="general">General</option>
+                        <option value="academic">Academic</option>
+                        <option value="event">Event</option>
+                        <option value="notice">Notice</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Target Scope</label>
+                    <select class="form-input" id="announcementScope">
+                        <option value="all">All Users (Global)</option>
+                    </select>
+                    <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.25rem;">Select which hierarchy nodes should see this announcement</p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="announcementImportant" style="width: auto;">
+                        <span>Mark as Important</span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="flowchart-btn secondary" id="cancelPostAnnouncementBtn">Cancel</button>
+                <button class="flowchart-btn primary" id="submitAnnouncementBtn">
+                    <i class="fas fa-paper-plane"></i> Post Announcement
+                </button>
             </div>
         </div>
     </div>
@@ -7276,10 +7352,27 @@
                 this.announcements = [];
                 this.currentUser = null;
                 this.currentFilter = 'all';
+                this.isAdmin = false;
+                this.adminNodes = []; // Nodes where user is admin
+                this.isSuperAdmin = false;
+                this.bookmarkedAnnouncements = []; // Bookmarked announcement IDs
             }
 
             async loadAnnouncements(userEmail) {
                 this.currentUser = userEmail;
+                
+                // Check if user is super admin
+                this.isSuperAdmin = userEmail === 'admin@flowlink.edu';
+                
+                // Check if user is admin of any nodes
+                await this.checkAdminStatus(userEmail);
+                
+                // Load user's bookmarked announcements
+                await this.loadBookmarks(userEmail);
+                
+                // Show/hide post button based on admin status
+                this.updatePostButtonVisibility();
+                
                 try {
                     const announcementsRef = collection(db, 'announcements');
                     const snapshot = await getDocs(announcementsRef);
@@ -7294,8 +7387,15 @@
                         });
                     });
                     
-                    // Sort by date (newest first)
-                    this.announcements.sort((a, b) => b.createdAt - a.createdAt);
+                    // Sort by priority (hierarchy level) and then by date
+                    this.announcements.sort((a, b) => {
+                        // Super admin announcements first (level 0)
+                        const levelA = a.hierarchyLevel ?? 999;
+                        const levelB = b.hierarchyLevel ?? 999;
+                        if (levelA !== levelB) return levelA - levelB;
+                        // Then by date (newest first)
+                        return b.createdAt - a.createdAt;
+                    });
                     
                     return this.announcements;
                 } catch (error) {
@@ -7303,22 +7403,259 @@
                     return [];
                 }
             }
+            
+            async checkAdminStatus(userEmail) {
+                this.adminNodes = [];
+                this.isAdmin = this.isSuperAdmin;
+                
+                if (this.isSuperAdmin) {
+                    this.adminNodes.push({ path: 'global', name: 'Global (Super Admin)', level: 0 });
+                    return;
+                }
+                
+                try {
+                    // Check all hierarchies for admin status
+                    const hierarchiesRef = collection(db, 'hierarchies');
+                    const snapshot = await getDocs(hierarchiesRef);
+                    
+                    for (const docSnap of snapshot.docs) {
+                        const data = docSnap.data();
+                        const orgId = docSnap.id;
+                        
+                        // Check if user is org admin
+                        if (data.adminEmails && data.adminEmails.includes(userEmail)) {
+                            this.isAdmin = true;
+                            this.adminNodes.push({
+                                path: `hierarchies/${orgId}`,
+                                name: data.name || orgId,
+                                level: 1
+                            });
+                        }
+                        
+                        // Check sub-nodes recursively
+                        await this.checkSubNodesForAdmin(orgId, userEmail, data.name || orgId, 2);
+                    }
+                } catch (error) {
+                    console.error('Error checking admin status:', error);
+                }
+            }
+            
+            async checkSubNodesForAdmin(orgId, userEmail, parentName, level) {
+                try {
+                    const subNodesRef = collection(db, 'hierarchies', orgId, 'sub-nodes');
+                    const snapshot = await getDocs(subNodesRef);
+                    
+                    for (const docSnap of snapshot.docs) {
+                        const data = docSnap.data();
+                        const nodeId = docSnap.id;
+                        const nodeName = data.name || nodeId;
+                        
+                        if (data.adminEmails && data.adminEmails.includes(userEmail)) {
+                            this.isAdmin = true;
+                            this.adminNodes.push({
+                                path: `hierarchies/${orgId}/sub-nodes/${nodeId}`,
+                                name: `${parentName} > ${nodeName}`,
+                                level: level
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.log('Error checking sub-nodes:', error);
+                }
+            }
+            
+            updatePostButtonVisibility() {
+                const postBtn = document.getElementById('postAnnouncementBtn');
+                if (postBtn) {
+                    postBtn.style.display = this.isAdmin ? 'flex' : 'none';
+                }
+            }
+            
+            openPostAnnouncementModal() {
+                if (!this.isAdmin) {
+                    flowchartManager.showToast('Only admins can post announcements', 'error');
+                    return;
+                }
+                
+                // Reset form
+                document.getElementById('announcementTitle').value = '';
+                document.getElementById('announcementContent').value = '';
+                document.getElementById('announcementCategory').value = 'general';
+                document.getElementById('announcementImportant').checked = false;
+                
+                // Populate scope dropdown with admin nodes
+                const scopeSelect = document.getElementById('announcementScope');
+                scopeSelect.innerHTML = '';
+                
+                if (this.isSuperAdmin) {
+                    scopeSelect.innerHTML += '<option value="global">All Users (Global)</option>';
+                }
+                
+                this.adminNodes.forEach(node => {
+                    scopeSelect.innerHTML += `<option value="${node.path}" data-level="${node.level}">${node.name}</option>`;
+                });
+                
+                document.getElementById('postAnnouncementModal').classList.add('show');
+            }
+            
+            closePostAnnouncementModal() {
+                document.getElementById('postAnnouncementModal').classList.remove('show');
+            }
+            
+            async submitAnnouncement() {
+                const title = document.getElementById('announcementTitle').value.trim();
+                const content = document.getElementById('announcementContent').value.trim();
+                const category = document.getElementById('announcementCategory').value;
+                const scopeSelect = document.getElementById('announcementScope');
+                const scope = scopeSelect.value;
+                const scopeLevel = parseInt(scopeSelect.selectedOptions[0]?.dataset?.level || '0');
+                const scopeName = scopeSelect.selectedOptions[0]?.textContent || 'Global';
+                const isImportant = document.getElementById('announcementImportant').checked;
+                
+                if (!title) {
+                    flowchartManager.showToast('Please enter a title', 'error');
+                    return;
+                }
+                
+                if (!content) {
+                    flowchartManager.showToast('Please enter content', 'error');
+                    return;
+                }
+                
+                const submitBtn = document.getElementById('submitAnnouncementBtn');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
+                
+                try {
+                    // Determine priority based on hierarchy level
+                    // Level 0 = Super Admin (highest priority)
+                    // Level 1 = Org Admin
+                    // Level 2+ = Node Admin (lower priority)
+                    let priority = 'normal';
+                    if (this.isSuperAdmin || scopeLevel === 0) {
+                        priority = 'high';
+                    } else if (scopeLevel === 1) {
+                        priority = 'medium';
+                    }
+                    
+                    // If marked as important, boost priority
+                    if (isImportant) {
+                        priority = 'high';
+                    }
+                    
+                    const announcementData = {
+                        title,
+                        content,
+                        description: content, // For backward compatibility
+                        category,
+                        scope,
+                        scopeName,
+                        hierarchyLevel: scopeLevel,
+                        priority,
+                        isImportant,
+                        createdBy: this.currentUser,
+                        createdAt: serverTimestamp(),
+                        updatedAt: serverTimestamp(),
+                        postedByRole: this.isSuperAdmin ? 'super_admin' : 'node_admin'
+                    };
+                    
+                    // Save to announcements collection
+                    const announcementsRef = collection(db, 'announcements');
+                    await addDoc(announcementsRef, announcementData);
+                    
+                    flowchartManager.showToast('Announcement posted successfully!', 'success');
+                    this.closePostAnnouncementModal();
+                    
+                    // Reload announcements
+                    await this.loadAnnouncements(this.currentUser);
+                    this.updateStats();
+                    this.renderAnnouncements('announcementsList', this.currentFilter);
+                    
+                } catch (error) {
+                    console.error('Error posting announcement:', error);
+                    flowchartManager.showToast('Failed to post announcement: ' + error.message, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Post Announcement';
+                }
+            }
 
             getImportantAnnouncements() {
                 return this.announcements.filter(a => a.priority === 'high' || a.isImportant);
+            }
+            
+            getBookmarkedAnnouncements() {
+                return this.announcements.filter(a => this.bookmarkedAnnouncements.includes(a.id));
+            }
+            
+            async loadBookmarks(userEmail) {
+                try {
+                    const userRef = doc(db, 'users', userEmail);
+                    const userDoc = await getDoc(userRef);
+                    
+                    if (userDoc.exists()) {
+                        const data = userDoc.data();
+                        this.bookmarkedAnnouncements = data.bookmarkedAnnouncements || [];
+                    } else {
+                        this.bookmarkedAnnouncements = [];
+                    }
+                } catch (error) {
+                    console.error('Error loading announcement bookmarks:', error);
+                    this.bookmarkedAnnouncements = [];
+                }
+            }
+            
+            async toggleBookmark(announcementId) {
+                try {
+                    const userRef = doc(db, 'users', this.currentUser);
+                    const isBookmarked = this.bookmarkedAnnouncements.includes(announcementId);
+                    
+                    if (isBookmarked) {
+                        // Remove from bookmarks
+                        await setDoc(userRef, {
+                            bookmarkedAnnouncements: arrayRemove(announcementId)
+                        }, { merge: true });
+                        
+                        const index = this.bookmarkedAnnouncements.indexOf(announcementId);
+                        if (index > -1) this.bookmarkedAnnouncements.splice(index, 1);
+                        
+                        flowchartManager.showToast('Announcement removed from bookmarks', 'info');
+                        return false;
+                    } else {
+                        // Add to bookmarks
+                        await setDoc(userRef, {
+                            bookmarkedAnnouncements: arrayUnion(announcementId)
+                        }, { merge: true });
+                        
+                        this.bookmarkedAnnouncements.push(announcementId);
+                        flowchartManager.showToast('Announcement bookmarked!', 'success');
+                        return true;
+                    }
+                } catch (error) {
+                    console.error('Error toggling announcement bookmark:', error);
+                    flowchartManager.showToast('Failed to update bookmark', 'error');
+                    throw error;
+                }
+            }
+            
+            isBookmarked(announcementId) {
+                return this.bookmarkedAnnouncements.includes(announcementId);
             }
 
             updateStats() {
                 const total = this.announcements.length;
                 const important = this.getImportantAnnouncements().length;
+                const bookmarked = this.getBookmarkedAnnouncements().length;
                 
                 const totalCount = document.getElementById('totalAnnouncementsCount');
                 const allTab = document.getElementById('allAnnouncementsTabCount');
                 const importantTab = document.getElementById('importantAnnouncementsTabCount');
+                const bookmarkedTab = document.getElementById('bookmarkedAnnouncementsTabCount');
                 
                 if (totalCount) totalCount.textContent = total;
                 if (allTab) allTab.textContent = total;
                 if (importantTab) importantTab.textContent = important;
+                if (bookmarkedTab) bookmarkedTab.textContent = bookmarked;
             }
 
             renderAnnouncements(containerId, filter = 'all') {
@@ -7326,9 +7663,14 @@
                 if (!container) return;
                 
                 let filteredAnnouncements = this.announcements;
+                let emptyMessage = 'No announcements to display.';
                 
                 if (filter === 'important') {
                     filteredAnnouncements = this.getImportantAnnouncements();
+                    emptyMessage = 'No important announcements at the moment.';
+                } else if (filter === 'bookmarked') {
+                    filteredAnnouncements = this.getBookmarkedAnnouncements();
+                    emptyMessage = 'No bookmarked announcements. Bookmark announcements to save them for later.';
                 }
                 
                 if (filteredAnnouncements.length === 0) {
@@ -7336,7 +7678,7 @@
                         <div class="empty-state">
                             <i class="fas fa-bullhorn"></i>
                             <h3>No Announcements</h3>
-                            <p>${filter === 'important' ? 'No important announcements at the moment.' : 'No announcements to display.'}</p>
+                            <p>${emptyMessage}</p>
                         </div>
                     `;
                     return;
@@ -7344,37 +7686,79 @@
                 
                 container.innerHTML = filteredAnnouncements.map(announcement => this.createAnnouncementCard(announcement)).join('');
                 
-                // Add event listeners
+                // Add event listeners for view buttons
                 container.querySelectorAll('.view-announcement-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         const announcementId = e.currentTarget.dataset.id;
                         this.viewAnnouncement(announcementId);
                     });
                 });
+                
+                // Add event listeners for bookmark buttons
+                container.querySelectorAll('.bookmark-announcement-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const announcementId = e.currentTarget.dataset.id;
+                        try {
+                            const isNowBookmarked = await this.toggleBookmark(announcementId);
+                            // Update button appearance
+                            if (isNowBookmarked) {
+                                e.currentTarget.classList.add('bookmarked');
+                                e.currentTarget.innerHTML = '<i class="fas fa-bookmark"></i> Bookmarked';
+                            } else {
+                                e.currentTarget.classList.remove('bookmarked');
+                                e.currentTarget.innerHTML = '<i class="far fa-bookmark"></i> Bookmark';
+                            }
+                            // Update stats
+                            this.updateStats();
+                            // Re-render if on bookmarked tab
+                            if (this.currentFilter === 'bookmarked') {
+                                this.renderAnnouncements(containerId, 'bookmarked');
+                            }
+                        } catch (error) {
+                            console.error('Error toggling bookmark:', error);
+                        }
+                    });
+                });
             }
 
             createAnnouncementCard(announcement) {
                 const isImportant = announcement.priority === 'high' || announcement.isImportant;
+                const isBookmarked = this.isBookmarked(announcement.id);
                 const timeAgo = this.getTimeAgo(announcement.createdAt);
                 
+                // Determine admin level badge
+                let adminBadge = '';
+                if (announcement.postedByRole === 'super_admin' || announcement.hierarchyLevel === 0) {
+                    adminBadge = '<span class="badge" style="background: linear-gradient(135deg, #8B5CF6, #7C3AED); color: white;"><i class="fas fa-crown"></i> Super Admin</span>';
+                } else if (announcement.hierarchyLevel === 1) {
+                    adminBadge = '<span class="badge" style="background: linear-gradient(135deg, #F59E0B, #D97706); color: white;"><i class="fas fa-building"></i> Org Admin</span>';
+                } else if (announcement.hierarchyLevel >= 2) {
+                    adminBadge = '<span class="badge" style="background: linear-gradient(135deg, #10B981, #059669); color: white;"><i class="fas fa-user-shield"></i> Node Admin</span>';
+                }
+                
                 return `
-                    <div class="item-card announcement">
+                    <div class="item-card announcement ${isImportant ? 'important' : ''}" style="${isImportant ? 'border-left: 4px solid #EF4444;' : ''}">
                         <div class="item-card-header">
                             <h4 class="item-card-title">${this.escapeHtml(announcement.title)}</h4>
                             <div class="item-card-badges">
-                                ${isImportant ? '<span class="badge badge-important">Important</span>' : ''}
-                                <span class="badge badge-${announcement.category || 'general'}" style="background: rgba(41, 171, 226, 0.1); color: #29ABE2;">${announcement.category || 'General'}</span>
+                                ${isImportant ? '<span class="badge badge-important"><i class="fas fa-exclamation-circle"></i> Important</span>' : ''}
+                                ${adminBadge}
+                                <span class="badge" style="background: rgba(41, 171, 226, 0.1); color: #29ABE2;">${announcement.category || 'General'}</span>
                             </div>
                         </div>
                         <p class="item-card-description">${this.escapeHtml(announcement.description || announcement.content || '')}</p>
                         <div class="item-card-meta">
                             <span><i class="fas fa-clock"></i> ${timeAgo}</span>
                             <span><i class="fas fa-user"></i> ${announcement.createdBy?.split('@')[0] || 'Admin'}</span>
-                            ${announcement.targetHierarchy ? `<span><i class="fas fa-sitemap"></i> ${announcement.targetHierarchy}</span>` : ''}
+                            ${announcement.scopeName ? `<span><i class="fas fa-sitemap"></i> ${announcement.scopeName}</span>` : ''}
                         </div>
                         <div class="item-card-actions">
                             <button class="item-action-btn primary view-announcement-btn" data-id="${announcement.id}">
                                 <i class="fas fa-eye"></i> View Details
+                            </button>
+                            <button class="item-action-btn ${isBookmarked ? 'bookmarked' : ''} bookmark-announcement-btn" data-id="${announcement.id}" style="${isBookmarked ? 'background: rgba(245, 158, 11, 0.1); color: #F59E0B; border-color: #F59E0B;' : ''}">
+                                <i class="${isBookmarked ? 'fas' : 'far'} fa-bookmark"></i> ${isBookmarked ? 'Bookmarked' : 'Bookmark'}
                             </button>
                         </div>
                     </div>
@@ -7389,11 +7773,22 @@
                 const title = document.getElementById('viewAnnouncementTitle');
                 const content = document.getElementById('viewAnnouncementContent');
                 
+                // Determine admin level badge
+                let adminBadgeHtml = '';
+                if (announcement.postedByRole === 'super_admin' || announcement.hierarchyLevel === 0) {
+                    adminBadgeHtml = '<span class="badge" style="background: linear-gradient(135deg, #8B5CF6, #7C3AED); color: white;"><i class="fas fa-crown"></i> Super Admin</span>';
+                } else if (announcement.hierarchyLevel === 1) {
+                    adminBadgeHtml = '<span class="badge" style="background: linear-gradient(135deg, #F59E0B, #D97706); color: white;"><i class="fas fa-building"></i> Org Admin</span>';
+                } else if (announcement.hierarchyLevel >= 2) {
+                    adminBadgeHtml = '<span class="badge" style="background: linear-gradient(135deg, #10B981, #059669); color: white;"><i class="fas fa-user-shield"></i> Node Admin</span>';
+                }
+                
                 title.textContent = announcement.title;
                 content.innerHTML = `
                     <div style="margin-bottom: 1rem;">
-                        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-                            ${announcement.priority === 'high' || announcement.isImportant ? '<span class="badge badge-important">Important</span>' : ''}
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
+                            ${announcement.priority === 'high' || announcement.isImportant ? '<span class="badge badge-important"><i class="fas fa-exclamation-circle"></i> Important</span>' : ''}
+                            ${adminBadgeHtml}
                             <span class="badge" style="background: rgba(41, 171, 226, 0.1); color: #29ABE2;">${announcement.category || 'General'}</span>
                         </div>
                     </div>
@@ -7409,16 +7804,16 @@
                             <span style="font-size: 0.85rem; color: #6B7280;">Posted On</span>
                             <p style="font-weight: 600; color: #1F2933;">${this.formatDate(announcement.createdAt)}</p>
                         </div>
+                        ${announcement.scopeName ? `
+                            <div>
+                                <span style="font-size: 0.85rem; color: #6B7280;">Target Scope</span>
+                                <p style="font-weight: 600; color: #29ABE2;"><i class="fas fa-sitemap"></i> ${announcement.scopeName}</p>
+                            </div>
+                        ` : ''}
                         ${announcement.deadline ? `
                             <div>
                                 <span style="font-size: 0.85rem; color: #6B7280;">Deadline</span>
                                 <p style="font-weight: 600; color: #EF4444;">${this.formatDate(new Date(announcement.deadline))}</p>
-                            </div>
-                        ` : ''}
-                        ${announcement.targetHierarchy ? `
-                            <div>
-                                <span style="font-size: 0.85rem; color: #6B7280;">Target</span>
-                                <p style="font-weight: 600; color: #1F2933;">${announcement.targetHierarchy}</p>
                             </div>
                         ` : ''}
                     </div>
@@ -8227,6 +8622,21 @@
             const closeViewAnnouncementModal = document.getElementById('closeViewAnnouncementModal');
             const closeViewAnnouncementBtn = document.getElementById('closeViewAnnouncementBtn');
             
+            // Post Announcement Modal Event Listeners
+            const postAnnouncementBtn = document.getElementById('postAnnouncementBtn');
+            const closePostAnnouncementModal = document.getElementById('closePostAnnouncementModal');
+            const cancelPostAnnouncementBtn = document.getElementById('cancelPostAnnouncementBtn');
+            const submitAnnouncementBtn = document.getElementById('submitAnnouncementBtn');
+            const postAnnouncementModal = document.getElementById('postAnnouncementModal');
+            
+            postAnnouncementBtn?.addEventListener('click', () => announcementsManager.openPostAnnouncementModal());
+            closePostAnnouncementModal?.addEventListener('click', () => announcementsManager.closePostAnnouncementModal());
+            cancelPostAnnouncementBtn?.addEventListener('click', () => announcementsManager.closePostAnnouncementModal());
+            submitAnnouncementBtn?.addEventListener('click', () => announcementsManager.submitAnnouncement());
+            postAnnouncementModal?.addEventListener('click', (e) => {
+                if (e.target.id === 'postAnnouncementModal') announcementsManager.closePostAnnouncementModal();
+            });
+            
             refreshAnnouncementsBtn?.addEventListener('click', async () => {
                 const user = dashboardAuth.getCurrentUser();
                 if (user) {
@@ -8254,6 +8664,7 @@
                     const tab = btn.dataset.tab;
                     if (tab === 'all-announcements') announcementsManager.setFilter('all');
                     else if (tab === 'important-announcements') announcementsManager.setFilter('important');
+                    else if (tab === 'bookmarked-announcements') announcementsManager.setFilter('bookmarked');
                 });
             });
             
