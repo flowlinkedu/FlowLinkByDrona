@@ -428,7 +428,6 @@
                     <!-- Governance Tabs -->
                     <div class="governance-tabs">
                         <button class="gov-tab active" data-tab="pending-approvals"><i class="fas fa-clipboard-list"></i> Pending Approvals <span class="tab-badge" id="pendingTabBadge">0</span></button>
-                        <button class="gov-tab" data-tab="announcement-moderation"><i class="fas fa-bullhorn"></i> Announcement Moderation <span class="tab-badge" id="announcementTabBadge">0</span></button>
                         <button class="gov-tab" data-tab="escalation-archive"><i class="fas fa-level-up-alt"></i> Escalation & Archive <span class="tab-badge" id="escalationTabBadge">0</span></button>
                     </div>
 
@@ -439,24 +438,10 @@
                             <div class="panel-filters">
                                 <button class="filter-chip active" data-filter="all">All</button>
                                 <button class="filter-chip" data-filter="problem"><i class="fas fa-exclamation-circle"></i> Problems</button>
-                                <button class="filter-chip" data-filter="announcement"><i class="fas fa-bullhorn"></i> Announcements</button>
                                 <button class="filter-chip" data-filter="escalation"><i class="fas fa-level-up-alt"></i> Escalations</button>
                             </div>
                         </div>
                         <div class="approval-list" id="pendingApprovalsList">
-                            <div class="loading-spinner"><i class="fas fa-spinner"></i></div>
-                        </div>
-                    </div>
-
-                    <!-- Announcement Moderation Panel -->
-                    <div class="governance-panel" id="announcement-moderation-panel">
-                        <div class="panel-header">
-                            <h3 class="panel-title"><i class="fas fa-bullhorn"></i> Announcement Moderation</h3>
-                            <div class="panel-actions">
-                                <label class="toggle-label"><input type="checkbox" id="showUrgentOnly"> Show Urgent Only</label>
-                            </div>
-                        </div>
-                        <div class="announcement-moderation-list" id="announcementModerationList">
                             <div class="loading-spinner"><i class="fas fa-spinner"></i></div>
                         </div>
                     </div>
@@ -1863,6 +1848,10 @@
             await Promise.all([loadJoinRequests(), loadBranchRequests(), loadSubNodes(), loadProblems(org), loadAnnouncements(org)]);
             updateBadges();
             renderAllSections(org);
+            
+            // Load governance data after org data is loaded
+            await initGovernanceData();
+            setupGovernanceTabs();
         }
 
         async function loadJoinRequests() {
@@ -3077,27 +3066,31 @@
         
         // Load real governance data from Firebase
         async function initGovernanceData() {
+            console.log('Initializing governance data...');
             try {
                 // Load pending problem approvals from Firebase
                 await loadPendingProblemApprovals();
+                console.log('Loaded problem approvals');
                 
-                // Load pending announcement approvals (if collection exists)
-                await loadPendingAnnouncementApprovals();
+                // Note: Announcements no longer need approval since only admins can post
+                // pendingAnnouncementApprovals stays empty
                 
                 // Load escalated items
                 await loadEscalatedItems();
+                console.log('Loaded escalated items');
                 
                 // Load archived items
                 await loadArchivedItems();
+                console.log('Loaded archived items');
                 
-                updateGovernanceMetrics();
-                renderGovernancePanels();
             } catch (error) {
                 console.error('Error initializing governance data:', error);
-                // Still render with empty arrays
-                updateGovernanceMetrics();
-                renderGovernancePanels();
             }
+            
+            // Always render panels and update metrics, even if loading failed
+            updateGovernanceMetrics();
+            renderGovernancePanels();
+            console.log('Governance panels rendered');
         }
         
         // Load pending problem approvals from Firebase
@@ -3267,10 +3260,9 @@
         
         // Update governance metrics
         function updateGovernanceMetrics() {
-            const totalPending = pendingProblemApprovals.length + pendingAnnouncementApprovals.length;
+            const totalPending = pendingProblemApprovals.length;
             document.getElementById('pendingApprovalsCount').textContent = totalPending;
             document.getElementById('pendingTabBadge').textContent = totalPending;
-            document.getElementById('announcementTabBadge').textContent = pendingAnnouncementApprovals.length;
             document.getElementById('escalationTabBadge').textContent = escalatedItems.length;
             document.getElementById('escalatedCount').textContent = escalatedItems.length;
             document.getElementById('archivedCount').textContent = archivedItems.length;
@@ -3308,17 +3300,11 @@
                     renderPendingApprovals(chip.dataset.filter);
                 });
             });
-            
-            // Urgent only toggle
-            document.getElementById('showUrgentOnly')?.addEventListener('change', (e) => {
-                renderAnnouncementModeration(e.target.checked);
-            });
         }
         
         // Render all governance panels
         function renderGovernancePanels() {
             renderPendingApprovals('all');
-            renderAnnouncementModeration(false);
             renderEscalations();
             renderArchive();
         }
@@ -3326,10 +3312,9 @@
         // Render pending approvals
         function renderPendingApprovals(filter = 'all') {
             const container = document.getElementById('pendingApprovalsList');
-            let items = [...pendingProblemApprovals, ...pendingAnnouncementApprovals];
+            let items = [...pendingProblemApprovals];
             
             if (filter === 'problem') items = pendingProblemApprovals;
-            else if (filter === 'announcement') items = pendingAnnouncementApprovals;
             else if (filter === 'escalation') items = escalatedItems.map(e => ({...e, type: 'escalation'}));
             
             if (items.length === 0) {
@@ -3370,49 +3355,6 @@
                             <button class="action-btn reject" onclick="openGovRejectModal('${item.id}', '${item.title}', '${item.type}')"><i class="fas fa-times"></i> Reject</button>
                             <button class="action-btn escalate" onclick="openGovEscalateModal('${item.id}', '${item.title}', '${item.type}')"><i class="fas fa-level-up-alt"></i> Escalate</button>
                             <button class="action-btn archive" onclick="openGovArchiveModal('${item.id}', '${item.title}', '${item.type}')"><i class="fas fa-archive"></i> Archive</button>
-                        </div>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-        
-        // Render announcement moderation
-        function renderAnnouncementModeration(urgentOnly = false) {
-            const container = document.getElementById('announcementModerationList');
-            let items = pendingAnnouncementApprovals;
-            
-            if (urgentOnly) items = items.filter(a => a.isUrgent);
-            
-            if (items.length === 0) {
-                container.innerHTML = `<div class="governance-empty"><i class="fas fa-bullhorn"></i><h3>No Announcements to Moderate</h3><p>${urgentOnly ? 'No urgent announcements pending.' : 'All announcements have been reviewed.'}</p></div>`;
-                return;
-            }
-            
-            container.innerHTML = items.map(item => {
-                const deadline = item.deadline ? new Date(item.deadline) : null;
-                const isExpiringSoon = deadline && (deadline - new Date()) < 3 * 24 * 60 * 60 * 1000;
-                
-                return `
-                <div class="announcement-card ${item.isUrgent ? 'urgent' : ''}">
-                    <div class="announcement-card-header">
-                        <div class="announcement-card-title">${item.title}</div>
-                        <div class="announcement-badges">
-                            <span class="scope-badge ${item.scope}">${item.scope === 'global' ? 'Global' : item.scope === 'org' ? 'Organization' : 'Node'}</span>
-                            ${item.isVerified ? '<span class="verified-badge"><i class="fas fa-check-circle"></i> Verified</span>' : ''}
-                            ${item.isUrgent ? '<span class="status-badge high">Urgent</span>' : ''}
-                        </div>
-                    </div>
-                    <div class="announcement-card-content">${item.content}</div>
-                    <div class="announcement-card-footer">
-                        <div class="deadline-info ${isExpiringSoon ? 'expiring-soon' : ''}">
-                            <i class="fas fa-clock"></i>
-                            ${deadline ? `Expires: ${deadline.toLocaleDateString()}` : 'No expiry set'}
-                            ${isExpiringSoon ? ' (Soon!)' : ''}
-                        </div>
-                        <div class="announcement-card-actions">
-                            <button class="action-btn approve" onclick="govApproveAnnouncement('${item.id}')"><i class="fas fa-check"></i> Approve</button>
-                            <button class="action-btn view" onclick="openEditAnnouncementModal('${item.id}')"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="action-btn reject" onclick="openGovRejectModal('${item.id}', '${item.title}', 'announcement')"><i class="fas fa-times"></i> Reject</button>
                         </div>
                     </div>
                 </div>`;
@@ -4006,12 +3948,6 @@
             renderGovernancePanels();
             showToast('Announcement updated.', 'success');
         });
-        
-        // Initialize governance on page load
-        setTimeout(() => {
-            initGovernanceData();
-            setupGovernanceTabs();
-        }, 1000);
 
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');

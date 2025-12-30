@@ -1458,14 +1458,33 @@
         }
         .vote-count-detail {
             margin-left: auto;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .vote-count-detail i {
             font-size: 0.8rem;
-            color: #6B7280;
+        }
+        .vote-count-up {
             display: flex;
             align-items: center;
             gap: 0.25rem;
+            color: #10B981;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 6px;
         }
-        .vote-count-detail i {
-            font-size: 0.75rem;
+        .vote-count-down {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: #EF4444;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 6px;
         }
         
         /* Solutions Preview Styles */
@@ -1801,6 +1820,20 @@
         }
         .empty-state p {
             margin-bottom: 1.5rem;
+        }
+        .empty-state-mini {
+            text-align: center;
+            padding: 1.5rem;
+            color: #9CA3AF;
+        }
+        .empty-state-mini i {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .empty-state-mini p {
+            font-size: 0.85rem;
+            margin: 0;
         }
         
         /* Stats Cards */
@@ -3078,43 +3111,15 @@
                         </div>
                         <div class="card-title-section">
                             <h3 class="card-title">Open Problems</h3>
-                            <p class="card-count">8 Active Issues</p>
+                            <p class="card-count" id="dashboardOpenCount">0 Active Issues</p>
                         </div>
                     </div>
 
                     <div class="card-content">
-                        <div class="item-list">
-                            <div class="list-item" data-priority="high">
-                                <div class="item-header">
-                                    <h4 class="item-title">Server Downtime Issue</h4>
-                                    <span class="priority-badge high">High</span>
-                                </div>
-                                <div class="item-meta">
-                                    <span class="item-category">Infrastructure</span>
-                                    <span class="item-time">2 hours ago</span>
-                                </div>
-                            </div>
-
-                            <div class="list-item" data-priority="medium">
-                                <div class="item-header">
-                                    <h4 class="item-title">Login Authentication Bug</h4>
-                                    <span class="priority-badge medium">Medium</span>
-                                </div>
-                                <div class="item-meta">
-                                    <span class="item-category">Security</span>
-                                    <span class="item-time">5 hours ago</span>
-                                </div>
-                            </div>
-
-                            <div class="list-item" data-priority="low">
-                                <div class="item-header">
-                                    <h4 class="item-title">UI Layout Inconsistency</h4>
-                                    <span class="priority-badge low">Low</span>
-                                </div>
-                                <div class="item-meta">
-                                    <span class="item-category">Frontend</span>
-                                    <span class="item-time">1 day ago</span>
-                                </div>
+                        <div class="item-list" id="dashboardOpenProblems">
+                            <div class="empty-state-mini">
+                                <i class="fas fa-check-circle" style="color: #10B981;"></i>
+                                <p>No open problems</p>
                             </div>
                         </div>
                     </div>
@@ -3139,34 +3144,15 @@
                         </div>
                         <div class="card-title-section">
                             <h3 class="card-title">Solved Problems</h3>
-                            <p class="card-count">23 This Month</p>
+                            <p class="card-count" id="dashboardSolvedCount">0 This Month</p>
                         </div>
                     </div>
 
                     <div class="card-content">
-                        <div class="item-list">
-                            <div class="list-item">
-                                <div class="item-header">
-                                    <h4 class="item-title">Database Connection Error</h4>
-                                    <span class="priority-badge low"
-                                        style="background: rgba(16, 185, 129, 0.1); color: #059669;">Solved</span>
-                                </div>
-                                <div class="item-meta">
-                                    <span class="item-category">Backend</span>
-                                    <span class="item-time">3 hours ago</span>
-                                </div>
-                            </div>
-
-                            <div class="list-item">
-                                <div class="item-header">
-                                    <h4 class="item-title">Email Notification Delay</h4>
-                                    <span class="priority-badge low"
-                                        style="background: rgba(16, 185, 129, 0.1); color: #059669;">Solved</span>
-                                </div>
-                                <div class="item-meta">
-                                    <span class="item-category">Communication</span>
-                                    <span class="item-time">1 day ago</span>
-                                </div>
+                        <div class="item-list" id="dashboardSolvedProblems">
+                            <div class="empty-state-mini">
+                                <i class="fas fa-inbox" style="color: #6B7280;"></i>
+                                <p>No solved problems yet</p>
                             </div>
                         </div>
                     </div>
@@ -3187,32 +3173,15 @@
                         </div>
                         <div class="card-title-section">
                             <h3 class="card-title">Announcements</h3>
-                            <p class="card-count">4 Recent Updates</p>
+                            <p class="card-count" id="dashboardAnnouncementsCount">0 Recent Updates</p>
                         </div>
                     </div>
 
                     <div class="card-content">
-                        <div class="item-list">
-                            <div class="list-item" data-priority="high">
-                                <div class="item-header">
-                                    <h4 class="item-title">Semester Exam Schedule</h4>
-                                    <span class="priority-badge high">Important</span>
-                                </div>
-                                <div class="item-meta">
-                                    <span class="item-category">Academic</span>
-                                    <span class="item-time">1 hour ago</span>
-                                </div>
-                            </div>
-
-                            <div class="list-item" data-priority="medium">
-                                <div class="item-header">
-                                    <h4 class="item-title">Hostel Maintenance Notice</h4>
-                                    <span class="priority-badge medium">Notice</span>
-                                </div>
-                                <div class="item-meta">
-                                    <span class="item-category">Hostel</span>
-                                    <span class="item-time">3 hours ago</span>
-                                </div>
+                        <div class="item-list" id="dashboardAnnouncements">
+                            <div class="empty-state-mini">
+                                <i class="fas fa-bullhorn" style="color: #29ABE2;"></i>
+                                <p>No announcements</p>
                             </div>
                         </div>
                     </div>
@@ -5532,8 +5501,8 @@
                             // Update detail counts
                             if (detailEl) {
                                 detailEl.innerHTML = `
-                                    <i class="fas fa-thumbs-up"></i> ${problem.upvotes || 0} 
-                                    <i class="fas fa-thumbs-down" style="margin-left: 0.5rem;"></i> ${problem.downvotes || 0}
+                                    <span class="vote-count-up"><i class="fas fa-thumbs-up"></i> ${problem.upvotes || 0}</span>
+                                    <span class="vote-count-down"><i class="fas fa-thumbs-down"></i> ${problem.downvotes || 0}</span>
                                 `;
                             }
                             
@@ -5684,8 +5653,8 @@
                                 <i class="fas fa-arrow-down"></i>
                             </button>
                             <span class="vote-count-detail">
-                                <i class="fas fa-thumbs-up"></i> ${upvotes} 
-                                <i class="fas fa-thumbs-down" style="margin-left: 0.5rem;"></i> ${downvotes}
+                                <span class="vote-count-up"><i class="fas fa-thumbs-up"></i> ${upvotes}</span>
+                                <span class="vote-count-down"><i class="fas fa-thumbs-down"></i> ${downvotes}</span>
                             </span>
                         </div>
                         ` : ''}
@@ -6887,9 +6856,9 @@
                                         <button class="solution-vote-btn downvote ${sol.hasDownvoted ? 'active' : ''}" data-solution-id="${sol.id}" data-vote="down" title="Downvote">
                                             <i class="fas fa-arrow-down"></i>
                                         </button>
-                                        <span style="font-size: 0.75rem; color: #9CA3AF; margin-left: 0.5rem;">
-                                            <i class="fas fa-thumbs-up"></i> ${sol.upvotes || 0} 
-                                            <i class="fas fa-thumbs-down" style="margin-left: 0.25rem;"></i> ${sol.downvotes || 0}
+                                        <span class="vote-count-detail" style="margin-left: 0.5rem;">
+                                            <span class="vote-count-up"><i class="fas fa-thumbs-up"></i> ${sol.upvotes || 0}</span>
+                                            <span class="vote-count-down"><i class="fas fa-thumbs-down"></i> ${sol.downvotes || 0}</span>
                                         </span>
                                     </div>
                                     ${isOwner && !isSolved && !sol.isAccepted ? `
@@ -7082,7 +7051,8 @@
             async loadSubNodesRecursive(parentRef, parentPath) {
                 const children = [];
                 try {
-                    const subNodesRef = collection(parentRef, 'sub-nodes');
+                    // Use path-based collection reference for consistency
+                    const subNodesRef = collection(db, parentPath, 'sub-nodes');
                     const snapshot = await getDocs(subNodesRef);
                     
                     for (const docSnap of snapshot.docs) {
@@ -7099,6 +7069,11 @@
                         children.push(node);
                     }
                 } catch (e) {
+                    // No sub-nodes or error - this is normal
+                    console.log('No sub-nodes at:', parentPath);
+                }
+                return children;
+            }
                     // No sub-nodes
                 }
                 return children;
@@ -7350,6 +7325,7 @@
         class AnnouncementsManager {
             constructor() {
                 this.announcements = [];
+                this.savedAnnouncements = []; // Saved copies of bookmarked announcements
                 this.currentUser = null;
                 this.currentFilter = 'all';
                 this.isAdmin = false;
@@ -7369,6 +7345,9 @@
                 
                 // Load user's bookmarked announcements
                 await this.loadBookmarks(userEmail);
+                
+                // Load saved announcements (copies of bookmarked ones)
+                await this.loadSavedAnnouncements();
                 
                 // Show/hide post button based on admin status
                 this.updatePostButtonVisibility();
@@ -7584,10 +7563,6 @@
                 return this.announcements.filter(a => a.priority === 'high' || a.isImportant);
             }
             
-            getBookmarkedAnnouncements() {
-                return this.announcements.filter(a => this.bookmarkedAnnouncements.includes(a.id));
-            }
-            
             async loadBookmarks(userEmail) {
                 try {
                     const userRef = doc(db, 'users', userEmail);
@@ -7611,7 +7586,7 @@
                     const isBookmarked = this.bookmarkedAnnouncements.includes(announcementId);
                     
                     if (isBookmarked) {
-                        // Remove from bookmarks
+                        // Remove from bookmarks (but keep the saved copy)
                         await setDoc(userRef, {
                             bookmarkedAnnouncements: arrayRemove(announcementId)
                         }, { merge: true });
@@ -7622,13 +7597,39 @@
                         flowchartManager.showToast('Announcement removed from bookmarks', 'info');
                         return false;
                     } else {
-                        // Add to bookmarks
+                        // Find the announcement to save a copy
+                        const announcement = this.announcements.find(a => a.id === announcementId);
+                        
+                        if (announcement) {
+                            // Create a clean copy without Date objects (Firestore can't handle JS Date in spread)
+                            const announcementCopy = {
+                                title: announcement.title || '',
+                                content: announcement.content || announcement.description || '',
+                                description: announcement.description || announcement.content || '',
+                                category: announcement.category || 'general',
+                                scope: announcement.scope || '',
+                                scopeName: announcement.scopeName || '',
+                                hierarchyLevel: announcement.hierarchyLevel || 0,
+                                priority: announcement.priority || 'normal',
+                                isImportant: announcement.isImportant || false,
+                                createdBy: announcement.createdBy || '',
+                                postedByRole: announcement.postedByRole || '',
+                                originalId: announcementId,
+                                savedAt: serverTimestamp()
+                            };
+                            
+                            // Save a copy to user's savedAnnouncements subcollection
+                            const savedAnnouncementRef = doc(db, 'users', this.currentUser, 'savedAnnouncements', announcementId);
+                            await setDoc(savedAnnouncementRef, announcementCopy);
+                        }
+                        
+                        // Add to bookmarks array
                         await setDoc(userRef, {
                             bookmarkedAnnouncements: arrayUnion(announcementId)
                         }, { merge: true });
                         
                         this.bookmarkedAnnouncements.push(announcementId);
-                        flowchartManager.showToast('Announcement bookmarked!', 'success');
+                        flowchartManager.showToast('Announcement bookmarked and saved!', 'success');
                         return true;
                     }
                 } catch (error) {
@@ -7640,6 +7641,43 @@
             
             isBookmarked(announcementId) {
                 return this.bookmarkedAnnouncements.includes(announcementId);
+            }
+            
+            // Get bookmarked announcements including saved copies for deleted ones
+            getBookmarkedAnnouncements() {
+                const bookmarkedFromMain = this.announcements.filter(a => this.bookmarkedAnnouncements.includes(a.id));
+                
+                // Add saved announcements that are no longer in main collection
+                const mainIds = this.announcements.map(a => a.id);
+                const savedOnly = this.savedAnnouncements.filter(sa => 
+                    this.bookmarkedAnnouncements.includes(sa.id) && !mainIds.includes(sa.id)
+                );
+                
+                // Mark saved-only announcements as deleted
+                savedOnly.forEach(sa => sa.isDeleted = true);
+                
+                return [...bookmarkedFromMain, ...savedOnly];
+            }
+            
+            async loadSavedAnnouncements() {
+                try {
+                    const savedRef = collection(db, 'users', this.currentUser, 'savedAnnouncements');
+                    const snapshot = await getDocs(savedRef);
+                    
+                    this.savedAnnouncements = [];
+                    snapshot.forEach(docSnap => {
+                        const data = docSnap.data();
+                        this.savedAnnouncements.push({
+                            id: docSnap.id,
+                            ...data,
+                            createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : (data.createdAt || new Date()),
+                            savedAt: data.savedAt?.toDate ? data.savedAt.toDate() : new Date()
+                        });
+                    });
+                } catch (error) {
+                    console.error('Error loading saved announcements:', error);
+                    this.savedAnnouncements = [];
+                }
             }
 
             updateStats() {
@@ -7725,6 +7763,7 @@
             createAnnouncementCard(announcement) {
                 const isImportant = announcement.priority === 'high' || announcement.isImportant;
                 const isBookmarked = this.isBookmarked(announcement.id);
+                const isDeleted = announcement.isDeleted || false;
                 const timeAgo = this.getTimeAgo(announcement.createdAt);
                 
                 // Determine admin level badge
@@ -7738,10 +7777,11 @@
                 }
                 
                 return `
-                    <div class="item-card announcement ${isImportant ? 'important' : ''}" style="${isImportant ? 'border-left: 4px solid #EF4444;' : ''}">
+                    <div class="item-card announcement ${isImportant ? 'important' : ''} ${isDeleted ? 'deleted-announcement' : ''}" style="${isImportant ? 'border-left: 4px solid #EF4444;' : ''} ${isDeleted ? 'opacity: 0.8; border-left: 4px solid #6B7280;' : ''}">
                         <div class="item-card-header">
                             <h4 class="item-card-title">${this.escapeHtml(announcement.title)}</h4>
                             <div class="item-card-badges">
+                                ${isDeleted ? '<span class="badge" style="background: rgba(107, 114, 128, 0.2); color: #4B5563;"><i class="fas fa-archive"></i> Saved Copy (Original Deleted)</span>' : ''}
                                 ${isImportant ? '<span class="badge badge-important"><i class="fas fa-exclamation-circle"></i> Important</span>' : ''}
                                 ${adminBadge}
                                 <span class="badge" style="background: rgba(41, 171, 226, 0.1); color: #29ABE2;">${announcement.category || 'General'}</span>
@@ -7752,6 +7792,7 @@
                             <span><i class="fas fa-clock"></i> ${timeAgo}</span>
                             <span><i class="fas fa-user"></i> ${announcement.createdBy?.split('@')[0] || 'Admin'}</span>
                             ${announcement.scopeName ? `<span><i class="fas fa-sitemap"></i> ${announcement.scopeName}</span>` : ''}
+                            ${isDeleted ? `<span style="color: #6B7280;"><i class="fas fa-save"></i> Saved on ${this.formatDate(announcement.savedAt || new Date())}</span>` : ''}
                         </div>
                         <div class="item-card-actions">
                             <button class="item-action-btn primary view-announcement-btn" data-id="${announcement.id}">
@@ -7766,7 +7807,11 @@
             }
 
             viewAnnouncement(announcementId) {
-                const announcement = this.announcements.find(a => a.id === announcementId);
+                // Check in main announcements first, then in saved announcements
+                let announcement = this.announcements.find(a => a.id === announcementId);
+                if (!announcement) {
+                    announcement = this.savedAnnouncements.find(a => a.id === announcementId);
+                }
                 if (!announcement) return;
                 
                 const modal = document.getElementById('viewAnnouncementModal');
@@ -7905,6 +7950,9 @@
                 this.setupEventListeners();
                 this.loadUserData();
                 this.hideLoading();
+                
+                // Load dashboard cards with real data
+                this.loadDashboardCards();
 
                 console.log('Dashboard initialized successfully');
             }
@@ -8070,12 +8118,155 @@
                     // Show dashboard (default)
                     if (dashboardGrid) dashboardGrid.style.display = 'grid';
                     if (filtersSection) filtersSection.style.display = 'block';
+                    this.loadDashboardCards();
                 }
 
                 // Close mobile menu
                 this.closeMobileMenu();
 
                 console.log('Navigating to:', page);
+            }
+            
+            // Load Dashboard Cards with real data
+            async loadDashboardCards() {
+                const user = dashboardAuth.getCurrentUser();
+                if (!user) return;
+                
+                try {
+                    // Load problems if not already loaded
+                    if (problemsManager.problems.length === 0) {
+                        await problemsManager.loadProblems(user.email);
+                    }
+                    
+                    // Load announcements if not already loaded
+                    if (announcementsManager.announcements.length === 0) {
+                        await announcementsManager.loadAnnouncements(user.email);
+                    }
+                    
+                    // Get open problems (top 3)
+                    const openProblems = problemsManager.problems.filter(p => p.status === 'open' || p.status === 'approved');
+                    const openContainer = document.getElementById('dashboardOpenProblems');
+                    const openCount = document.getElementById('dashboardOpenCount');
+                    
+                    if (openCount) openCount.textContent = `${openProblems.length} Active Issues`;
+                    
+                    if (openContainer) {
+                        if (openProblems.length === 0) {
+                            openContainer.innerHTML = `
+                                <div class="empty-state-mini">
+                                    <i class="fas fa-check-circle" style="color: #10B981;"></i>
+                                    <p>No open problems</p>
+                                </div>
+                            `;
+                        } else {
+                            openContainer.innerHTML = openProblems.slice(0, 3).map(p => `
+                                <div class="list-item" data-priority="${p.priority || 'medium'}">
+                                    <div class="item-header">
+                                        <h4 class="item-title">${this.escapeHtml(p.title)}</h4>
+                                        <span class="priority-badge ${p.priority || 'medium'}">${(p.priority || 'Medium').charAt(0).toUpperCase() + (p.priority || 'medium').slice(1)}</span>
+                                    </div>
+                                    <div class="item-meta">
+                                        <span class="item-category">${p.category || 'General'}</span>
+                                        <span class="item-time">${this.getTimeAgo(p.createdAt)}</span>
+                                    </div>
+                                </div>
+                            `).join('');
+                        }
+                    }
+                    
+                    // Get solved problems (top 2)
+                    const solvedProblems = problemsManager.problems.filter(p => p.status === 'solved');
+                    const solvedContainer = document.getElementById('dashboardSolvedProblems');
+                    const solvedCount = document.getElementById('dashboardSolvedCount');
+                    
+                    if (solvedCount) solvedCount.textContent = `${solvedProblems.length} Solved`;
+                    
+                    if (solvedContainer) {
+                        if (solvedProblems.length === 0) {
+                            solvedContainer.innerHTML = `
+                                <div class="empty-state-mini">
+                                    <i class="fas fa-inbox" style="color: #6B7280;"></i>
+                                    <p>No solved problems yet</p>
+                                </div>
+                            `;
+                        } else {
+                            solvedContainer.innerHTML = solvedProblems.slice(0, 2).map(p => `
+                                <div class="list-item">
+                                    <div class="item-header">
+                                        <h4 class="item-title">${this.escapeHtml(p.title)}</h4>
+                                        <span class="priority-badge low" style="background: rgba(16, 185, 129, 0.1); color: #059669;">Solved</span>
+                                    </div>
+                                    <div class="item-meta">
+                                        <span class="item-category">${p.category || 'General'}</span>
+                                        <span class="item-time">${this.getTimeAgo(p.createdAt)}</span>
+                                    </div>
+                                </div>
+                            `).join('');
+                        }
+                    }
+                    
+                    // Get announcements (top 2)
+                    const announcements = announcementsManager.announcements;
+                    const announcementsContainer = document.getElementById('dashboardAnnouncements');
+                    const announcementsCount = document.getElementById('dashboardAnnouncementsCount');
+                    
+                    if (announcementsCount) announcementsCount.textContent = `${announcements.length} Recent Updates`;
+                    
+                    if (announcementsContainer) {
+                        if (announcements.length === 0) {
+                            announcementsContainer.innerHTML = `
+                                <div class="empty-state-mini">
+                                    <i class="fas fa-bullhorn" style="color: #29ABE2;"></i>
+                                    <p>No announcements</p>
+                                </div>
+                            `;
+                        } else {
+                            announcementsContainer.innerHTML = announcements.slice(0, 2).map(a => `
+                                <div class="list-item" data-priority="${a.isImportant ? 'high' : 'medium'}">
+                                    <div class="item-header">
+                                        <h4 class="item-title">${this.escapeHtml(a.title)}</h4>
+                                        <span class="priority-badge ${a.isImportant ? 'high' : 'medium'}">${a.isImportant ? 'Important' : (a.category || 'Notice')}</span>
+                                    </div>
+                                    <div class="item-meta">
+                                        <span class="item-category">${a.category || 'General'}</span>
+                                        <span class="item-time">${this.getTimeAgo(a.createdAt)}</span>
+                                    </div>
+                                </div>
+                            `).join('');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error loading dashboard cards:', error);
+                }
+            }
+            
+            escapeHtml(text) {
+                if (!text) return '';
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+            
+            getTimeAgo(date) {
+                if (!date) return 'Unknown';
+                const d = date instanceof Date ? date : (date.toDate ? date.toDate() : new Date(date));
+                const seconds = Math.floor((new Date() - d) / 1000);
+                const intervals = {
+                    year: 31536000,
+                    month: 2592000,
+                    week: 604800,
+                    day: 86400,
+                    hour: 3600,
+                    minute: 60
+                };
+                
+                for (const [unit, secondsInUnit] of Object.entries(intervals)) {
+                    const interval = Math.floor(seconds / secondsInUnit);
+                    if (interval >= 1) {
+                        return `${interval} ${unit}${interval > 1 ? 's' : ''} ago`;
+                    }
+                }
+                return 'Just now';
             }
 
             handleFilter(e) {
