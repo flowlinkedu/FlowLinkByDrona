@@ -5,34 +5,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Admin - FlowLink</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=PT+Sans:wght@400;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="global.css">
     <style>
         :root {
+            --primary: #6366F1;
+            --primary-dark: #4F46E5;
+            --secondary: #22D3EE;
+            --accent: #F472B6;
+            --dark: #0F172A;
+            --gray: #64748B;
+            --light: #F8FAFC;
+            --white: #FFFFFF;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
             --super-admin-accent: #8B5CF6;
-            --danger-color: #EF4444;
-            --success-color: #10B981;
-            --warning-color: #F59E0B;
-            --border: rgba(139, 92, 246, 0.2);
+            --border: rgba(139, 92, 246, 0.15);
         }
 
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         .super-admin-page {
-            background: linear-gradient(135deg, #E5F6FD 0%, rgba(139, 92, 246, 0.05) 100%);
+            background: linear-gradient(135deg, #EEF2FF 0%, #F8FAFC 50%, #F5F3FF 100%);
             min-height: 100vh;
             display: flex;
-            font-family: 'PT Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         .admin-sidebar {
             width: 280px;
-            background: linear-gradient(180deg, #1F2933 0%, #2D3748 100%);
+            background: linear-gradient(180deg, var(--dark) 0%, #1E293B 100%);
             position: fixed;
             top: 0;
             left: 0;
@@ -40,7 +48,7 @@
             z-index: 1000;
             display: flex;
             flex-direction: column;
-            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 4px 0 25px rgba(0, 0, 0, 0.15);
             transition: transform 0.3s ease;
         }
 
@@ -49,8 +57,9 @@
         }
 
         .sidebar-header {
-            padding: 2rem 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.75rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .sidebar-logo {
@@ -60,13 +69,16 @@
         }
 
         .sidebar-logo i {
-            font-size: 1.8rem;
-            color: #29ABE2;
+            font-size: 1.75rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .sidebar-logo span {
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.4rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.35rem;
             font-weight: 700;
             color: white;
         }
@@ -76,16 +88,17 @@
             background: linear-gradient(135deg, var(--super-admin-accent), #A78BFA);
             color: white;
             font-size: 0.6rem;
-            font-weight: 600;
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
+            font-weight: 700;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
             margin-left: 0.5rem;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .sidebar-nav {
             flex: 1;
-            padding: 2rem 0;
+            padding: 1.5rem 0;
         }
 
         .nav-list {
@@ -95,7 +108,7 @@
         }
 
         .nav-item {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
             cursor: pointer;
         }
 
@@ -103,53 +116,75 @@
             display: flex;
             align-items: center;
             gap: 1rem;
-            padding: 1rem 1.5rem;
-            color: rgba(255, 255, 255, 0.7);
+            padding: 0.875rem 1.5rem;
+            color: rgba(255, 255, 255, 0.6);
             text-decoration: none;
             font-weight: 500;
+            font-size: 0.95rem;
             transition: all 0.3s ease;
             border-left: 3px solid transparent;
+            position: relative;
         }
 
         .nav-link:hover {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(139, 92, 246, 0.1);
             color: white;
             border-left-color: var(--super-admin-accent);
         }
 
         .nav-item.active .nav-link {
-            background: rgba(139, 92, 246, 0.2);
+            background: linear-gradient(90deg, rgba(139, 92, 246, 0.2), transparent);
             color: white;
             border-left-color: var(--super-admin-accent);
         }
 
+        .nav-item.active .nav-link::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 60%;
+            background: var(--super-admin-accent);
+            border-radius: 3px 0 0 3px;
+        }
+
         .nav-icon {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             width: 24px;
             text-align: center;
+            opacity: 0.8;
+        }
+
+        .nav-item.active .nav-icon,
+        .nav-link:hover .nav-icon {
+            opacity: 1;
         }
 
         .sidebar-footer {
-            padding: 1.5rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.25rem 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(0, 0, 0, 0.15);
         }
 
         .admin-profile {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.875rem;
         }
 
         .admin-avatar {
-            width: 45px;
-            height: 45px;
+            width: 44px;
+            height: 44px;
             border-radius: 12px;
             background: linear-gradient(135deg, var(--super-admin-accent), #A78BFA);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
         }
 
         .admin-info {
@@ -157,18 +192,19 @@
         }
 
         .admin-info .admin-name {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-weight: 600;
             color: white;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .admin-info .admin-role {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.75rem;
+            font-weight: 500;
         }
 
         .admin-main {
@@ -185,8 +221,7 @@
         }
 
         .admin-topbar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
+            background: var(--white);
             border-bottom: 1px solid rgba(139, 92, 246, 0.1);
             padding: 1rem 2rem;
             display: flex;
@@ -197,6 +232,7 @@
             z-index: 100;
             flex-wrap: wrap;
             gap: 1rem;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.04);
         }
 
         .topbar-left {
@@ -210,11 +246,11 @@
             display: none;
             background: none;
             border: none;
-            color: #4B5563;
+            color: var(--gray);
             font-size: 1.3rem;
             cursor: pointer;
             padding: 0.5rem;
-            border-radius: 8px;
+            border-radius: 10px;
             transition: all 0.3s ease;
         }
 
@@ -224,10 +260,10 @@
         }
 
         .page-title {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.5rem;
-            font-weight: 600;
-            color: #1F2933;
+            font-weight: 700;
+            color: var(--dark);
             margin: 0;
         }
 
@@ -236,23 +272,26 @@
             color: white;
             font-size: 0.75rem;
             font-weight: 600;
-            padding: 0.35rem 0.75rem;
+            padding: 0.4rem 0.875rem;
             border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(139, 92, 246, 0.25);
         }
 
         .sign-out-btn {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
+            padding: 0.7rem 1.25rem;
             background: linear-gradient(135deg, var(--super-admin-accent), #A78BFA);
             color: white;
             border: none;
             border-radius: 10px;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-weight: 600;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
         }
 
         .sign-out-btn:hover {
@@ -271,47 +310,73 @@
 
         .page-section.active {
             display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
+            gap: 1.25rem;
             margin-bottom: 2rem;
         }
 
         .metric-card {
-            background: white;
+            background: var(--white);
             border-radius: 16px;
             padding: 1.5rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(139, 92, 246, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(139, 92, 246, 0.08);
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--super-admin-accent), #A78BFA);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .metric-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+            border-color: rgba(139, 92, 246, 0.2);
+        }
+
+        .metric-card:hover::before {
+            opacity: 1;
         }
 
         .metric-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3rem;
+            font-size: 1.25rem;
             color: white;
             margin-bottom: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
         .metric-icon.orgs {
-            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
         }
 
         .metric-icon.users {
-            background: linear-gradient(135deg, #10B981, #059669);
+            background: linear-gradient(135deg, var(--success), #059669);
         }
 
         .metric-icon.admins {
@@ -319,20 +384,22 @@
         }
 
         .metric-icon.pending {
-            background: linear-gradient(135deg, #EF4444, #DC2626);
+            background: linear-gradient(135deg, var(--danger), #DC2626);
         }
 
         .metric-value {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 2rem;
             font-weight: 700;
-            color: #1F2933;
+            color: var(--dark);
             margin-bottom: 0.25rem;
+            line-height: 1;
         }
 
         .metric-label {
-            color: #6B7280;
-            font-size: 0.9rem;
+            color: var(--gray);
+            font-size: 0.85rem;
+            font-weight: 500;
         }
 
         .section-header {
@@ -343,18 +410,19 @@
         }
 
         .section-title {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.25rem;
             font-weight: 600;
-            color: #1F2933;
+            color: var(--dark);
         }
 
         .data-table {
             width: 100%;
-            background: white;
+            background: var(--white);
             border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(139, 92, 246, 0.08);
             overflow-x: auto;
         }
 
@@ -371,16 +439,18 @@
         }
 
         .data-table th {
-            background: rgba(139, 92, 246, 0.05);
-            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(167, 139, 250, 0.03));
+            font-family: 'Inter', sans-serif;
             font-weight: 600;
-            color: #1F2933;
-            font-size: 0.9rem;
+            color: var(--dark);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .data-table td {
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            color: #4B5563;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.06);
+            color: var(--gray);
         }
 
         .data-table tr:last-child td {
@@ -458,37 +528,39 @@
         }
 
         .action-btn.assign {
-            background: rgba(41, 171, 226, 0.1);
-            color: #29ABE2;
+            background: rgba(34, 211, 238, 0.1);
+            color: var(--secondary);
         }
 
         .action-btn.assign:hover {
-            background: #29ABE2;
+            background: var(--secondary);
             color: white;
         }
 
         .empty-state {
             text-align: center;
             padding: 3rem;
-            color: #6B7280;
+            color: var(--gray);
         }
 
         .empty-state i {
             font-size: 3rem;
             margin-bottom: 1rem;
-            opacity: 0.5;
+            opacity: 0.4;
+            color: var(--super-admin-accent);
         }
 
         .empty-state h3 {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             margin-bottom: 0.5rem;
-            color: #1F2933;
+            color: var(--dark);
         }
 
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
             display: none;
             align-items: center;
             justify-content: center;
@@ -501,13 +573,15 @@
         }
 
         .modal {
-            background: white;
-            border-radius: 16px;
+            background: var(--white);
+            border-radius: 20px;
             width: 100%;
             max-width: 500px;
             max-height: 90vh;
             overflow-y: auto;
-            animation: modalIn 0.2s ease;
+            animation: modalIn 0.3s ease;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(139, 92, 246, 0.1);
         }
 
         @keyframes modalIn {
@@ -527,13 +601,15 @@
             justify-content: space-between;
             align-items: center;
             padding: 1.5rem;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.03), rgba(167, 139, 250, 0.02));
         }
 
         .modal-title {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.25rem;
             font-weight: 600;
+            color: var(--dark);
         }
 
         .modal-close {
@@ -541,11 +617,11 @@
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
-            color: #6B7280;
+            color: var(--gray);
         }
 
         .modal-close:hover {
-            color: #1F2933;
+            color: var(--dark);
         }
 
         .modal-body {
@@ -557,7 +633,8 @@
             justify-content: flex-end;
             gap: 0.75rem;
             padding: 1rem 1.5rem;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            border-top: 1px solid rgba(139, 92, 246, 0.1);
+            background: rgba(248, 250, 252, 0.5);
         }
 
         .form-group {
@@ -568,7 +645,7 @@
             display: block;
             font-weight: 600;
             margin-bottom: 0.5rem;
-            color: #1F2933;
+            color: var(--dark);
         }
 
         .form-input {
@@ -603,31 +680,33 @@
         }
 
         .btn-secondary {
-            background: rgba(0, 0, 0, 0.05);
-            color: #4B5563;
+            background: rgba(100, 116, 139, 0.1);
+            color: var(--gray);
             padding: 0.75rem 1.5rem;
             border: none;
             border-radius: 10px;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
 
         .btn-secondary:hover {
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(100, 116, 139, 0.2);
         }
 
         .toast {
             position: fixed;
             bottom: 2rem;
             right: 2rem;
-            background: white;
+            background: var(--white);
             padding: 1rem 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            border-radius: 14px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
             display: none;
             align-items: center;
             gap: 0.75rem;
             z-index: 3000;
+            border: 1px solid rgba(139, 92, 246, 0.1);
         }
 
         .toast.show {
@@ -662,18 +741,25 @@
         }
 
         .settings-card {
-            background: white;
+            background: var(--white);
             border-radius: 16px;
             padding: 1.5rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(139, 92, 246, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .settings-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
         }
 
         .settings-card h3 {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.1rem;
             font-weight: 600;
             margin-bottom: 1rem;
-            color: #1F2933;
+            color: var(--dark);
         }
 
         .toggle-switch {
@@ -681,7 +767,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 0.75rem 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.06);
         }
 
         .toggle-switch:last-child {
@@ -689,7 +775,8 @@
         }
 
         .toggle-label {
-            color: #4B5563;
+            color: var(--gray);
+            font-weight: 500;
         }
 
         .toggle-input {
@@ -750,7 +837,7 @@
             display: flex;
             justify-content: space-between;
             padding: 0.75rem 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.06);
         }
 
         .detail-row:last-child {
@@ -758,28 +845,29 @@
         }
 
         .detail-label {
-            color: #6B7280;
+            color: var(--gray);
             font-weight: 500;
         }
 
         .detail-value {
-            color: #1F2933;
+            color: var(--dark);
             font-weight: 600;
         }
 
         .members-list {
             max-height: 150px;
             overflow-y: auto;
-            background: rgba(0, 0, 0, 0.02);
-            border-radius: 8px;
+            background: rgba(139, 92, 246, 0.03);
+            border-radius: 10px;
             padding: 0.75rem;
             margin-top: 0.5rem;
+            border: 1px solid rgba(139, 92, 246, 0.08);
         }
 
         .member-item {
             padding: 0.25rem 0;
             font-size: 0.9rem;
-            color: #4B5563;
+            color: var(--gray);
         }
 
         @media (max-width: 768px) {
@@ -1110,7 +1198,7 @@
                 <button class="modal-close" onclick="closeModal('mergeOrgModal')">&times;</button>
             </div>
             <div class="modal-body">
-                <p style="margin-bottom:1rem;color:#6B7280;">Merge <strong id="mergeSourceName" style="color:#1F2933;"></strong> into an existing organization.</p>
+                <p style="margin-bottom:1rem;color:#64748B;">Merge <strong id="mergeSourceName" style="color:var(--dark);"></strong> into an existing organization.</p>
                 <p style="margin-bottom:1rem;font-size:0.85rem;color:#6B7280;">The user will be added as a pending member and will need approval from the organization admin.</p>
                 
                 <div class="form-group">
@@ -1126,14 +1214,14 @@
                         <label style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.75rem;border:2px solid var(--border);border-radius:8px;cursor:pointer;transition:all 0.2s;" class="merge-option" data-value="retain">
                             <input type="radio" name="nameHandling" value="retain" checked style="margin-top:3px;">
                             <div>
-                                <strong style="color:#1F2933;">Retain as Alias</strong>
+                                <strong style="color:var(--dark);">Retain as Alias</strong>
                                 <p style="font-size:0.8rem;color:#6B7280;margin-top:0.25rem;">Keep "<span id="retainNamePreview"></span>" as an alternate name. Future users typing this name will be redirected to the target organization.</p>
                             </div>
                         </label>
                         <label style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.75rem;border:2px solid var(--border);border-radius:8px;cursor:pointer;transition:all 0.2s;" class="merge-option" data-value="vanish">
                             <input type="radio" name="nameHandling" value="vanish" style="margin-top:3px;">
                             <div>
-                                <strong style="color:#1F2933;">Vanish Name</strong>
+                                <strong style="color:var(--dark);">Vanish Name</strong>
                                 <p style="font-size:0.8rem;color:#6B7280;margin-top:0.25rem;">Don't keep the alternate name. The name will not be recognized in future.</p>
                             </div>
                         </label>
