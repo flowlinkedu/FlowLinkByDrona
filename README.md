@@ -245,7 +245,7 @@ http://localhost:3000
 **🔐 Super Admin Credentials:**
 ```
 📧 Email: admin@flowlink.edu
-🔑 Password: Contact system administrator
+🔑 Password: drona@admin
 ```
 
 ### 🏢 Organization Admin
