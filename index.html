@@ -3,48 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlowLink - Solve Problems Through Structured Hierarchies</title>
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
-    
-    <!-- AOS Animation Library -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="global.css">
+    <title>FlowLink - Hierarchical Problem Solving Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #6366F1;
+            --primary-dark: #4F46E5;
+            --secondary: #22D3EE;
+            --accent: #F472B6;
+            --dark: #0F172A;
+            --gray: #64748B;
+            --light: #F8FAFC;
+            --white: #FFFFFF;
+        }
+        body { font-family: 'Inter', sans-serif; color: var(--dark); line-height: 1.6; overflow-x: hidden; background: var(--white); }
+        
+        /* Navbar */
+        .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 1rem 0; background: rgba(255,255,255,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; }
+        .logo { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; font-weight: 700; font-size: 1.5rem; color: var(--dark); }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { text-decoration: none; color: var(--gray); font-weight: 500; transition: color 0.3s; }
+        .nav-links a:hover { color: var(--primary); }
+        .nav-btns { display: flex; gap: 1rem; }
+        .btn { padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; border: none; font-size: 0.95rem; }
+        .btn-ghost { background: transparent; color: var(--gray); }
+        .btn-ghost:hover { color: var(--primary); background: rgba(99,102,241,0.1); }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; box-shadow: 0 4px 15px rgba(99,102,241,0.3); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(99,102,241,0.4); }
+        
+        /* Hero */
+        .hero { min-height: 100vh; display: flex; align-items: center; padding: 8rem 2rem 4rem; background: linear-gradient(180deg, #F8FAFC 0%, #EEF2FF 100%); position: relative; overflow: hidden; }
+        .hero::before { content: ''; position: absolute; top: 0; right: 0; width: 50%; height: 100%; background: radial-gradient(circle at 70% 30%, rgba(99,102,241,0.1) 0%, transparent 50%); }
+        .hero-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+        .hero-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: rgba(99,102,241,0.1); border-radius: 50px; color: var(--primary); font-size: 0.85rem; font-weight: 600; margin-bottom: 1.5rem; }
+        .hero-title { font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; }
+        .hero-title span { background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero-desc { font-size: 1.2rem; color: var(--gray); margin-bottom: 2rem; max-width: 500px; }
+        .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .btn-lg { padding: 1rem 2rem; font-size: 1rem; }
+        .hero-visual { position: relative; }
+        .hero-card { background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 25px 50px rgba(0,0,0,0.1); }
+        .flow-demo { display: flex; flex-direction: column; gap: 1rem; }
+        .flow-item { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--light); border-radius: 12px; transition: all 0.3s; }
+        .flow-item:hover { transform: translateX(10px); background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(34,211,238,0.1)); }
+        .flow-icon { width: 45px; height: 45px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .flow-icon.purple { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; }
+        .flow-icon.cyan { background: linear-gradient(135deg, var(--secondary), #06B6D4); color: white; }
+        .flow-icon.pink { background: linear-gradient(135deg, var(--accent), #EC4899); color: white; }
+        .flow-icon.green { background: linear-gradient(135deg, #22C55E, #16A34A); color: white; }
+        .flow-text h4 { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.25rem; }
+        .flow-text p { font-size: 0.8rem; color: var(--gray); }
+        
+        /* Links Bar */
+        .links-bar { padding: 2rem; background: var(--dark); }
+        .links-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem; }
+        .link-btn { display: inline-flex; align-items: center; gap: 0.75rem; padding: 0.875rem 1.5rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; text-decoration: none; font-weight: 500; transition: all 0.3s; }
+        .link-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
+        .link-btn i { font-size: 1.25rem; }
+        .link-btn.yt:hover { border-color: #FF0000; color: #FF0000; }
+        .link-btn.gh:hover { border-color: #A855F7; color: #A855F7; }
+        .link-btn.doc:hover { border-color: var(--secondary); color: var(--secondary); }
+        .link-btn.web:hover { border-color: #22C55E; color: #22C55E; }
+        
+        /* Features */
+        .features { padding: 6rem 2rem; background: white; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .section-header { text-align: center; margin-bottom: 4rem; }
+        .section-badge { display: inline-block; padding: 0.5rem 1rem; background: rgba(99,102,241,0.1); color: var(--primary); border-radius: 50px; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem; }
+        .section-title { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
+        .section-title span { background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .section-desc { color: var(--gray); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .feature-card { background: var(--light); border-radius: 16px; padding: 2rem; transition: all 0.3s; border: 1px solid transparent; }
+        .feature-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); border-color: rgba(99,102,241,0.2); }
+        .feature-icon { width: 55px; height: 55px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem; font-size: 1.5rem; color: white; }
+        .feature-card h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .feature-card p { color: var(--gray); font-size: 0.9rem; line-height: 1.6; }
+        
+        /* How It Works */
+        .how-it-works { padding: 6rem 2rem; background: linear-gradient(180deg, #F8FAFC 0%, #EEF2FF 100%); }
+        .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; margin-top: 3rem; }
+        .step { text-align: center; position: relative; }
+        .step::after { content: ''; position: absolute; top: 35px; right: -50%; width: 100%; height: 2px; background: linear-gradient(90deg, var(--primary), var(--secondary)); }
+        .step:last-child::after { display: none; }
+        .step-num { width: 70px; height: 70px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: 700; margin: 0 auto 1.5rem; position: relative; z-index: 1; }
+        .step h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .step p { color: var(--gray); font-size: 0.9rem; }
+        
+        /* Team */
+        .team { padding: 6rem 2rem; background: white; }
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; }
+        .team-card { text-align: center; padding: 2rem 1.5rem; background: var(--light); border-radius: 16px; transition: all 0.3s; }
+        .team-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.08); }
+        .team-avatar { width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: white; font-size: 2rem; }
+        .team-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; }
+        .team-card p { color: var(--primary); font-size: 0.85rem; font-weight: 500; }
+        
+        /* CTA */
+        .cta { padding: 5rem 2rem; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); text-align: center; }
+        .cta h2 { font-size: 2.25rem; font-weight: 700; color: white; margin-bottom: 1rem; }
+        .cta p { color: rgba(255,255,255,0.8); font-size: 1.1rem; margin-bottom: 2rem; }
+        .btn-white { background: white; color: var(--primary); }
+        .btn-white:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        
+        /* Footer */
+        .footer { padding: 3rem 2rem; background: var(--dark); color: white; }
+        .footer-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 2rem; }
+        .footer-brand { display: flex; align-items: center; gap: 0.5rem; }
+        .footer-brand span { font-weight: 700; font-size: 1.25rem; }
+        .footer-links { display: flex; gap: 2rem; }
+        .footer-links a { color: rgba(255,255,255,0.7); text-decoration: none; transition: color 0.3s; }
+        .footer-links a:hover { color: white; }
+        .footer-copy { width: 100%; text-align: center; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); font-size: 0.9rem; }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero-container { grid-template-columns: 1fr; text-align: center; }
+            .hero-desc { margin: 0 auto 2rem; }
+            .hero-btns { justify-content: center; }
+            .hero-visual { order: -1; }
+            .hero-card { max-width: 400px; margin: 0 auto; }
+            .nav-links { display: none; }
+            .steps { grid-template-columns: repeat(2, 1fr); }
+            .step::after { display: none; }
+        }
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .section-title { font-size: 2rem; }
+            .steps { grid-template-columns: 1fr; }
+            .footer-container { flex-direction: column; text-align: center; }
+            .footer-links { flex-wrap: wrap; justify-content: center; }
+        }
+        @media (max-width: 480px) {
+            .hero-title { font-size: 2rem; }
+            .hero-btns { flex-direction: column; }
+            .links-container { flex-direction: column; align-items: stretch; }
+            .link-btn { justify-content: center; }
+        }
+    </style>
 </head>
 <body>
-    <!-- Hero Section -->
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <div class="logo-icon"><i class="fas fa-project-diagram"></i></div>
+                <span>FlowLink</span>
+            </a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#team">Team</a>
+            </div>
+            <div class="nav-btns">
+                <a href="login.html" class="btn btn-ghost">Login</a>
+                <a href="login.html" class="btn btn-primary">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
     <section class="hero">
-        <div class="container">
+        <div class="hero-container">
             <div class="hero-content">
-                <div class="hero-text">
-                    <h1 class="hero-title">Solve Problems Through Structured Hierarchies</h1>
-                    <p class="hero-subtitle">FlowLink transforms complex organizational challenges into manageable, hierarchical workflows. Experience seamless problem resolution with intelligent escalation and verified communication channels.</p>
-                    
-                    <div class="cta-buttons">
-                        <button class="btn btn-primary">Get Started</button>
-                        <button class="btn btn-secondary" onclick="window.location.href='/login.html';">Login</button>
-                    </div>
+                <div class="hero-badge"><i class="fas fa-bolt"></i> Next-Gen Problem Solving</div>
+                <h1 class="hero-title">Solve Problems Through <span>Structured Hierarchies</span></h1>
+                <p class="hero-desc">FlowLink transforms organizational challenges into manageable workflows with intelligent escalation, community voting, and verified communication.</p>
+                <div class="hero-btns">
+                    <a href="login.html" class="btn btn-primary btn-lg"><i class="fas fa-rocket"></i> Get Started Free</a>
+                    <a href="#how-it-works" class="btn btn-ghost btn-lg"><i class="fas fa-play-circle"></i> See How It Works</a>
                 </div>
-                
-                <div class="hero-visual">
-                    <div class="flowchart">
-                        <div class="flow-node node-1">
-                            <div class="node-content">Problem</div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-card">
+                    <div class="flow-demo">
+                        <div class="flow-item">
+                            <div class="flow-icon purple"><i class="fas fa-building"></i></div>
+                            <div class="flow-text"><h4>Create Organization</h4><p>Set up your hierarchy structure</p></div>
                         </div>
-                        <div class="flow-line line-1"></div>
-                        <div class="flow-node node-2">
-                            <div class="node-content">Analysis</div>
+                        <div class="flow-item">
+                            <div class="flow-icon cyan"><i class="fas fa-exclamation-circle"></i></div>
+                            <div class="flow-text"><h4>Submit Problem</h4><p>Report issues to relevant nodes</p></div>
                         </div>
-                        <div class="flow-line line-2"></div>
-                        <div class="flow-node node-3">
-                            <div class="node-content">Solution</div>
+                        <div class="flow-item">
+                            <div class="flow-icon pink"><i class="fas fa-vote-yea"></i></div>
+                            <div class="flow-text"><h4>Community Votes</h4><p>Prioritize through voting</p></div>
                         </div>
-                        <div class="flow-line line-3"></div>
-                        <div class="flow-node node-4">
-                            <div class="node-content">Verification</div>
+                        <div class="flow-item">
+                            <div class="flow-icon green"><i class="fas fa-check-circle"></i></div>
+                            <div class="flow-text"><h4>Problem Solved!</h4><p>Accept best solution</p></div>
                         </div>
                     </div>
                 </div>
@@ -52,59 +203,188 @@
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="features">
+    <!-- Links Bar -->
+    <section class="links-bar">
+        <div class="links-container">
+            <a href="#" class="link-btn yt" id="youtubeLink"><i class="fab fa-youtube"></i> YouTube Demo</a>
+            <a href="#" class="link-btn gh" id="githubLink"><i class="fab fa-github"></i> GitHub Repo</a>
+            <a href="#" class="link-btn doc" id="docsLink"><i class="fas fa-book"></i> Documentation</a>
+            <a href="#" class="link-btn web" id="websiteLink"><i class="fas fa-globe"></i> Live Website</a>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features" id="features">
         <div class="container">
-            <h2 class="section-title" data-aos="fade-up">Key Features</h2>
-            
+            <div class="section-header">
+                <div class="section-badge">Features</div>
+                <h2 class="section-title">Everything You Need to <span>Solve Problems</span></h2>
+                <p class="section-desc">A comprehensive platform designed for organizations of any size.</p>
+            </div>
             <div class="features-grid">
-                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
-                    <div class="feature-icon">
-                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                            <path d="M24 4L44 14V34L24 44L4 34V14L24 4Z" stroke="#29ABE2" stroke-width="2" fill="#E5F6FD"/>
-                            <circle cx="24" cy="16" r="3" fill="#29ABE2"/>
-                            <circle cx="16" cy="28" r="3" fill="#29ABE2"/>
-                            <circle cx="32" cy="28" r="3" fill="#29ABE2"/>
-                            <line x1="24" y1="19" x2="19" y2="25" stroke="#29ABE2" stroke-width="2"/>
-                            <line x1="24" y1="19" x2="29" y2="25" stroke="#29ABE2" stroke-width="2"/>
-                        </svg>
-                    </div>
-                    <h3 class="feature-title">Hierarchical Governance</h3>
-                    <p class="feature-description">Organize your team's decision-making process through clear hierarchical structures that ensure accountability and efficient problem resolution.</p>
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #6366F1, #4F46E5);"><i class="fas fa-sitemap"></i></div>
+                    <h3>Hierarchical Governance</h3>
+                    <p>Create multi-level organizational structures with customizable admin roles at each level.</p>
                 </div>
-
-                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
-                    <div class="feature-icon">
-                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                            <path d="M24 8L36 20L24 32L12 20L24 8Z" stroke="#29ABE2" stroke-width="2" fill="#E5F6FD"/>
-                            <path d="M24 16L30 22L24 28L18 22L24 16Z" fill="#29E2D0"/>
-                            <path d="M8 24L20 36L32 24" stroke="#29ABE2" stroke-width="2" fill="none"/>
-                        </svg>
-                    </div>
-                    <h3 class="feature-title">Smart Problem Escalation</h3>
-                    <p class="feature-description">Automatically route issues to the right people at the right time with intelligent escalation paths that adapt to your organization's needs.</p>
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #22D3EE, #06B6D4);"><i class="fas fa-vote-yea"></i></div>
+                    <h3>Community Voting</h3>
+                    <p>Let your community prioritize problems through upvotes and downvotes.</p>
                 </div>
-
-                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
-                    <div class="feature-icon">
-                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                            <rect x="8" y="12" width="32" height="24" rx="4" stroke="#29ABE2" stroke-width="2" fill="#E5F6FD"/>
-                            <path d="M16 20L20 24L32 16" stroke="#29E2D0" stroke-width="2" fill="none"/>
-                            <circle cx="38" cy="10" r="6" fill="#29E2D0"/>
-                            <path d="M35 10L37 12L41 8" stroke="white" stroke-width="2" fill="none"/>
-                        </svg>
-                    </div>
-                    <h3 class="feature-title">Verified Announcements</h3>
-                    <p class="feature-description">Ensure critical information reaches everyone through verified announcement channels with read receipts and engagement tracking.</p>
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #F472B6, #EC4899);"><i class="fas fa-lightbulb"></i></div>
+                    <h3>Solution System</h3>
+                    <p>Anyone can propose solutions. Best ones get accepted by problem owners.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #22C55E, #16A34A);"><i class="fas fa-level-up-alt"></i></div>
+                    <h3>Smart Escalation</h3>
+                    <p>Problems automatically escalate to higher authorities when needed.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #F59E0B, #D97706);"><i class="fas fa-bullhorn"></i></div>
+                    <h3>Admin Announcements</h3>
+                    <p>Admins post announcements that reach their entire hierarchy.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #EF4444, #DC2626);"><i class="fas fa-bookmark"></i></div>
+                    <h3>Bookmarks & Saves</h3>
+                    <p>Save important items for later. They persist even if originals are deleted.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- AOS Animation Library -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    
-    <!-- Custom JavaScript -->
-    <script src="global.js"></script>
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">Process</div>
+                <h2 class="section-title">How <span>FlowLink</span> Works</h2>
+            </div>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <h3>Create Organization</h3>
+                    <p>Set up your hierarchy with departments and teams</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <h3>Submit Problems</h3>
+                    <p>Members report issues to relevant nodes</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <h3>Vote & Discuss</h3>
+                    <p>Community prioritizes and proposes solutions</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">4</div>
+                    <h3>Resolve & Archive</h3>
+                    <p>Accept solutions and mark as solved</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team -->
+    <section class="team" id="team">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">Team</div>
+                <h2 class="section-title">Meet the <span>Developers</span></h2>
+                <p class="section-desc">The talented team behind FlowLink.</p>
+            </div>
+            <div class="team-grid">
+                <div class="team-card">
+                    <div class="team-avatar"><i class="fas fa-user"></i></div>
+                    <h3>Animesh Gupta</h3>
+                    <p>Developer</p>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar"><i class="fas fa-user"></i></div>
+                    <h3>Rudra Samadhiya</h3>
+                    <p>Developer</p>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar"><i class="fas fa-user"></i></div>
+                    <h3>Kishlay Singh</h3>
+                    <p>Developer</p>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar"><i class="fas fa-user"></i></div>
+                    <h3>Gaurav Singh</h3>
+                    <p>Developer</p>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar"><i class="fas fa-user"></i></div>
+                    <h3>Shubh Kamal</h3>
+                    <p>Developer</p>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar"><i class="fas fa-user"></i></div>
+                    <h3>Aryash Singh</h3>
+                    <p>Developer</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+        <h2>Ready to Transform Your Organization?</h2>
+        <p>Join FlowLink today and experience the future of problem-solving.</p>
+        <a href="login.html" class="btn btn-white btn-lg"><i class="fas fa-rocket"></i> Get Started Now</a>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <div class="logo-icon"><i class="fas fa-project-diagram"></i></div>
+                <span>FlowLink</span>
+            </div>
+            <div class="footer-links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#team">Team</a>
+                <a href="login.html">Login</a>
+            </div>
+            <div class="footer-copy">&copy; 2024 FlowLink. Built with ❤️ by the FlowLink Team.</div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => {
+                e.preventDefault();
+                const t = document.querySelector(a.getAttribute('href'));
+                if(t) t.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+        
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('.nav');
+            nav.style.boxShadow = window.scrollY > 50 ? '0 4px 20px rgba(0,0,0,0.1)' : 'none';
+        });
+        
+        // ========================================
+        // ADD YOUR PROJECT LINKS HERE
+        // ========================================
+        const links = {
+            youtube: '#',    // Your YouTube video URL
+            github: '#',     // Your GitHub repo URL
+            docs: '#',       // Your documentation URL
+            website: '#'     // Your live website URL
+        };
+        
+        document.getElementById('youtubeLink').href = links.youtube;
+        document.getElementById('githubLink').href = links.github;
+        document.getElementById('docsLink').href = links.docs;
+        document.getElementById('websiteLink').href = links.website;
+    </script>
 </body>
 </html>
