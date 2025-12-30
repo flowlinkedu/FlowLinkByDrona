@@ -356,11 +356,14 @@
     </footer>
 
     <script>
-        // Smooth scroll
+        // Smooth scroll (only for internal anchor links)
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
+                const href = a.getAttribute('href');
+                // Skip if it's just "#" or if the href has been changed to an external URL
+                if (href === '#' || !href.startsWith('#')) return;
                 e.preventDefault();
-                const t = document.querySelector(a.getAttribute('href'));
+                const t = document.querySelector(href);
                 if(t) t.scrollIntoView({ behavior: 'smooth' });
             });
         });
@@ -377,7 +380,7 @@
         const links = {
             youtube: '#',    // Your YouTube video URL
             github: 'https://github.com/flowlinkedu/FlowLinkByDrona',     // Your GitHub repo URL
-            docs: '#',       // Your documentation URL
+            docs: 'https://docs.google.com/document/d/1w7RCjnbzg2F3sXWxP6mroS6Nb9AA6OKGpboVgjVdq8s/edit?usp=sharing',       // Your documentation URL
             website: 'https://flowlinkedu.github.io/FlowLinkByDrona/index.html'     // Your live website URL
         };
         
