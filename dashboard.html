@@ -1120,8 +1120,342 @@
                 text-align: center;
                 gap: 1rem;
             }
+        }
 
-            .card-actions {
+        /* Problems & Announcements Section Styles */
+        .section-page {
+            display: none;
+        }
+        .section-page.active {
+            display: block;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .section-header-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1F2933;
+        }
+        .section-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .action-btn-primary {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .action-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(41, 171, 226, 0.4);
+        }
+        .action-btn-secondary {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: rgba(107, 114, 128, 0.1);
+            color: #4B5563;
+            border: 1px solid rgba(107, 114, 128, 0.2);
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .action-btn-secondary:hover {
+            background: rgba(107, 114, 128, 0.2);
+        }
+        
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid rgba(41, 171, 226, 0.1);
+            padding-bottom: 0.5rem;
+            overflow-x: auto;
+        }
+        .tab-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: transparent;
+            color: #6B7280;
+            border: none;
+            border-radius: 10px 10px 0 0;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .tab-btn:hover {
+            background: rgba(41, 171, 226, 0.1);
+            color: #29ABE2;
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            color: white;
+        }
+        .tab-btn .tab-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+        }
+        .tab-btn:not(.active) .tab-count {
+            background: rgba(107, 114, 128, 0.2);
+        }
+        
+        /* Items List Container */
+        .items-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(41, 171, 226, 0.1);
+        }
+        .items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .item-card {
+            background: white;
+            border: 1px solid rgba(41, 171, 226, 0.1);
+            border-radius: 16px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .item-card:hover {
+            border-color: #29ABE2;
+            box-shadow: 0 4px 15px rgba(41, 171, 226, 0.15);
+            transform: translateX(5px);
+        }
+        .item-card.solved {
+            border-left: 4px solid #10B981;
+        }
+        .item-card.open {
+            border-left: 4px solid #EF4444;
+        }
+        .item-card.announcement {
+            border-left: 4px solid #29ABE2;
+        }
+        .item-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+            gap: 1rem;
+        }
+        .item-card-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: #1F2933;
+            font-size: 1rem;
+            margin: 0;
+            flex: 1;
+        }
+        .item-card-badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-high { background: rgba(239, 68, 68, 0.1); color: #DC2626; }
+        .badge-medium { background: rgba(245, 158, 11, 0.1); color: #D97706; }
+        .badge-low { background: rgba(59, 130, 246, 0.1); color: #2563EB; }
+        .badge-solved { background: rgba(16, 185, 129, 0.1); color: #059669; }
+        .badge-open { background: rgba(239, 68, 68, 0.1); color: #DC2626; }
+        .badge-important { background: rgba(139, 92, 246, 0.1); color: #7C3AED; }
+        .item-card-description {
+            color: #6B7280;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 0.75rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .item-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #9CA3AF;
+            font-size: 0.85rem;
+            flex-wrap: wrap;
+        }
+        .item-card-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .item-card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .item-action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .item-action-btn.primary {
+            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            color: white;
+        }
+        .item-action-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(41, 171, 226, 0.3);
+        }
+        .item-action-btn.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+        .item-action-btn.success:hover {
+            background: #10B981;
+            color: white;
+        }
+        .item-action-btn.danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #DC2626;
+        }
+        .item-action-btn.danger:hover {
+            background: #EF4444;
+            color: white;
+        }
+        .item-action-btn.secondary {
+            background: rgba(107, 114, 128, 0.1);
+            color: #4B5563;
+        }
+        .item-action-btn.secondary:hover {
+            background: rgba(107, 114, 128, 0.2);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6B7280;
+        }
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+            color: #29ABE2;
+        }
+        .empty-state h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #1F2933;
+        }
+        .empty-state p {
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.25rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(41, 171, 226, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+        }
+        .stat-icon.problems { background: linear-gradient(135deg, #EF4444, #F97316); }
+        .stat-icon.solved { background: linear-gradient(135deg, #10B981, #059669); }
+        .stat-icon.announcements { background: linear-gradient(135deg, #29ABE2, #29E2D0); }
+        .stat-icon.my-problems { background: linear-gradient(135deg, #8B5CF6, #A78BFA); }
+        .stat-info h4 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1F2933;
+            margin: 0;
+        }
+        .stat-info p {
+            color: #6B7280;
+            font-size: 0.85rem;
+            margin: 0;
+        }
+        
+        /* Loading State */
+        .section-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+        }
+        .section-loading i {
+            font-size: 2rem;
+            color: #29ABE2;
+            animation: spin 1s linear infinite;
+        }d-actions {
                 flex-direction: column;
             }
         }
@@ -1365,6 +1699,746 @@
             .children-horizontal-line { display: none; }
             .node-card { min-width: 180px; }
         }
+
+        /* ========== COMPOSE PROBLEM BUTTON (Gmail-style) ========== */
+        .compose-problem-fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 20px rgba(41, 171, 226, 0.4);
+            cursor: pointer;
+            z-index: 1500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .compose-problem-fab:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 8px 30px rgba(41, 171, 226, 0.5);
+        }
+        
+        .compose-problem-fab.expanded {
+            width: auto;
+            border-radius: 30px;
+            padding: 0 1.5rem;
+            gap: 0.5rem;
+        }
+        
+        .compose-problem-fab .fab-text {
+            display: none;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+        
+        .compose-problem-fab.expanded .fab-text {
+            display: inline;
+        }
+        
+        /* Compose Problem Modal */
+        .compose-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2500;
+            padding: 1rem;
+        }
+        
+        .compose-modal-overlay.show {
+            display: flex;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .compose-modal {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 650px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .compose-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 1.5rem;
+            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            color: white;
+        }
+        
+        .compose-header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .compose-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .compose-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+        
+        .compose-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+        
+        .compose-form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        .compose-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #1F2933;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        
+        .compose-label i {
+            color: #29ABE2;
+            font-size: 0.9rem;
+        }
+        
+        .compose-label .required {
+            color: #EF4444;
+        }
+        
+        .compose-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid rgba(41, 171, 226, 0.2);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'PT Sans', sans-serif;
+            color: #1F2933;
+            transition: all 0.3s ease;
+        }
+        
+        .compose-input:focus {
+            outline: none;
+            border-color: #29ABE2;
+            box-shadow: 0 0 0 4px rgba(41, 171, 226, 0.1);
+        }
+        
+        .compose-input::placeholder {
+            color: #9CA3AF;
+        }
+        
+        .compose-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .compose-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+            cursor: pointer;
+        }
+        
+        /* Hierarchy Selector Button */
+        .hierarchy-selector-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid rgba(41, 171, 226, 0.2);
+            border-radius: 12px;
+            background: white;
+            color: #1F2933;
+            font-size: 1rem;
+            font-family: 'PT Sans', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .hierarchy-selector-btn:hover {
+            border-color: #29ABE2;
+            background: rgba(41, 171, 226, 0.05);
+        }
+        
+        .hierarchy-selector-btn.has-selection {
+            border-color: #29ABE2;
+            background: rgba(41, 171, 226, 0.05);
+        }
+        
+        .hierarchy-selector-btn .btn-content {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+        }
+        
+        .hierarchy-selector-btn .btn-placeholder {
+            color: #9CA3AF;
+        }
+        
+        .hierarchy-selector-btn .btn-icon {
+            color: #29ABE2;
+        }
+        
+        .selected-nodes-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        
+        .selected-node-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.75rem;
+            background: linear-gradient(135deg, rgba(41, 171, 226, 0.1), rgba(41, 226, 208, 0.1));
+            border: 1px solid rgba(41, 171, 226, 0.3);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #29ABE2;
+            font-weight: 500;
+        }
+        
+        .selected-node-chip i {
+            font-size: 0.75rem;
+        }
+        
+        .selected-node-chip .remove-chip {
+            background: none;
+            border: none;
+            color: #29ABE2;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 0.25rem;
+            font-size: 0.9rem;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .selected-node-chip .remove-chip:hover {
+            opacity: 1;
+        }
+        
+        /* Priority Options */
+        .priority-options {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        
+        .priority-option {
+            flex: 1;
+            min-width: 100px;
+        }
+        
+        .priority-option input {
+            display: none;
+        }
+        
+        .priority-option label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .priority-option input:checked + label {
+            border-width: 2px;
+        }
+        
+        .priority-option.low label { color: #3B82F6; }
+        .priority-option.low input:checked + label { 
+            background: rgba(59, 130, 246, 0.1); 
+            border-color: #3B82F6; 
+        }
+        
+        .priority-option.medium label { color: #F59E0B; }
+        .priority-option.medium input:checked + label { 
+            background: rgba(245, 158, 11, 0.1); 
+            border-color: #F59E0B; 
+        }
+        
+        .priority-option.high label { color: #EF4444; }
+        .priority-option.high input:checked + label { 
+            background: rgba(239, 68, 68, 0.1); 
+            border-color: #EF4444; 
+        }
+        
+        .compose-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            background: #FAFAFA;
+        }
+        
+        .compose-footer-info {
+            font-size: 0.85rem;
+            color: #6B7280;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        
+        .compose-footer-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .compose-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .compose-btn.cancel {
+            background: rgba(0, 0, 0, 0.05);
+            color: #6B7280;
+        }
+        
+        .compose-btn.cancel:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        
+        .compose-btn.submit {
+            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            color: white;
+        }
+        
+        .compose-btn.submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(41, 171, 226, 0.4);
+        }
+        
+        .compose-btn.submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* ========== HIERARCHY TREE SELECTOR MODAL ========== */
+        .hierarchy-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            padding: 1rem;
+        }
+        
+        .hierarchy-modal-overlay.show {
+            display: flex;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        .hierarchy-modal {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+        
+        .hierarchy-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 1.5rem;
+            background: linear-gradient(135deg, #8B5CF6, #A78BFA);
+            color: white;
+        }
+        
+        .hierarchy-modal-header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .hierarchy-modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .hierarchy-modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .hierarchy-modal-info {
+            padding: 1rem 1.5rem;
+            background: rgba(139, 92, 246, 0.05);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+            font-size: 0.9rem;
+            color: #6B7280;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .hierarchy-modal-info i {
+            color: #8B5CF6;
+        }
+        
+        .hierarchy-modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            min-height: 300px;
+        }
+        
+        .hierarchy-tree-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+        }
+        
+        .hierarchy-tree-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: #6B7280;
+        }
+        
+        .hierarchy-tree-loading i {
+            font-size: 2rem;
+            color: #8B5CF6;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+        
+        /* Tree Node Styles */
+        .tree-node-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .tree-node-selectable {
+            min-width: 200px;
+            max-width: 280px;
+            background: white;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .tree-node-selectable:hover {
+            border-color: #F59E0B;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .tree-node-selectable.selected {
+            border-color: #F59E0B;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(251, 191, 36, 0.15));
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+        }
+        
+        .tree-node-selectable.selected::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background: #F59E0B;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            animation: popIn 0.3s ease;
+        }
+        
+        @keyframes popIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+        
+        .tree-node-selectable.root {
+            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            color: white;
+            border: none;
+        }
+        
+        .tree-node-selectable.root:hover {
+            box-shadow: 0 8px 25px rgba(41, 171, 226, 0.4);
+        }
+        
+        .tree-node-selectable.root.selected {
+            background: linear-gradient(135deg, #F59E0B, #FBBF24);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.5);
+        }
+        
+        .tree-node-selectable.root.selected::after {
+            background: #fff;
+            color: #F59E0B;
+        }
+        
+        .tree-node-name {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .tree-node-type {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            text-transform: capitalize;
+        }
+        
+        .tree-node-admin {
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            color: #6B7280;
+        }
+        
+        .tree-node-selectable.root .tree-node-admin {
+            border-top-color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .tree-connector-v {
+            width: 2px;
+            height: 24px;
+            background: #D1D5DB;
+        }
+        
+        .tree-children-wrapper {
+            position: relative;
+            margin-top: 0.5rem;
+        }
+        
+        .tree-children-line {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 2px;
+            background: #D1D5DB;
+        }
+        
+        .tree-children {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            padding-top: 1.5rem;
+        }
+        
+        .tree-child-branch {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .tree-child-branch::before {
+            content: '';
+            position: absolute;
+            top: -1.5rem;
+            left: 50%;
+            width: 2px;
+            height: 1.5rem;
+            background: #D1D5DB;
+        }
+        
+        .hierarchy-modal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            background: #FAFAFA;
+        }
+        
+        .selected-count {
+            font-size: 0.9rem;
+            color: #6B7280;
+        }
+        
+        .selected-count strong {
+            color: #8B5CF6;
+        }
+        
+        .hierarchy-modal-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .hierarchy-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .hierarchy-btn.cancel {
+            background: rgba(0, 0, 0, 0.05);
+            color: #6B7280;
+        }
+        
+        .hierarchy-btn.cancel:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        
+        .hierarchy-btn.confirm {
+            background: linear-gradient(135deg, #8B5CF6, #A78BFA);
+            color: white;
+        }
+        
+        .hierarchy-btn.confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+        
+        /* Pending Approval Badge */
+        .pending-approval-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.5rem;
+            background: rgba(245, 158, 11, 0.1);
+            color: #D97706;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .compose-problem-fab {
+                bottom: 1.5rem;
+                right: 1.5rem;
+                width: 56px;
+                height: 56px;
+            }
+            
+            .compose-modal, .hierarchy-modal {
+                max-height: 95vh;
+                border-radius: 16px 16px 0 0;
+                margin-top: auto;
+            }
+            
+            .tree-children {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+            
+            .tree-child-branch::before {
+                display: none;
+            }
+            
+            .tree-children-line {
+                display: none;
+            }
+            
+            .priority-options {
+                flex-direction: column;
+            }
+            
+            .priority-option {
+                min-width: 100%;
+            }
+        }
     </style>
 </head>
 
@@ -1387,15 +2461,33 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-page="flowcharts">
-                        <i class="fas fa-sitemap nav-icon"></i>
-                        <span class="nav-text">My Flowcharts</span>
+                    <a href="#" class="nav-link" data-page="problems">
+                        <i class="fas fa-exclamation-triangle nav-icon"></i>
+                        <span class="nav-text">Problems</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="announcements">
+                        <i class="fas fa-bullhorn nav-icon"></i>
+                        <span class="nav-text">Announcements</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="my-problems">
+                        <i class="fas fa-user-edit nav-icon"></i>
+                        <span class="nav-text">My Problems</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link" data-page="profile">
                         <i class="fas fa-user nav-icon"></i>
                         <span class="nav-text">Profile</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="flowchart">
+                        <i class="fas fa-project-diagram nav-icon"></i>
+                        <span class="nav-text">Flowchart</span>
                     </a>
                 </li>
                 <li class="nav-item" id="adminPanelLink" style="display: none;">
@@ -1659,44 +2751,162 @@
                 </div>
             </div>
             
-            <!-- Flowcharts Section (Hidden by default) -->
-            <section class="flowchart-section" id="flowchartsSection">
-                <!-- Browse Organizations Section -->
-                <div class="flowchart-card" id="browseSection" style="display: none; margin-bottom: 1.5rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h2 class="flowchart-title">Discover Organizations</h2>
-                        <button class="node-btn" id="closeBrowseBtn" style="padding: 0.5rem;">
-                            <i class="fas fa-times"></i>
+            <!-- Problems Section -->
+            <section class="section-page" id="problemsSection">
+                <div class="section-header">
+                    <h2 class="section-header-title">All Problems</h2>
+                    <div class="section-actions">
+                        <button class="action-btn-primary" id="reportProblemBtn">
+                            <i class="fas fa-plus"></i>
+                            Report Problem
                         </button>
                     </div>
-                    <div style="margin-bottom: 1rem;">
-                        <input type="text" class="search-input" id="searchOrgsInput" placeholder="Search organizations..." style="width: 100%; max-width: 400px;">
+                </div>
+                
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon problems"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="stat-info">
+                            <h4 id="openProblemsCount">0</h4>
+                            <p>Open Problems</p>
+                        </div>
                     </div>
-                    <div id="browseOrgsList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
-                        <div class="flowchart-loading">
-                            <i class="fas fa-spinner"></i>
+                    <div class="stat-card">
+                        <div class="stat-icon solved"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-info">
+                            <h4 id="solvedProblemsCount">0</h4>
+                            <p>Solved</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #6B7280, #4B5563);"><i class="fas fa-archive"></i></div>
+                        <div class="stat-info">
+                            <h4 id="archivedProblemsCount">0</h4>
+                            <p>Archived</p>
                         </div>
                     </div>
                 </div>
-
-                <div class="flowchart-card">
-                    <div class="flowchart-header">
-                        <h2 class="flowchart-title">My Network Hierarchy</h2>
-                        <div class="flowchart-actions">
-                            <button class="flowchart-btn secondary" id="browseOrgsBtn">
-                                <i class="fas fa-search"></i>
-                                Browse & Join
-                            </button>
-                            <button class="flowchart-btn primary" id="addNodeBtn">
-                                <i class="fas fa-plus"></i>
-                                Add Node
-                            </button>
+                
+                <!-- Tabs -->
+                <div class="tab-navigation">
+                    <button class="tab-btn active" data-tab="all-problems">
+                        <i class="fas fa-list"></i>
+                        All
+                        <span class="tab-count" id="allProblemsTabCount">0</span>
+                    </button>
+                    <button class="tab-btn" data-tab="open-problems">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Open
+                        <span class="tab-count" id="openProblemsTabCount">0</span>
+                    </button>
+                    <button class="tab-btn" data-tab="solved-problems">
+                        <i class="fas fa-check-circle"></i>
+                        Solved
+                        <span class="tab-count" id="solvedProblemsTabCount">0</span>
+                    </button>
+                    <button class="tab-btn" data-tab="archived-problems">
+                        <i class="fas fa-archive"></i>
+                        Archived
+                        <span class="tab-count" id="archivedProblemsTabCount">0</span>
+                    </button>
+                </div>
+                
+                <!-- Problems List -->
+                <div class="items-container">
+                    <div class="items-list" id="problemsList">
+                        <div class="section-loading">
+                            <i class="fas fa-spinner"></i>
+                            <p style="margin-top: 1rem; color: #6B7280;">Loading problems...</p>
                         </div>
                     </div>
-                    <div class="flowchart-container" id="flowchartContainer">
-                        <div class="flowchart-loading">
+                </div>
+            </section>
+            
+            <!-- My Problems Section -->
+            <section class="section-page" id="myProblemsSection">
+                <div class="section-header">
+                    <h2 class="section-header-title">My Problems</h2>
+                    <div class="section-actions">
+                        <button class="action-btn-primary" id="reportMyProblemBtn">
+                            <i class="fas fa-plus"></i>
+                            Report Problem
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon my-problems"><i class="fas fa-user-edit"></i></div>
+                        <div class="stat-info">
+                            <h4 id="myProblemsCount">0</h4>
+                            <p>My Problems</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon solved"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-info">
+                            <h4 id="mySolvedCount">0</h4>
+                            <p>Solved</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- My Problems List -->
+                <div class="items-container">
+                    <div class="items-list" id="myProblemsList">
+                        <div class="section-loading">
                             <i class="fas fa-spinner"></i>
-                            <p style="margin-top: 1rem; color: #6B7280;">Loading your hierarchy...</p>
+                            <p style="margin-top: 1rem; color: #6B7280;">Loading your problems...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Announcements Section -->
+            <section class="section-page" id="announcementsSection">
+                <div class="section-header">
+                    <h2 class="section-header-title">Announcements</h2>
+                    <div class="section-actions">
+                        <button class="action-btn-secondary" id="refreshAnnouncementsBtn">
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon announcements"><i class="fas fa-bullhorn"></i></div>
+                        <div class="stat-info">
+                            <h4 id="totalAnnouncementsCount">0</h4>
+                            <p>Total Announcements</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tabs -->
+                <div class="tab-navigation">
+                    <button class="tab-btn active" data-tab="all-announcements">
+                        <i class="fas fa-list"></i>
+                        All
+                        <span class="tab-count" id="allAnnouncementsTabCount">0</span>
+                    </button>
+                    <button class="tab-btn" data-tab="important-announcements">
+                        <i class="fas fa-star"></i>
+                        Important
+                        <span class="tab-count" id="importantAnnouncementsTabCount">0</span>
+                    </button>
+                </div>
+                
+                <!-- Announcements List -->
+                <div class="items-container">
+                    <div class="items-list" id="announcementsList">
+                        <div class="section-loading">
+                            <i class="fas fa-spinner"></i>
+                            <p style="margin-top: 1rem; color: #6B7280;">Loading announcements...</p>
                         </div>
                     </div>
                 </div>
@@ -1751,7 +2961,89 @@
             </div>
             <div class="modal-footer">
                 <button class="flowchart-btn secondary" id="cancelDeleteBtn">Cancel</button>
-                <button class="flowchart-btn primary" style="background: linear-gradient(135deg, #EF4444, #DC2626);" id="confirmDeleteBtn">Delete</butt
+                <button class="flowchart-btn primary" style="background: linear-gradient(135deg, #EF4444, #DC2626);" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Report Problem Modal -->
+    <div class="modal-overlay" id="problemModal">
+        <div class="modal-content" style="max-width: 550px;">
+            <div class="modal-header">
+                <h2 class="modal-title" id="problemModalTitle">Report New Problem</h2>
+                <button class="modal-close" id="closeProblemModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Title <span style="color: #EF4444;">*</span></label>
+                    <input type="text" class="form-input" id="problemTitle" placeholder="Brief description of the problem" maxlength="100">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description <span style="color: #EF4444;">*</span></label>
+                    <textarea class="form-input" id="problemDescription" placeholder="Detailed description of the problem..." rows="4" maxlength="1000" style="resize: vertical;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select class="form-input" id="problemCategory">
+                        <option value="general">General</option>
+                        <option value="academic">Academic</option>
+                        <option value="hostel">Hostel</option>
+                        <option value="infrastructure">Infrastructure</option>
+                        <option value="sports">Sports</option>
+                        <option value="technical">Technical</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Priority</label>
+                    <select class="form-input" id="problemPriority">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Target Organization (Optional)</label>
+                    <select class="form-input" id="problemTargetOrg">
+                        <option value="">Select organization...</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="flowchart-btn secondary" id="cancelProblemBtn">Cancel</button>
+                <button class="flowchart-btn primary" id="saveProblemBtn">Submit Problem</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- View Problem Modal -->
+    <div class="modal-overlay" id="viewProblemModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2 class="modal-title" id="viewProblemTitle">Problem Details</h2>
+                <button class="modal-close" id="closeViewProblemModal">&times;</button>
+            </div>
+            <div class="modal-body" id="viewProblemContent">
+                <!-- Content will be dynamically inserted -->
+            </div>
+            <div class="modal-footer" id="viewProblemFooter">
+                <button class="flowchart-btn secondary" id="closeViewProblemBtn">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- View Announcement Modal -->
+    <div class="modal-overlay" id="viewAnnouncementModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2 class="modal-title" id="viewAnnouncementTitle">Announcement Details</h2>
+                <button class="modal-close" id="closeViewAnnouncementModal">&times;</button>
+            </div>
+            <div class="modal-body" id="viewAnnouncementContent">
+                <!-- Content will be dynamically inserted -->
+            </div>
+            <div class="modal-footer">
+                <button class="flowchart-btn secondary" id="closeViewAnnouncementBtn">Close</button>
             </div>
         </div>
     </div>
@@ -1760,6 +3052,138 @@
     <div class="toast-notification" id="toastNotification">
         <i class="fas fa-check-circle" id="toastIcon"></i>
         <span id="toastMessage">Success!</span>
+    </div>
+
+    <!-- Compose Problem FAB (Gmail-style) -->
+    <button class="compose-problem-fab" id="composeProblemFab" title="Report a Problem">
+        <i class="fas fa-plus"></i>
+        <span class="fab-text">Compose</span>
+    </button>
+
+    <!-- Compose Problem Modal -->
+    <div class="compose-modal-overlay" id="composeModalOverlay">
+        <div class="compose-modal">
+            <div class="compose-header">
+                <h2><i class="fas fa-edit"></i> Report New Problem</h2>
+                <button class="compose-close" id="composeCloseBtn">&times;</button>
+            </div>
+            <div class="compose-body">
+                <div class="compose-form-group">
+                    <label class="compose-label">
+                        <i class="fas fa-heading"></i>
+                        Problem Title <span class="required">*</span>
+                    </label>
+                    <input type="text" class="compose-input" id="composeProblemTitle" placeholder="Brief description of the problem" maxlength="100">
+                </div>
+                
+                <div class="compose-form-group">
+                    <label class="compose-label">
+                        <i class="fas fa-align-left"></i>
+                        Description <span class="required">*</span>
+                    </label>
+                    <textarea class="compose-input compose-textarea" id="composeProblemDescription" placeholder="Provide detailed information about the problem..." maxlength="1000"></textarea>
+                </div>
+                
+                <div class="compose-form-group">
+                    <label class="compose-label">
+                        <i class="fas fa-sitemap"></i>
+                        Target Hierarchy <span class="required">*</span>
+                    </label>
+                    <button type="button" class="hierarchy-selector-btn" id="hierarchySelectorBtn">
+                        <span class="btn-content">
+                            <i class="fas fa-project-diagram btn-icon"></i>
+                            <span class="btn-placeholder">Click to select target nodes...</span>
+                        </span>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <div class="selected-nodes-preview" id="selectedNodesPreview"></div>
+                </div>
+                
+                <div class="compose-form-group">
+                    <label class="compose-label">
+                        <i class="fas fa-tag"></i>
+                        Category
+                    </label>
+                    <select class="compose-input compose-select" id="composeProblemCategory">
+                        <option value="general">General</option>
+                        <option value="academic">Academic</option>
+                        <option value="hostel">Hostel</option>
+                        <option value="infrastructure">Infrastructure</option>
+                        <option value="sports">Sports</option>
+                        <option value="technical">Technical</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="compose-form-group">
+                    <label class="compose-label">
+                        <i class="fas fa-flag"></i>
+                        Priority
+                    </label>
+                    <div class="priority-options">
+                        <div class="priority-option low">
+                            <input type="radio" name="composePriority" id="priorityLow" value="low">
+                            <label for="priorityLow"><i class="fas fa-arrow-down"></i> Low</label>
+                        </div>
+                        <div class="priority-option medium">
+                            <input type="radio" name="composePriority" id="priorityMedium" value="medium" checked>
+                            <label for="priorityMedium"><i class="fas fa-minus"></i> Medium</label>
+                        </div>
+                        <div class="priority-option high">
+                            <input type="radio" name="composePriority" id="priorityHigh" value="high">
+                            <label for="priorityHigh"><i class="fas fa-arrow-up"></i> High</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="compose-footer">
+                <div class="compose-footer-info">
+                    <i class="fas fa-info-circle"></i>
+                    Problem will be sent for admin approval
+                </div>
+                <div class="compose-footer-actions">
+                    <button class="compose-btn cancel" id="composeCancelBtn">Cancel</button>
+                    <button class="compose-btn submit" id="composeSubmitBtn">
+                        <i class="fas fa-paper-plane"></i>
+                        Submit Problem
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hierarchy Tree Selector Modal -->
+    <div class="hierarchy-modal-overlay" id="hierarchyModalOverlay">
+        <div class="hierarchy-modal">
+            <div class="hierarchy-modal-header">
+                <h2><i class="fas fa-sitemap"></i> Select Target Nodes</h2>
+                <button class="hierarchy-modal-close" id="hierarchyModalClose">&times;</button>
+            </div>
+            <div class="hierarchy-modal-info">
+                <i class="fas fa-info-circle"></i>
+                Click on nodes to select them. You can select multiple nodes. The problem will be sent to the admins of selected nodes.
+            </div>
+            <div class="hierarchy-modal-body">
+                <div class="hierarchy-tree-container" id="hierarchyTreeContainer">
+                    <div class="hierarchy-tree-loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>Loading hierarchy...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="hierarchy-modal-footer">
+                <div class="selected-count">
+                    <strong id="selectedNodeCount">0</strong> node(s) selected
+                </div>
+                <div class="hierarchy-modal-actions">
+                    <button class="hierarchy-btn cancel" id="hierarchyCancelBtn">Cancel</button>
+                    <button class="hierarchy-btn confirm" id="hierarchyConfirmBtn">
+                        <i class="fas fa-check"></i>
+                        Done
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <style>
@@ -1932,6 +3356,7 @@
             deleteDoc,
             collection,
             getDocs,
+            addDoc,
             serverTimestamp,
             arrayUnion,
             arrayRemove
@@ -2998,6 +4423,1070 @@
 
         const flowchartManager = new FlowchartManager();
 
+        // Problems Manager Class
+        class ProblemsManager {
+            constructor() {
+                this.problems = [];
+                this.currentUser = null;
+                this.currentFilter = 'all';
+                this.editingProblem = null;
+            }
+
+            async loadProblems(userEmail) {
+                this.currentUser = userEmail;
+                try {
+                    const problemsRef = collection(db, 'problems');
+                    const snapshot = await getDocs(problemsRef);
+                    
+                    this.problems = [];
+                    snapshot.forEach(docSnap => {
+                        const data = docSnap.data();
+                        this.problems.push({
+                            id: docSnap.id,
+                            ...data,
+                            createdAt: data.createdAt?.toDate() || new Date()
+                        });
+                    });
+                    
+                    // Sort by date (newest first)
+                    this.problems.sort((a, b) => b.createdAt - a.createdAt);
+                    
+                    return this.problems;
+                } catch (error) {
+                    console.error('Error loading problems:', error);
+                    return [];
+                }
+            }
+
+            getOpenProblems() {
+                return this.problems.filter(p => p.status !== 'solved' && p.status !== 'archived');
+            }
+
+            getSolvedProblems() {
+                return this.problems.filter(p => p.status === 'solved');
+            }
+
+            getArchivedProblems() {
+                return this.problems.filter(p => p.status === 'archived');
+            }
+
+            getMyProblems() {
+                return this.problems.filter(p => p.createdBy === this.currentUser && p.status !== 'archived');
+            }
+
+            getMySolvedProblems() {
+                return this.problems.filter(p => p.createdBy === this.currentUser && p.status === 'solved');
+            }
+
+            updateStats() {
+                const open = this.getOpenProblems().length;
+                const solved = this.getSolvedProblems().length;
+                const archived = this.getArchivedProblems().length;
+                const myProblems = this.getMyProblems().length;
+                const mySolved = this.getMySolvedProblems().length;
+                
+                // Update stats
+                const openCount = document.getElementById('openProblemsCount');
+                const solvedCount = document.getElementById('solvedProblemsCount');
+                const archivedCount = document.getElementById('archivedProblemsCount');
+                const myCount = document.getElementById('myProblemsCount');
+                const mySolvedCountEl = document.getElementById('mySolvedCount');
+                
+                if (openCount) openCount.textContent = open;
+                if (solvedCount) solvedCount.textContent = solved;
+                if (archivedCount) archivedCount.textContent = archived;
+                if (myCount) myCount.textContent = myProblems;
+                if (mySolvedCountEl) mySolvedCountEl.textContent = mySolved;
+                
+                // Update tab counts (exclude archived from "all" count)
+                const allTab = document.getElementById('allProblemsTabCount');
+                const openTab = document.getElementById('openProblemsTabCount');
+                const solvedTab = document.getElementById('solvedProblemsTabCount');
+                const archivedTab = document.getElementById('archivedProblemsTabCount');
+                
+                if (allTab) allTab.textContent = this.problems.filter(p => p.status !== 'archived').length;
+                if (openTab) openTab.textContent = open;
+                if (solvedTab) solvedTab.textContent = solved;
+                if (archivedTab) archivedTab.textContent = archived;
+            }
+
+            renderProblems(containerId, filter = 'all') {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                
+                let filteredProblems = this.problems.filter(p => p.status !== 'archived');
+                
+                if (filter === 'open') {
+                    filteredProblems = this.getOpenProblems();
+                } else if (filter === 'solved') {
+                    filteredProblems = this.getSolvedProblems();
+                } else if (filter === 'archived') {
+                    filteredProblems = this.getArchivedProblems();
+                } else if (filter === 'my') {
+                    filteredProblems = this.getMyProblems();
+                }
+                
+                if (filteredProblems.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas ${filter === 'archived' ? 'fa-archive' : 'fa-clipboard-list'}"></i>
+                            <h3>No Problems Found</h3>
+                            <p>${filter === 'my' ? 'You haven\'t reported any problems yet.' : filter === 'archived' ? 'No archived problems.' : 'No problems to display.'}</p>
+                            ${filter !== 'archived' ? `<button class="action-btn-primary" onclick="problemsManager.openProblemModal()">
+                                <i class="fas fa-plus"></i> Report Problem
+                            </button>` : ''}
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = filteredProblems.map(problem => this.createProblemCard(problem)).join('');
+                
+                // Add event listeners
+                container.querySelectorAll('.view-problem-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const problemId = e.currentTarget.dataset.id;
+                        this.viewProblem(problemId);
+                    });
+                });
+                
+                container.querySelectorAll('.solve-problem-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const problemId = e.currentTarget.dataset.id;
+                        this.markAsSolved(problemId);
+                    });
+                });
+                
+                container.querySelectorAll('.delete-problem-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const problemId = e.currentTarget.dataset.id;
+                        this.deleteProblem(problemId);
+                    });
+                });
+
+                container.querySelectorAll('.archive-problem-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const problemId = e.currentTarget.dataset.id;
+                        this.archiveProblem(problemId);
+                    });
+                });
+
+                container.querySelectorAll('.unarchive-problem-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const problemId = e.currentTarget.dataset.id;
+                        this.unarchiveProblem(problemId);
+                    });
+                });
+            }
+
+            createProblemCard(problem) {
+                const isSolved = problem.status === 'solved';
+                const isArchived = problem.status === 'archived';
+                const isOwner = problem.createdBy === this.currentUser;
+                const timeAgo = this.getTimeAgo(problem.createdAt);
+                
+                return `
+                    <div class="item-card ${isSolved ? 'solved' : isArchived ? 'archived' : 'open'}" style="${isArchived ? 'opacity: 0.7; border-left: 4px solid #6B7280;' : ''}">
+                        <div class="item-card-header">
+                            <h4 class="item-card-title">${this.escapeHtml(problem.title)}</h4>
+                            <div class="item-card-badges">
+                                <span class="badge badge-${problem.priority || 'medium'}">${problem.priority || 'Medium'}</span>
+                                <span class="badge ${isSolved ? 'badge-solved' : isArchived ? 'badge-archived' : 'badge-open'}" ${isArchived ? 'style="background: rgba(107, 114, 128, 0.1); color: #4B5563;"' : ''}>${isSolved ? 'Solved' : isArchived ? 'Archived' : 'Open'}</span>
+                            </div>
+                        </div>
+                        <p class="item-card-description">${this.escapeHtml(problem.description || '')}</p>
+                        <div class="item-card-meta">
+                            <span><i class="fas fa-folder"></i> ${problem.category || 'General'}</span>
+                            <span><i class="fas fa-clock"></i> ${timeAgo}</span>
+                            <span><i class="fas fa-user"></i> ${problem.createdBy?.split('@')[0] || 'Anonymous'}</span>
+                        </div>
+                        <div class="item-card-actions">
+                            <button class="item-action-btn primary view-problem-btn" data-id="${problem.id}">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            ${!isSolved && !isArchived && isOwner ? `
+                                <button class="item-action-btn success solve-problem-btn" data-id="${problem.id}">
+                                    <i class="fas fa-check"></i> Mark Solved
+                                </button>
+                            ` : ''}
+                            ${isArchived && isOwner ? `
+                                <button class="item-action-btn secondary unarchive-problem-btn" data-id="${problem.id}">
+                                    <i class="fas fa-undo"></i> Restore
+                                </button>
+                            ` : ''}
+                            ${!isArchived && isOwner ? `
+                                <button class="item-action-btn secondary archive-problem-btn" data-id="${problem.id}">
+                                    <i class="fas fa-archive"></i> Archive
+                                </button>
+                            ` : ''}
+                            ${isOwner ? `
+                                <button class="item-action-btn danger delete-problem-btn" data-id="${problem.id}">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            viewProblem(problemId) {
+                const problem = this.problems.find(p => p.id === problemId);
+                if (!problem) return;
+                
+                const modal = document.getElementById('viewProblemModal');
+                const title = document.getElementById('viewProblemTitle');
+                const content = document.getElementById('viewProblemContent');
+                
+                title.textContent = problem.title;
+                content.innerHTML = `
+                    <div style="margin-bottom: 1rem;">
+                        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                            <span class="badge badge-${problem.priority || 'medium'}">${problem.priority || 'Medium'}</span>
+                            <span class="badge ${problem.status === 'solved' ? 'badge-solved' : problem.status === 'archived' ? 'badge-archived' : 'badge-open'}" ${problem.status === 'archived' ? 'style="background: rgba(107, 114, 128, 0.1); color: #4B5563;"' : ''}>${problem.status === 'solved' ? 'Solved' : problem.status === 'archived' ? 'Archived' : 'Open'}</span>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 1.5rem;">
+                        <h4 style="font-size: 0.9rem; color: #6B7280; margin-bottom: 0.5rem;">Description</h4>
+                        <p style="color: #1F2933; line-height: 1.6;">${this.escapeHtml(problem.description || 'No description provided.')}</p>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1rem; background: rgba(41, 171, 226, 0.05); border-radius: 12px;">
+                        <div>
+                            <span style="font-size: 0.85rem; color: #6B7280;">Category</span>
+                            <p style="font-weight: 600; color: #1F2933;">${problem.category || 'General'}</p>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.85rem; color: #6B7280;">Reported By</span>
+                            <p style="font-weight: 600; color: #1F2933;">${problem.createdBy?.split('@')[0] || 'Anonymous'}</p>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.85rem; color: #6B7280;">Created</span>
+                            <p style="font-weight: 600; color: #1F2933;">${this.formatDate(problem.createdAt)}</p>
+                        </div>
+                        ${problem.targetOrg ? `
+                            <div>
+                                <span style="font-size: 0.85rem; color: #6B7280;">Organization</span>
+                                <p style="font-weight: 600; color: #1F2933;">${problem.targetOrg}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                    ${problem.solution ? `
+                        <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(16, 185, 129, 0.1); border-radius: 12px; border-left: 4px solid #10B981;">
+                            <h4 style="font-size: 0.9rem; color: #059669; margin-bottom: 0.5rem;"><i class="fas fa-check-circle"></i> Solution</h4>
+                            <p style="color: #1F2933;">${this.escapeHtml(problem.solution)}</p>
+                        </div>
+                    ` : ''}
+                `;
+                
+                modal.classList.add('show');
+            }
+
+            openProblemModal() {
+                this.editingProblem = null;
+                document.getElementById('problemModalTitle').textContent = 'Report New Problem';
+                document.getElementById('problemTitle').value = '';
+                document.getElementById('problemDescription').value = '';
+                document.getElementById('problemCategory').value = 'general';
+                document.getElementById('problemPriority').value = 'medium';
+                document.getElementById('problemTargetOrg').value = '';
+                document.getElementById('problemModal').classList.add('show');
+                
+                // Load organizations for dropdown
+                this.loadOrganizationsDropdown();
+            }
+
+            async loadOrganizationsDropdown() {
+                const select = document.getElementById('problemTargetOrg');
+                if (!select) return;
+                
+                try {
+                    const hierarchiesRef = collection(db, 'hierarchies');
+                    const snapshot = await getDocs(hierarchiesRef);
+                    
+                    select.innerHTML = '<option value="">Select organization...</option>';
+                    snapshot.forEach(docSnap => {
+                        const data = docSnap.data();
+                        if (data.status === 'active') {
+                            select.innerHTML += `<option value="${docSnap.id}">${data.name || docSnap.id}</option>`;
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error loading organizations:', error);
+                }
+            }
+
+            closeProblemModal() {
+                document.getElementById('problemModal').classList.remove('show');
+                this.editingProblem = null;
+            }
+
+            async saveProblem() {
+                const title = document.getElementById('problemTitle').value.trim();
+                const description = document.getElementById('problemDescription').value.trim();
+                const category = document.getElementById('problemCategory').value;
+                const priority = document.getElementById('problemPriority').value;
+                const targetOrg = document.getElementById('problemTargetOrg').value;
+                
+                if (!title) {
+                    flowchartManager.showToast('Please enter a title', 'error');
+                    return;
+                }
+                
+                if (!description) {
+                    flowchartManager.showToast('Please enter a description', 'error');
+                    return;
+                }
+                
+                const saveBtn = document.getElementById('saveProblemBtn');
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Submitting...';
+                
+                try {
+                    const problemData = {
+                        title,
+                        description,
+                        category,
+                        priority,
+                        targetOrg: targetOrg || null,
+                        status: 'open',
+                        createdBy: this.currentUser,
+                        createdAt: serverTimestamp(),
+                        updatedAt: serverTimestamp()
+                    };
+                    
+                    const problemsRef = collection(db, 'problems');
+                    await setDoc(doc(problemsRef), problemData);
+                    
+                    flowchartManager.showToast('Problem reported successfully!', 'success');
+                    this.closeProblemModal();
+                    
+                    // Reload problems
+                    await this.loadProblems(this.currentUser);
+                    this.updateStats();
+                    this.renderProblems('problemsList', this.currentFilter);
+                    this.renderProblems('myProblemsList', 'my');
+                } catch (error) {
+                    console.error('Error saving problem:', error);
+                    flowchartManager.showToast('Failed to submit problem', 'error');
+                } finally {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Submit Problem';
+                }
+            }
+
+            async markAsSolved(problemId) {
+                if (!confirm('Mark this problem as solved?')) return;
+                
+                try {
+                    const problemRef = doc(db, 'problems', problemId);
+                    await setDoc(problemRef, {
+                        status: 'solved',
+                        solvedAt: serverTimestamp(),
+                        updatedAt: serverTimestamp()
+                    }, { merge: true });
+                    
+                    flowchartManager.showToast('Problem marked as solved!', 'success');
+                    
+                    // Reload problems
+                    await this.loadProblems(this.currentUser);
+                    this.updateStats();
+                    this.renderProblems('problemsList', this.currentFilter);
+                    this.renderProblems('myProblemsList', 'my');
+                } catch (error) {
+                    console.error('Error marking problem as solved:', error);
+                    flowchartManager.showToast('Failed to update problem', 'error');
+                }
+            }
+
+            async deleteProblem(problemId) {
+                if (!confirm('Are you sure you want to delete this problem?')) return;
+                
+                try {
+                    await deleteDoc(doc(db, 'problems', problemId));
+                    
+                    flowchartManager.showToast('Problem deleted successfully!', 'success');
+                    
+                    // Reload problems
+                    await this.loadProblems(this.currentUser);
+                    this.updateStats();
+                    this.renderProblems('problemsList', this.currentFilter);
+                    this.renderProblems('myProblemsList', 'my');
+                } catch (error) {
+                    console.error('Error deleting problem:', error);
+                    flowchartManager.showToast('Failed to delete problem', 'error');
+                }
+            }
+
+            async archiveProblem(problemId) {
+                if (!confirm('Archive this problem? It will be moved to the Archived tab.')) return;
+                
+                try {
+                    const problemRef = doc(db, 'problems', problemId);
+                    await setDoc(problemRef, {
+                        status: 'archived',
+                        archivedAt: serverTimestamp(),
+                        updatedAt: serverTimestamp()
+                    }, { merge: true });
+                    
+                    flowchartManager.showToast('Problem archived!', 'success');
+                    
+                    // Reload problems
+                    await this.loadProblems(this.currentUser);
+                    this.updateStats();
+                    this.renderProblems('problemsList', this.currentFilter);
+                    this.renderProblems('myProblemsList', 'my');
+                } catch (error) {
+                    console.error('Error archiving problem:', error);
+                    flowchartManager.showToast('Failed to archive problem', 'error');
+                }
+            }
+
+            async unarchiveProblem(problemId) {
+                try {
+                    const problemRef = doc(db, 'problems', problemId);
+                    await setDoc(problemRef, {
+                        status: 'open',
+                        archivedAt: null,
+                        updatedAt: serverTimestamp()
+                    }, { merge: true });
+                    
+                    flowchartManager.showToast('Problem restored!', 'success');
+                    
+                    // Reload problems
+                    await this.loadProblems(this.currentUser);
+                    this.updateStats();
+                    this.renderProblems('problemsList', this.currentFilter);
+                    this.renderProblems('myProblemsList', 'my');
+                } catch (error) {
+                    console.error('Error restoring problem:', error);
+                    flowchartManager.showToast('Failed to restore problem', 'error');
+                }
+            }
+
+            setFilter(filter) {
+                this.currentFilter = filter;
+                
+                // Update tab buttons
+                document.querySelectorAll('#problemsSection .tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.tab === `${filter}-problems` || (filter === 'all' && btn.dataset.tab === 'all-problems')) {
+                        btn.classList.add('active');
+                    }
+                });
+                
+                this.renderProblems('problemsList', filter);
+            }
+
+            getTimeAgo(date) {
+                const seconds = Math.floor((new Date() - date) / 1000);
+                const intervals = {
+                    year: 31536000,
+                    month: 2592000,
+                    week: 604800,
+                    day: 86400,
+                    hour: 3600,
+                    minute: 60
+                };
+                
+                for (const [unit, secondsInUnit] of Object.entries(intervals)) {
+                    const interval = Math.floor(seconds / secondsInUnit);
+                    if (interval >= 1) {
+                        return `${interval} ${unit}${interval > 1 ? 's' : ''} ago`;
+                    }
+                }
+                return 'Just now';
+            }
+
+            formatDate(date) {
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+
+        const problemsManager = new ProblemsManager();
+
+        // ========== COMPOSE PROBLEM MANAGER ==========
+        class ComposeProblemManager {
+            constructor() {
+                this.selectedNodes = [];
+                this.hierarchyData = [];
+                this.isLoading = false;
+            }
+
+            init() {
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                // FAB button
+                const fab = document.getElementById('composeProblemFab');
+                fab?.addEventListener('click', () => this.openComposeModal());
+                
+                // Compose modal controls
+                document.getElementById('composeCloseBtn')?.addEventListener('click', () => this.closeComposeModal());
+                document.getElementById('composeCancelBtn')?.addEventListener('click', () => this.closeComposeModal());
+                document.getElementById('composeSubmitBtn')?.addEventListener('click', () => this.submitProblem());
+                
+                // Hierarchy selector
+                document.getElementById('hierarchySelectorBtn')?.addEventListener('click', () => this.openHierarchyModal());
+                document.getElementById('hierarchyModalClose')?.addEventListener('click', () => this.closeHierarchyModal());
+                document.getElementById('hierarchyCancelBtn')?.addEventListener('click', () => this.closeHierarchyModal());
+                document.getElementById('hierarchyConfirmBtn')?.addEventListener('click', () => this.confirmHierarchySelection());
+                
+                // Close modals on overlay click
+                document.getElementById('composeModalOverlay')?.addEventListener('click', (e) => {
+                    if (e.target.id === 'composeModalOverlay') this.closeComposeModal();
+                });
+                document.getElementById('hierarchyModalOverlay')?.addEventListener('click', (e) => {
+                    if (e.target.id === 'hierarchyModalOverlay') this.closeHierarchyModal();
+                });
+            }
+
+            openComposeModal() {
+                // Reset form
+                document.getElementById('composeProblemTitle').value = '';
+                document.getElementById('composeProblemDescription').value = '';
+                document.getElementById('composeProblemCategory').value = 'general';
+                document.getElementById('priorityMedium').checked = true;
+                this.selectedNodes = [];
+                this.updateSelectedNodesPreview();
+                
+                document.getElementById('composeModalOverlay').classList.add('show');
+            }
+
+            closeComposeModal() {
+                document.getElementById('composeModalOverlay').classList.remove('show');
+            }
+
+            async openHierarchyModal() {
+                document.getElementById('hierarchyModalOverlay').classList.add('show');
+                await this.loadHierarchyTree();
+            }
+
+            closeHierarchyModal() {
+                document.getElementById('hierarchyModalOverlay').classList.remove('show');
+            }
+
+            async loadHierarchyTree() {
+                const container = document.getElementById('hierarchyTreeContainer');
+                container.innerHTML = `<div class="hierarchy-tree-loading"><i class="fas fa-spinner"></i><p>Loading hierarchy...</p></div>`;
+                
+                try {
+                    // Load all hierarchies
+                    const hierarchiesRef = collection(db, 'hierarchies');
+                    const snapshot = await getDocs(hierarchiesRef);
+                    
+                    this.hierarchyData = [];
+                    
+                    for (const docSnap of snapshot.docs) {
+                        const data = docSnap.data();
+                        if (data.status === 'active') {
+                            const org = {
+                                id: docSnap.id,
+                                path: `hierarchies/${docSnap.id}`,
+                                name: data.name || docSnap.id,
+                                type: data.type || 'organization',
+                                adminEmails: data.adminEmails || [],
+                                children: []
+                            };
+                            
+                            // Load sub-nodes recursively
+                            org.children = await this.loadSubNodesRecursive(docSnap.ref, org.path);
+                            this.hierarchyData.push(org);
+                        }
+                    }
+                    
+                    this.renderHierarchyTree();
+                } catch (error) {
+                    console.error('Error loading hierarchy:', error);
+                    container.innerHTML = `<div class="hierarchy-tree-loading"><i class="fas fa-exclamation-circle" style="color:#EF4444;"></i><p>Failed to load hierarchy</p></div>`;
+                }
+            }
+
+            async loadSubNodesRecursive(parentRef, parentPath) {
+                const children = [];
+                try {
+                    const subNodesRef = collection(parentRef, 'sub-nodes');
+                    const snapshot = await getDocs(subNodesRef);
+                    
+                    for (const docSnap of snapshot.docs) {
+                        const data = docSnap.data();
+                        const nodePath = `${parentPath}/sub-nodes/${docSnap.id}`;
+                        const node = {
+                            id: docSnap.id,
+                            path: nodePath,
+                            name: data.name || docSnap.id,
+                            type: data.type || 'department',
+                            adminEmails: data.adminEmails || [],
+                            children: await this.loadSubNodesRecursive(docSnap.ref, nodePath)
+                        };
+                        children.push(node);
+                    }
+                } catch (e) {
+                    // No sub-nodes
+                }
+                return children;
+            }
+
+            renderHierarchyTree() {
+                const container = document.getElementById('hierarchyTreeContainer');
+                
+                if (this.hierarchyData.length === 0) {
+                    container.innerHTML = `<div class="hierarchy-tree-loading"><i class="fas fa-building" style="color:#6B7280;"></i><p>No organizations found</p></div>`;
+                    return;
+                }
+                
+                let html = '';
+                this.hierarchyData.forEach(org => {
+                    html += this.renderTreeNode(org, true);
+                });
+                
+                container.innerHTML = html;
+                
+                // Add event delegation for node selection
+                container.querySelectorAll('.tree-node-selectable').forEach(nodeEl => {
+                    nodeEl.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const path = nodeEl.dataset.path;
+                        const name = nodeEl.dataset.name;
+                        const admins = nodeEl.dataset.admins;
+                        this.toggleNodeSelection(path, name, admins);
+                    });
+                });
+                
+                this.updateSelectedCount();
+            }
+
+            renderTreeNode(node, isRoot = false) {
+                const isSelected = this.selectedNodes.some(n => n.path === node.path);
+                const adminText = node.adminEmails.length > 0 ? `Admin: ${node.adminEmails[0]}` : 'No admin assigned';
+                const escapedPath = node.path.replace(/'/g, "\\'");
+                const escapedName = node.name.replace(/'/g, "\\'");
+                const escapedAdmins = node.adminEmails.join(',').replace(/'/g, "\\'");
+                
+                let html = `
+                    <div class="tree-node-wrapper">
+                        <div class="tree-node-selectable ${isRoot ? 'root' : ''} ${isSelected ? 'selected' : ''}" 
+                             data-path="${node.path}" 
+                             data-name="${node.name}"
+                             data-admins="${node.adminEmails.join(',')}">
+                            <div class="tree-node-name">${node.name}</div>
+                            <div class="tree-node-type">${node.type}</div>
+                            <div class="tree-node-admin"><i class="fas fa-user-shield"></i> ${adminText}</div>
+                        </div>
+                `;
+                
+                if (node.children && node.children.length > 0) {
+                    html += `<div class="tree-connector-v"></div>`;
+                    html += `<div class="tree-children-wrapper">`;
+                    
+                    // Calculate line width
+                    const lineWidth = node.children.length > 1 ? `calc(${(node.children.length - 1) * 100}% / ${node.children.length} + 100px)` : '0';
+                    html += `<div class="tree-children-line" style="width: ${lineWidth};"></div>`;
+                    
+                    html += `<div class="tree-children">`;
+                    node.children.forEach(child => {
+                        html += `<div class="tree-child-branch">${this.renderTreeNode(child, false)}</div>`;
+                    });
+                    html += `</div></div>`;
+                }
+                
+                html += `</div>`;
+                return html;
+            }
+
+            toggleNodeSelection(path, name, admins) {
+                const index = this.selectedNodes.findIndex(n => n.path === path);
+                
+                if (index > -1) {
+                    this.selectedNodes.splice(index, 1);
+                } else {
+                    this.selectedNodes.push({
+                        path,
+                        name,
+                        adminEmails: admins ? admins.split(',').filter(e => e) : []
+                    });
+                }
+                
+                // Update UI
+                const nodeEl = document.querySelector(`.tree-node-selectable[data-path="${path}"]`);
+                if (nodeEl) {
+                    nodeEl.classList.toggle('selected');
+                }
+                
+                this.updateSelectedCount();
+            }
+
+            updateSelectedCount() {
+                document.getElementById('selectedNodeCount').textContent = this.selectedNodes.length;
+            }
+
+            confirmHierarchySelection() {
+                this.updateSelectedNodesPreview();
+                this.closeHierarchyModal();
+                
+                // Update button appearance
+                const btn = document.getElementById('hierarchySelectorBtn');
+                if (this.selectedNodes.length > 0) {
+                    btn.classList.add('has-selection');
+                    btn.querySelector('.btn-placeholder').textContent = `${this.selectedNodes.length} node(s) selected`;
+                } else {
+                    btn.classList.remove('has-selection');
+                    btn.querySelector('.btn-placeholder').textContent = 'Click to select target nodes...';
+                }
+            }
+
+            updateSelectedNodesPreview() {
+                const container = document.getElementById('selectedNodesPreview');
+                
+                if (this.selectedNodes.length === 0) {
+                    container.innerHTML = '';
+                    return;
+                }
+                
+                container.innerHTML = this.selectedNodes.map(node => `
+                    <div class="selected-node-chip">
+                        <i class="fas fa-sitemap"></i>
+                        ${node.name}
+                        <button class="remove-chip" onclick="composeProblemManager.removeSelectedNode('${node.path}')">&times;</button>
+                    </div>
+                `).join('');
+            }
+
+            removeSelectedNode(path) {
+                this.selectedNodes = this.selectedNodes.filter(n => n.path !== path);
+                this.updateSelectedNodesPreview();
+                
+                // Update button
+                const btn = document.getElementById('hierarchySelectorBtn');
+                if (this.selectedNodes.length > 0) {
+                    btn.querySelector('.btn-placeholder').textContent = `${this.selectedNodes.length} node(s) selected`;
+                } else {
+                    btn.classList.remove('has-selection');
+                    btn.querySelector('.btn-placeholder').textContent = 'Click to select target nodes...';
+                }
+            }
+
+            async submitProblem() {
+                const title = document.getElementById('composeProblemTitle').value.trim();
+                const description = document.getElementById('composeProblemDescription').value.trim();
+                const category = document.getElementById('composeProblemCategory').value;
+                const priority = document.querySelector('input[name="composePriority"]:checked')?.value || 'medium';
+                
+                // Validation
+                if (!title) {
+                    flowchartManager.showToast('Please enter a problem title', 'error');
+                    return;
+                }
+                
+                if (!description) {
+                    flowchartManager.showToast('Please enter a problem description', 'error');
+                    return;
+                }
+                
+                if (this.selectedNodes.length === 0) {
+                    flowchartManager.showToast('Please select at least one target node', 'error');
+                    return;
+                }
+                
+                const submitBtn = document.getElementById('composeSubmitBtn');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+                
+                try {
+                    const user = dashboardAuth.getCurrentUser();
+                    if (!user) throw new Error('User not authenticated');
+                    
+                    // Collect all admin emails from selected nodes
+                    const adminEmails = new Set();
+                    this.selectedNodes.forEach(node => {
+                        node.adminEmails.forEach(email => {
+                            if (email) adminEmails.add(email);
+                        });
+                    });
+                    
+                    // Create problem approval request
+                    const problemData = {
+                        title,
+                        description,
+                        category,
+                        priority,
+                        targetNodes: this.selectedNodes.map(n => ({
+                            path: n.path,
+                            name: n.name
+                        })),
+                        hierarchyPaths: this.selectedNodes.map(n => n.path),
+                        assignedAdminEmails: Array.from(adminEmails),
+                        status: 'pending',
+                        createdBy: user.email,
+                        createdAt: serverTimestamp(),
+                        updatedAt: serverTimestamp()
+                    };
+                    
+                    // Save to pendingProblemApprovals collection
+                    const pendingRef = collection(db, 'pendingProblemApprovals');
+                    const docRef = await addDoc(pendingRef, problemData);
+                    const problemId = docRef.id;
+                    
+                    console.log('Created pending problem approval:', problemId);
+                    
+                    // Add notification to each admin
+                    for (const adminEmail of adminEmails) {
+                        try {
+                            const adminNotifRef = doc(db, 'users', adminEmail, 'notifications', 'pending');
+                            await setDoc(adminNotifRef, {
+                                problemApprovals: arrayUnion(problemId),
+                                updatedAt: serverTimestamp()
+                            }, { merge: true });
+                            console.log('Added notification for admin:', adminEmail);
+                        } catch (notifError) {
+                            console.error('Error adding notification for admin:', adminEmail, notifError);
+                        }
+                    }
+                    
+                    flowchartManager.showToast('Problem submitted for approval!', 'success');
+                    this.closeComposeModal();
+                    
+                    // Reload problems to show pending status
+                    await problemsManager.loadProblems(user.email);
+                    problemsManager.updateStats();
+                    
+                } catch (error) {
+                    console.error('Error submitting problem:', error);
+                    flowchartManager.showToast('Failed to submit problem: ' + error.message, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Problem';
+                }
+            }
+        }
+
+        const composeProblemManager = new ComposeProblemManager();
+
+        // Announcements Manager Class
+        class AnnouncementsManager {
+            constructor() {
+                this.announcements = [];
+                this.currentUser = null;
+                this.currentFilter = 'all';
+            }
+
+            async loadAnnouncements(userEmail) {
+                this.currentUser = userEmail;
+                try {
+                    const announcementsRef = collection(db, 'announcements');
+                    const snapshot = await getDocs(announcementsRef);
+                    
+                    this.announcements = [];
+                    snapshot.forEach(docSnap => {
+                        const data = docSnap.data();
+                        this.announcements.push({
+                            id: docSnap.id,
+                            ...data,
+                            createdAt: data.createdAt?.toDate() || new Date()
+                        });
+                    });
+                    
+                    // Sort by date (newest first)
+                    this.announcements.sort((a, b) => b.createdAt - a.createdAt);
+                    
+                    return this.announcements;
+                } catch (error) {
+                    console.error('Error loading announcements:', error);
+                    return [];
+                }
+            }
+
+            getImportantAnnouncements() {
+                return this.announcements.filter(a => a.priority === 'high' || a.isImportant);
+            }
+
+            updateStats() {
+                const total = this.announcements.length;
+                const important = this.getImportantAnnouncements().length;
+                
+                const totalCount = document.getElementById('totalAnnouncementsCount');
+                const allTab = document.getElementById('allAnnouncementsTabCount');
+                const importantTab = document.getElementById('importantAnnouncementsTabCount');
+                
+                if (totalCount) totalCount.textContent = total;
+                if (allTab) allTab.textContent = total;
+                if (importantTab) importantTab.textContent = important;
+            }
+
+            renderAnnouncements(containerId, filter = 'all') {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                
+                let filteredAnnouncements = this.announcements;
+                
+                if (filter === 'important') {
+                    filteredAnnouncements = this.getImportantAnnouncements();
+                }
+                
+                if (filteredAnnouncements.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-bullhorn"></i>
+                            <h3>No Announcements</h3>
+                            <p>${filter === 'important' ? 'No important announcements at the moment.' : 'No announcements to display.'}</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = filteredAnnouncements.map(announcement => this.createAnnouncementCard(announcement)).join('');
+                
+                // Add event listeners
+                container.querySelectorAll('.view-announcement-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const announcementId = e.currentTarget.dataset.id;
+                        this.viewAnnouncement(announcementId);
+                    });
+                });
+            }
+
+            createAnnouncementCard(announcement) {
+                const isImportant = announcement.priority === 'high' || announcement.isImportant;
+                const timeAgo = this.getTimeAgo(announcement.createdAt);
+                
+                return `
+                    <div class="item-card announcement">
+                        <div class="item-card-header">
+                            <h4 class="item-card-title">${this.escapeHtml(announcement.title)}</h4>
+                            <div class="item-card-badges">
+                                ${isImportant ? '<span class="badge badge-important">Important</span>' : ''}
+                                <span class="badge badge-${announcement.category || 'general'}" style="background: rgba(41, 171, 226, 0.1); color: #29ABE2;">${announcement.category || 'General'}</span>
+                            </div>
+                        </div>
+                        <p class="item-card-description">${this.escapeHtml(announcement.description || announcement.content || '')}</p>
+                        <div class="item-card-meta">
+                            <span><i class="fas fa-clock"></i> ${timeAgo}</span>
+                            <span><i class="fas fa-user"></i> ${announcement.createdBy?.split('@')[0] || 'Admin'}</span>
+                            ${announcement.targetHierarchy ? `<span><i class="fas fa-sitemap"></i> ${announcement.targetHierarchy}</span>` : ''}
+                        </div>
+                        <div class="item-card-actions">
+                            <button class="item-action-btn primary view-announcement-btn" data-id="${announcement.id}">
+                                <i class="fas fa-eye"></i> View Details
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            viewAnnouncement(announcementId) {
+                const announcement = this.announcements.find(a => a.id === announcementId);
+                if (!announcement) return;
+                
+                const modal = document.getElementById('viewAnnouncementModal');
+                const title = document.getElementById('viewAnnouncementTitle');
+                const content = document.getElementById('viewAnnouncementContent');
+                
+                title.textContent = announcement.title;
+                content.innerHTML = `
+                    <div style="margin-bottom: 1rem;">
+                        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                            ${announcement.priority === 'high' || announcement.isImportant ? '<span class="badge badge-important">Important</span>' : ''}
+                            <span class="badge" style="background: rgba(41, 171, 226, 0.1); color: #29ABE2;">${announcement.category || 'General'}</span>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 1.5rem;">
+                        <p style="color: #1F2933; line-height: 1.8; white-space: pre-wrap;">${this.escapeHtml(announcement.description || announcement.content || 'No content provided.')}</p>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1rem; background: rgba(41, 171, 226, 0.05); border-radius: 12px;">
+                        <div>
+                            <span style="font-size: 0.85rem; color: #6B7280;">Posted By</span>
+                            <p style="font-weight: 600; color: #1F2933;">${announcement.createdBy?.split('@')[0] || 'Admin'}</p>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.85rem; color: #6B7280;">Posted On</span>
+                            <p style="font-weight: 600; color: #1F2933;">${this.formatDate(announcement.createdAt)}</p>
+                        </div>
+                        ${announcement.deadline ? `
+                            <div>
+                                <span style="font-size: 0.85rem; color: #6B7280;">Deadline</span>
+                                <p style="font-weight: 600; color: #EF4444;">${this.formatDate(new Date(announcement.deadline))}</p>
+                            </div>
+                        ` : ''}
+                        ${announcement.targetHierarchy ? `
+                            <div>
+                                <span style="font-size: 0.85rem; color: #6B7280;">Target</span>
+                                <p style="font-weight: 600; color: #1F2933;">${announcement.targetHierarchy}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                
+                modal.classList.add('show');
+            }
+
+            setFilter(filter) {
+                this.currentFilter = filter;
+                
+                // Update tab buttons
+                document.querySelectorAll('#announcementsSection .tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.tab === `${filter}-announcements` || (filter === 'all' && btn.dataset.tab === 'all-announcements')) {
+                        btn.classList.add('active');
+                    }
+                });
+                
+                this.renderAnnouncements('announcementsList', filter);
+            }
+
+            getTimeAgo(date) {
+                const seconds = Math.floor((new Date() - date) / 1000);
+                const intervals = {
+                    year: 31536000,
+                    month: 2592000,
+                    week: 604800,
+                    day: 86400,
+                    hour: 3600,
+                    minute: 60
+                };
+                
+                for (const [unit, secondsInUnit] of Object.entries(intervals)) {
+                    const interval = Math.floor(seconds / secondsInUnit);
+                    if (interval >= 1) {
+                        return `${interval} ${unit}${interval > 1 ? 's' : ''} ago`;
+                    }
+                }
+                return 'Just now';
+            }
+
+            formatDate(date) {
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+
+        const announcementsManager = new AnnouncementsManager();
+
         // Dashboard Controller
         class DashboardController {
             constructor() {
@@ -3149,44 +5638,42 @@
                 // Show/hide sections based on page
                 const dashboardGrid = document.querySelector('.dashboard-grid');
                 const filtersSection = document.querySelector('.filters-section');
-                const flowchartsSection = document.getElementById('flowchartsSection');
+                const problemsSection = document.getElementById('problemsSection');
+                const myProblemsSection = document.getElementById('myProblemsSection');
+                const announcementsSection = document.getElementById('announcementsSection');
                 
-                if (page === 'flowcharts') {
-                    // Show flowcharts, hide dashboard
-                    if (dashboardGrid) dashboardGrid.style.display = 'none';
-                    if (filtersSection) filtersSection.style.display = 'none';
-                    if (flowchartsSection) {
-                        flowchartsSection.classList.add('active');
-                        this.loadFlowcharts();
+                // Hide all sections first
+                if (dashboardGrid) dashboardGrid.style.display = 'none';
+                if (filtersSection) filtersSection.style.display = 'none';
+                if (problemsSection) problemsSection.classList.remove('active');
+                if (myProblemsSection) myProblemsSection.classList.remove('active');
+                if (announcementsSection) announcementsSection.classList.remove('active');
+                
+                if (page === 'problems') {
+                    if (problemsSection) {
+                        problemsSection.classList.add('active');
+                        this.loadProblemsSection();
+                    }
+                } else if (page === 'my-problems') {
+                    if (myProblemsSection) {
+                        myProblemsSection.classList.add('active');
+                        this.loadMyProblemsSection();
+                    }
+                } else if (page === 'announcements') {
+                    if (announcementsSection) {
+                        announcementsSection.classList.add('active');
+                        this.loadAnnouncementsSection();
                     }
                 } else {
-                    // Show dashboard, hide flowcharts
+                    // Show dashboard (default)
                     if (dashboardGrid) dashboardGrid.style.display = 'grid';
                     if (filtersSection) filtersSection.style.display = 'block';
-                    if (flowchartsSection) flowchartsSection.classList.remove('active');
                 }
 
                 // Close mobile menu
                 this.closeMobileMenu();
 
                 console.log('Navigating to:', page);
-            }
-
-            async loadFlowcharts() {
-                const container = document.getElementById('flowchartContainer');
-                const user = dashboardAuth.getCurrentUser();
-                
-                if (!user || !container) return;
-                
-                container.innerHTML = `
-                    <div class="flowchart-loading">
-                        <i class="fas fa-spinner"></i>
-                        <p style="margin-top: 1rem; color: #6B7280;">Loading your hierarchy...</p>
-                    </div>
-                `;
-                
-                await flowchartManager.loadHierarchy(user.email);
-                flowchartManager.renderFlowchart(container);
             }
 
             handleFilter(e) {
@@ -3526,11 +6013,136 @@
                     setTimeout(() => notification.remove(), 300);
                 }, 3000);
             }
+
+            // Load Problems Section
+            async loadProblemsSection() {
+                const user = dashboardAuth.getCurrentUser();
+                if (!user) return;
+                
+                await problemsManager.loadProblems(user.email);
+                problemsManager.updateStats();
+                problemsManager.renderProblems('problemsList', 'all');
+            }
+
+            // Load My Problems Section
+            async loadMyProblemsSection() {
+                const user = dashboardAuth.getCurrentUser();
+                if (!user) return;
+                
+                await problemsManager.loadProblems(user.email);
+                problemsManager.updateStats();
+                problemsManager.renderProblems('myProblemsList', 'my');
+            }
+
+            // Load Announcements Section
+            async loadAnnouncementsSection() {
+                const user = dashboardAuth.getCurrentUser();
+                if (!user) return;
+                
+                await announcementsManager.loadAnnouncements(user.email);
+                announcementsManager.updateStats();
+                announcementsManager.renderAnnouncements('announcementsList', 'all');
+            }
         }
 
         // Initialize dashboard when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
-            new DashboardController();
+            const dashboard = new DashboardController();
+            
+            // Initialize Compose Problem Manager
+            composeProblemManager.init();
+            
+            // Problems Section Event Listeners
+            const reportProblemBtn = document.getElementById('reportProblemBtn');
+            const reportMyProblemBtn = document.getElementById('reportMyProblemBtn');
+            const closeProblemModal = document.getElementById('closeProblemModal');
+            const cancelProblemBtn = document.getElementById('cancelProblemBtn');
+            const saveProblemBtn = document.getElementById('saveProblemBtn');
+            const closeViewProblemModal = document.getElementById('closeViewProblemModal');
+            const closeViewProblemBtn = document.getElementById('closeViewProblemBtn');
+            
+            reportProblemBtn?.addEventListener('click', () => problemsManager.openProblemModal());
+            reportMyProblemBtn?.addEventListener('click', () => problemsManager.openProblemModal());
+            closeProblemModal?.addEventListener('click', () => problemsManager.closeProblemModal());
+            cancelProblemBtn?.addEventListener('click', () => problemsManager.closeProblemModal());
+            saveProblemBtn?.addEventListener('click', () => problemsManager.saveProblem());
+            closeViewProblemModal?.addEventListener('click', () => {
+                document.getElementById('viewProblemModal').classList.remove('show');
+            });
+            closeViewProblemBtn?.addEventListener('click', () => {
+                document.getElementById('viewProblemModal').classList.remove('show');
+            });
+            
+            // Problems Tab Navigation
+            document.querySelectorAll('#problemsSection .tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tab = btn.dataset.tab;
+                    if (tab === 'all-problems') problemsManager.setFilter('all');
+                    else if (tab === 'open-problems') problemsManager.setFilter('open');
+                    else if (tab === 'solved-problems') problemsManager.setFilter('solved');
+                    else if (tab === 'archived-problems') problemsManager.setFilter('archived');
+                });
+            });
+            
+            // Announcements Section Event Listeners
+            const refreshAnnouncementsBtn = document.getElementById('refreshAnnouncementsBtn');
+            const closeViewAnnouncementModal = document.getElementById('closeViewAnnouncementModal');
+            const closeViewAnnouncementBtn = document.getElementById('closeViewAnnouncementBtn');
+            
+            refreshAnnouncementsBtn?.addEventListener('click', async () => {
+                const user = dashboardAuth.getCurrentUser();
+                if (user) {
+                    refreshAnnouncementsBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+                    refreshAnnouncementsBtn.disabled = true;
+                    await announcementsManager.loadAnnouncements(user.email);
+                    announcementsManager.updateStats();
+                    announcementsManager.renderAnnouncements('announcementsList', announcementsManager.currentFilter);
+                    refreshAnnouncementsBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+                    refreshAnnouncementsBtn.disabled = false;
+                    flowchartManager.showToast('Announcements refreshed!', 'success');
+                }
+            });
+            
+            closeViewAnnouncementModal?.addEventListener('click', () => {
+                document.getElementById('viewAnnouncementModal').classList.remove('show');
+            });
+            closeViewAnnouncementBtn?.addEventListener('click', () => {
+                document.getElementById('viewAnnouncementModal').classList.remove('show');
+            });
+            
+            // Announcements Tab Navigation
+            document.querySelectorAll('#announcementsSection .tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tab = btn.dataset.tab;
+                    if (tab === 'all-announcements') announcementsManager.setFilter('all');
+                    else if (tab === 'important-announcements') announcementsManager.setFilter('important');
+                });
+            });
+            
+            // Dashboard Card Buttons - Wire up "Report Problem" and "View All" buttons
+            const dashboardCards = document.querySelectorAll('.dashboard-card');
+            dashboardCards.forEach((card, index) => {
+                const buttons = card.querySelectorAll('.card-btn');
+                buttons.forEach(btn => {
+                    const btnText = btn.textContent.trim().toLowerCase();
+                    btn.onclick = (e) => {
+                        e.stopPropagation();
+                        if (btnText.includes('report problem')) {
+                            problemsManager.openProblemModal();
+                        } else if (btnText.includes('view all')) {
+                            // Navigate to appropriate section based on card
+                            const cardTitle = card.querySelector('.card-title')?.textContent.toLowerCase() || '';
+                            let targetPage = 'problems';
+                            if (cardTitle.includes('solved')) targetPage = 'problems';
+                            else if (cardTitle.includes('announcement')) targetPage = 'announcements';
+                            
+                            // Trigger navigation
+                            const navLink = document.querySelector(`.nav-link[data-page="${targetPage}"]`);
+                            if (navLink) navLink.click();
+                        }
+                    };
+                });
+            });
         });
     </script>
 </body>

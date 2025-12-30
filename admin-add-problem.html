@@ -16,6 +16,591 @@
     
     <!-- Custom Styles -->
     <link rel="stylesheet" href="global.css">
+    
+    <style>
+        /* Page Base Styles */
+        * {
+            box-sizing: border-box;
+        }
+
+        .admin-add-problem-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #E5F6FD 0%, rgba(41, 171, 226, 0.1) 100%);
+            font-family: 'PT Sans', sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Header Styles */
+        .admin-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(41, 171, 226, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-left,
+        .header-right {
+            flex: 1;
+        }
+
+        .header-center {
+            flex: 0 0 auto;
+        }
+
+        .header-right {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: rgba(0, 0, 0, 0.05);
+            color: #4B5563;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(41, 171, 226, 0.1);
+            color: #29ABE2;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+            color: #29ABE2;
+        }
+
+        .logo-text {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1F2933;
+        }
+
+        .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .admin-name {
+            font-weight: 600;
+            color: #1F2933;
+            font-size: 0.95rem;
+        }
+
+        /* Main Content */
+        .admin-main {
+            padding: 2rem 0 4rem;
+        }
+
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1F2933;
+            margin: 0 0 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #6B7280;
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        /* Form Card */
+        .form-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(41, 171, 226, 0.1);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(41, 171, 226, 0.1);
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+        }
+
+        .card-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1F2933;
+            margin: 0;
+        }
+
+        /* Form Styles */
+        .admin-problem-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #1F2933;
+            font-size: 0.95rem;
+        }
+
+        .form-label i {
+            color: #29ABE2;
+            font-size: 0.9rem;
+        }
+
+        .required {
+            color: #EF4444;
+        }
+
+        .input-container {
+            position: relative;
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid rgba(41, 171, 226, 0.2);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'PT Sans', sans-serif;
+            color: #1F2933;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #29ABE2;
+            box-shadow: 0 0 0 4px rgba(41, 171, 226, 0.1);
+        }
+
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+            color: #9CA3AF;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-select {
+            appearance: none;
+            cursor: pointer;
+            padding-right: 2.5rem;
+        }
+
+        .select-arrow {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6B7280;
+            pointer-events: none;
+        }
+
+        .input-focus-line {
+            display: none;
+        }
+
+        /* Visibility Options */
+        .visibility-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .visibility-option {
+            position: relative;
+        }
+
+        .visibility-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .visibility-label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            border: 2px solid rgba(41, 171, 226, 0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .visibility-option input[type="radio"]:checked + .visibility-label {
+            border-color: #29ABE2;
+            background: rgba(41, 171, 226, 0.05);
+        }
+
+        .visibility-option input[type="radio"]:checked + .visibility-label .visibility-icon {
+            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            color: white;
+        }
+
+        .visibility-label:hover {
+            border-color: #29ABE2;
+        }
+
+        .visibility-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(41, 171, 226, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #29ABE2;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .visibility-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .visibility-title {
+            font-weight: 600;
+            color: #1F2933;
+            font-size: 0.9rem;
+        }
+
+        .visibility-desc {
+            font-size: 0.75rem;
+            color: #6B7280;
+        }
+
+        /* Form Actions */
+        .form-actions {
+            margin-top: 1rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(41, 171, 226, 0.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(41, 171, 226, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Success Modal */
+        .success-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 1rem;
+        }
+
+        .success-modal-overlay.show {
+            display: flex;
+        }
+
+        .success-modal {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem;
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .success-animation {
+            margin-bottom: 1.5rem;
+        }
+
+        .success-checkmark {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+        }
+
+        .checkmark-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .checkmark-circle {
+            stroke: #10B981;
+            stroke-width: 2;
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+
+        .checkmark-check {
+            stroke: #10B981;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+        }
+
+        @keyframes stroke {
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .success-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1F2933;
+            margin: 0 0 0.5rem;
+        }
+
+        .success-message {
+            color: #6B7280;
+            margin: 0 0 1.5rem;
+        }
+
+        .success-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(41, 171, 226, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(0, 0, 0, 0.05);
+            color: #4B5563;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-left,
+            .header-right {
+                flex: none;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .header-left {
+                order: 2;
+            }
+
+            .header-center {
+                order: 1;
+            }
+
+            .header-right {
+                order: 3;
+            }
+
+            .back-btn span {
+                display: none;
+            }
+
+            .admin-name {
+                display: none;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .form-card {
+                padding: 1.5rem;
+                border-radius: 20px;
+            }
+
+            .visibility-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .admin-main {
+                padding: 1.5rem 0 3rem;
+            }
+
+            .form-card {
+                padding: 1.25rem;
+            }
+
+            .card-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .success-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 <body class="admin-add-problem-page">
     <!-- Header -->

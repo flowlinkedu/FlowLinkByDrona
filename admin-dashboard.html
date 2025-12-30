@@ -8,55 +8,357 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="global.css">
     <style>
-        :root { --admin-accent: #29ABE2; --danger-color: #EF4444; --success-color: #10B981; --warning-color: #F59E0B; }
-        .admin-dashboard-page { background: linear-gradient(135deg, #E5F6FD 0%, rgba(41, 171, 226, 0.1) 100%); min-height: 100vh; display: flex; font-family: 'PT Sans', sans-serif; }
-        .admin-sidebar { width: 280px; background: linear-gradient(180deg, #1F2933 0%, #2D3748 100%); position: fixed; top: 0; left: 0; height: 100vh; z-index: 1000; display: flex; flex-direction: column; box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; }
-        .admin-sidebar.collapsed { transform: translateX(-280px); }
-        .sidebar-header { padding: 2rem 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-        .sidebar-logo { display: flex; align-items: center; gap: 0.75rem; }
-        .sidebar-logo i { font-size: 1.8rem; color: #29ABE2; }
-        .sidebar-logo span { font-family: 'Poppins', sans-serif; font-size: 1.4rem; font-weight: 700; color: white; }
-        .admin-badge { display: inline-block; background: linear-gradient(135deg, var(--admin-accent), #29E2D0); color: white; font-size: 0.6rem; font-weight: 600; padding: 0.2rem 0.4rem; border-radius: 4px; margin-left: 0.5rem; text-transform: uppercase; }
-        .sidebar-nav { flex: 1; padding: 2rem 0; overflow-y: auto; }
-        .nav-list { list-style: none; padding: 0; margin: 0; }
-        .nav-item { margin-bottom: 0.5rem; cursor: pointer; }
-        .nav-link { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem; color: rgba(255, 255, 255, 0.7); text-decoration: none; font-weight: 500; transition: all 0.3s ease; border-left: 3px solid transparent; }
-        .nav-link:hover { background: rgba(255, 255, 255, 0.05); color: white; border-left-color: var(--admin-accent); }
-        .nav-item.active .nav-link { background: rgba(41, 171, 226, 0.2); color: white; border-left-color: var(--admin-accent); }
-        .nav-icon { font-size: 1.2rem; width: 24px; text-align: center; }
-        .nav-badge { background: var(--danger-color); color: white; font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 10px; margin-left: auto; }
-        .sidebar-footer { padding: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1); }
-        .admin-profile { display: flex; align-items: center; gap: 1rem; }
-        .admin-avatar { width: 45px; height: 45px; border-radius: 12px; background: linear-gradient(135deg, var(--admin-accent), #29E2D0); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; }
-        .admin-info .admin-name { font-family: 'Poppins', sans-serif; font-weight: 600; color: white; font-size: 0.95rem; }
-        .admin-info .admin-role { color: rgba(255, 255, 255, 0.6); font-size: 0.8rem; }
-        .admin-main { flex: 1; margin-left: 280px; display: flex; flex-direction: column; min-height: 100vh; transition: margin-left 0.3s ease; }
-        .admin-main.expanded { margin-left: 0; }
-        .admin-topbar { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(41, 171, 226, 0.1); padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-        .topbar-left { display: flex; align-items: center; gap: 1rem; }
-        .mobile-menu-btn { display: none; background: none; border: none; color: #4B5563; font-size: 1.3rem; cursor: pointer; padding: 0.5rem; border-radius: 8px; }
-        .page-title { font-family: 'Poppins', sans-serif; font-size: 1.5rem; font-weight: 600; color: #1F2933; margin: 0; }
-        .topbar-badge { background: linear-gradient(135deg, var(--admin-accent), #29E2D0); color: white; font-size: 0.75rem; font-weight: 600; padding: 0.35rem 0.75rem; border-radius: 20px; }
-        .topbar-right { display: flex; align-items: center; gap: 1rem; }
-        .back-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: rgba(0, 0, 0, 0.05); color: #4B5563; border: none; border-radius: 10px; font-family: 'Poppins', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
-        .back-btn:hover { background: rgba(0, 0, 0, 0.1); }
-        .sign-out-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, var(--admin-accent), #29E2D0); color: white; border: none; border-radius: 10px; font-family: 'Poppins', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
-        .sign-out-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(41, 171, 226, 0.4); }
-        .admin-content { flex: 1; padding: 2rem; }
-        .page-section { display: none; }
-        .page-section.active { display: block; }
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-        .metric-card { background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); border: 1px solid rgba(41, 171, 226, 0.1); transition: all 0.3s ease; }
-        .metric-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); }
-        .metric-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: white; margin-bottom: 1rem; }
+        :root {
+            --admin-accent: #29ABE2;
+            --danger-color: #EF4444;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .admin-dashboard-page {
+            background: linear-gradient(135deg, #E5F6FD 0%, rgba(41, 171, 226, 0.1) 100%);
+            min-height: 100vh;
+            display: flex;
+            font-family: 'PT Sans', sans-serif;
+        }
+
+        /* Sidebar Styles */
+        .admin-sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1F2933 0%, #2D3748 100%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .admin-sidebar.collapsed {
+            transform: translateX(-280px);
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sidebar-logo i {
+            font-size: 1.8rem;
+            color: #29ABE2;
+        }
+
+        .sidebar-logo span {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .admin-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--admin-accent), #29E2D0);
+            color: white;
+            font-size: 0.6rem;
+            font-weight: 600;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            margin-left: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 2rem 0;
+            overflow-y: auto;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border-left-color: var(--admin-accent);
+        }
+
+        .nav-item.active .nav-link {
+            background: rgba(41, 171, 226, 0.2);
+            color: white;
+            border-left-color: var(--admin-accent);
+        }
+
+        .nav-icon {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-badge {
+            background: var(--danger-color);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            margin-left: auto;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--admin-accent), #29E2D0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .admin-info {
+            overflow: hidden;
+        }
+
+        .admin-info .admin-name {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: white;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .admin-info .admin-role {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+        }
+
+        /* Main Content Area */
+        .admin-main {
+            flex: 1;
+            margin-left: 280px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .admin-main.expanded {
+            margin-left: 0;
+        }
+
+        /* Top Bar */
+        .admin-topbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(41, 171, 226, 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #4B5563;
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        .page-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1F2933;
+            margin: 0;
+        }
+
+        .topbar-badge {
+            background: linear-gradient(135deg, var(--admin-accent), #29E2D0);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(0, 0, 0, 0.05);
+            color: #4B5563;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .sign-out-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, var(--admin-accent), #29E2D0);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sign-out-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(41, 171, 226, 0.4);
+        }
+
+        /* Content Area */
+        .admin-content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(41, 171, 226, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
         .metric-icon.members { background: linear-gradient(135deg, #29ABE2, #29E2D0); }
         .metric-icon.problems { background: linear-gradient(135deg, #EF4444, #F97316); }
         .metric-icon.solved { background: linear-gradient(135deg, #10B981, #059669); }
         .metric-icon.pending { background: linear-gradient(135deg, #F59E0B, #D97706); }
         .metric-icon.join { background: linear-gradient(135deg, #8B5CF6, #A78BFA); }
         .metric-icon.branch { background: linear-gradient(135deg, #EC4899, #F472B6); }
-        .metric-value { font-family: 'Poppins', sans-serif; font-size: 2rem; font-weight: 700; color: #1F2933; margin-bottom: 0.25rem; }
-        .metric-label { color: #6B7280; font-size: 0.9rem; }
+        .metric-icon.escalation { background: linear-gradient(135deg, #F59E0B, #EF4444); }
+        .metric-icon.archived { background: linear-gradient(135deg, #6B7280, #9CA3AF); }
+
+        .metric-value {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1F2933;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-label {
+            color: #6B7280;
+            font-size: 0.9rem;
+        }
 </style>
 </head>
 <body class="admin-dashboard-page">
@@ -108,16 +410,80 @@
                     <h2 class="section-title">Select Organization</h2>
                     <div class="org-selector"><label for="orgSelect">Organization:</label><select id="orgSelect"></select></div>
                 </div>
-                <!-- Dashboard Page -->
+                <!-- Dashboard Page - Problem Governance & Approval Center -->
                 <section class="page-section active" id="dashboardPage">
+                    <!-- Metrics Grid -->
                     <div class="metrics-grid">
                         <div class="metric-card"><div class="metric-icon members"><i class="fas fa-users"></i></div><div class="metric-value" id="totalMembers">0</div><div class="metric-label">Total Members</div></div>
-                        <div class="metric-card"><div class="metric-icon join"><i class="fas fa-user-plus"></i></div><div class="metric-value" id="joinRequestCount">0</div><div class="metric-label">Join Requests</div></div>
-                        <div class="metric-card"><div class="metric-icon branch"><i class="fas fa-code-branch"></i></div><div class="metric-value" id="branchRequestCount">0</div><div class="metric-label">Branch Requests</div></div>
+                        <div class="metric-card"><div class="metric-icon pending"><i class="fas fa-clipboard-check"></i></div><div class="metric-value" id="pendingApprovalsCount">0</div><div class="metric-label">Pending Approvals</div></div>
                         <div class="metric-card"><div class="metric-icon problems"><i class="fas fa-exclamation-triangle"></i></div><div class="metric-value" id="totalProblems">0</div><div class="metric-label">Open Problems</div></div>
+                        <div class="metric-card"><div class="metric-icon escalation"><i class="fas fa-level-up-alt"></i></div><div class="metric-value" id="escalatedCount">0</div><div class="metric-label">Escalated</div></div>
                         <div class="metric-card"><div class="metric-icon solved"><i class="fas fa-check-circle"></i></div><div class="metric-value" id="solvedProblems">0</div><div class="metric-label">Solved Problems</div></div>
+                        <div class="metric-card"><div class="metric-icon archived"><i class="fas fa-archive"></i></div><div class="metric-value" id="archivedCount">0</div><div class="metric-label">Archived</div></div>
                     </div>
-                    <div class="section-header"><h2 class="section-title">Recent Activity</h2></div>
+                    <!-- Hidden elements for backward compatibility -->
+                    <span id="joinRequestCount" style="display:none;">0</span>
+                    <span id="branchRequestCount" style="display:none;">0</span>
+
+                    <!-- Governance Tabs -->
+                    <div class="governance-tabs">
+                        <button class="gov-tab active" data-tab="pending-approvals"><i class="fas fa-clipboard-list"></i> Pending Approvals <span class="tab-badge" id="pendingTabBadge">0</span></button>
+                        <button class="gov-tab" data-tab="announcement-moderation"><i class="fas fa-bullhorn"></i> Announcement Moderation <span class="tab-badge" id="announcementTabBadge">0</span></button>
+                        <button class="gov-tab" data-tab="escalation-archive"><i class="fas fa-level-up-alt"></i> Escalation & Archive <span class="tab-badge" id="escalationTabBadge">0</span></button>
+                    </div>
+
+                    <!-- Pending Approvals Panel -->
+                    <div class="governance-panel active" id="pending-approvals-panel">
+                        <div class="panel-header">
+                            <h3 class="panel-title"><i class="fas fa-clipboard-check"></i> Pending Approvals</h3>
+                            <div class="panel-filters">
+                                <button class="filter-chip active" data-filter="all">All</button>
+                                <button class="filter-chip" data-filter="problem"><i class="fas fa-exclamation-circle"></i> Problems</button>
+                                <button class="filter-chip" data-filter="announcement"><i class="fas fa-bullhorn"></i> Announcements</button>
+                                <button class="filter-chip" data-filter="escalation"><i class="fas fa-level-up-alt"></i> Escalations</button>
+                            </div>
+                        </div>
+                        <div class="approval-list" id="pendingApprovalsList">
+                            <div class="loading-spinner"><i class="fas fa-spinner"></i></div>
+                        </div>
+                    </div>
+
+                    <!-- Announcement Moderation Panel -->
+                    <div class="governance-panel" id="announcement-moderation-panel">
+                        <div class="panel-header">
+                            <h3 class="panel-title"><i class="fas fa-bullhorn"></i> Announcement Moderation</h3>
+                            <div class="panel-actions">
+                                <label class="toggle-label"><input type="checkbox" id="showUrgentOnly"> Show Urgent Only</label>
+                            </div>
+                        </div>
+                        <div class="announcement-moderation-list" id="announcementModerationList">
+                            <div class="loading-spinner"><i class="fas fa-spinner"></i></div>
+                        </div>
+                    </div>
+
+                    <!-- Escalation & Archive Panel -->
+                    <div class="governance-panel" id="escalation-archive-panel">
+                        <div class="panel-header">
+                            <h3 class="panel-title"><i class="fas fa-level-up-alt"></i> Escalation & Archive Management</h3>
+                        </div>
+                        <div class="escalation-tabs">
+                            <button class="esc-tab active" data-esctab="escalations"><i class="fas fa-arrow-up"></i> Escalations</button>
+                            <button class="esc-tab" data-esctab="archived"><i class="fas fa-archive"></i> Archived</button>
+                        </div>
+                        <div class="escalation-content active" id="escalations-content">
+                            <div class="escalation-list" id="escalationList">
+                                <div class="loading-spinner"><i class="fas fa-spinner"></i></div>
+                            </div>
+                        </div>
+                        <div class="escalation-content" id="archived-content">
+                            <div class="archive-list" id="archiveList">
+                                <div class="loading-spinner"><i class="fas fa-spinner"></i></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity (kept for reference) -->
+                    <div class="section-header" style="margin-top: 2rem;"><h2 class="section-title">Recent Activity</h2></div>
                     <div class="data-table" id="recentActivityTable"><div class="loading-spinner"><i class="fas fa-spinner"></i></div></div>
                 </section>
                 <!-- Join Requests Page -->
@@ -232,8 +598,25 @@
         .subnode-name { font-weight: 600; color: #1F2933; }
         .subnode-meta { font-size: 0.85rem; color: #6B7280; }
         .subnode-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-        @media (max-width: 768px) { .admin-sidebar { transform: translateX(-100%); } .admin-sidebar.show { transform: translateX(0); } .admin-main { margin-left: 0; } .mobile-menu-btn { display: block; } .metrics-grid { grid-template-columns: repeat(2, 1fr); } .admin-topbar { padding: 1rem; } .topbar-right { gap: 0.5rem; } .back-btn span, .sign-out-btn span { display: none; } }
-        @media (max-width: 480px) { .metrics-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) {
+            .admin-sidebar { transform: translateX(-100%); }
+            .admin-sidebar.show { transform: translateX(0); }
+            .admin-main { margin-left: 0; }
+            .mobile-menu-btn { display: block; }
+            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+            .admin-topbar { padding: 1rem; }
+            .topbar-right { gap: 0.5rem; }
+            .back-btn span, .sign-out-btn span { display: none; }
+            .data-table { border-radius: 12px; }
+            .data-table th, .data-table td { padding: 0.75rem 1rem; }
+        }
+        @media (max-width: 480px) {
+            .metrics-grid { grid-template-columns: 1fr; }
+            .admin-content { padding: 1rem; }
+            .section-header { flex-direction: column; align-items: flex-start; }
+            .org-selector { width: 100%; }
+            .org-selector select { width: 100%; }
+        }
         
         /* Tree View Styles for Branch Requests */
         .branch-tree-container { background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); margin-bottom: 1.5rem; }
@@ -268,6 +651,732 @@
         .restructure-preview .preview-node.new { background: rgba(16, 185, 129, 0.1); border-color: #10B981; color: #059669; }
         .restructure-preview .preview-node.moved { background: rgba(245, 158, 11, 0.1); border-color: #F59E0B; color: #D97706; }
         .restructure-preview .preview-arrow { color: #9CA3AF; }
+
+        /* ========== GOVERNANCE & APPROVAL CENTER STYLES ========== */
+        
+        /* Governance Tabs */
+        .governance-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .gov-tab {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #6B7280;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .gov-tab:hover {
+            background: rgba(41, 171, 226, 0.1);
+            color: var(--admin-accent);
+        }
+        
+        .gov-tab.active {
+            background: linear-gradient(135deg, var(--admin-accent), #29E2D0);
+            color: white;
+            box-shadow: 0 4px 15px rgba(41, 171, 226, 0.3);
+        }
+        
+        .tab-badge {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .gov-tab.active .tab-badge {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .gov-tab:not(.active) .tab-badge {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        /* Governance Panels */
+        .governance-panel {
+            display: none;
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            animation: panelFadeIn 0.3s ease;
+        }
+        
+        .governance-panel.active {
+            display: block;
+        }
+        
+        @keyframes panelFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .panel-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1F2933;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .panel-title i {
+            color: var(--admin-accent);
+        }
+        
+        .panel-filters {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.5rem 1rem;
+            background: rgba(0, 0, 0, 0.05);
+            border: none;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #6B7280;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-chip:hover {
+            background: rgba(41, 171, 226, 0.1);
+            color: var(--admin-accent);
+        }
+        
+        .filter-chip.active {
+            background: var(--admin-accent);
+            color: white;
+        }
+        
+        /* Approval Items */
+        .approval-list, .announcement-moderation-list, .escalation-list, .archive-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .approval-item {
+            background: #FAFAFA;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .approval-item:hover {
+            border-color: var(--admin-accent);
+            box-shadow: 0 4px 15px rgba(41, 171, 226, 0.1);
+        }
+        
+        .approval-item.expanded {
+            border-color: var(--admin-accent);
+        }
+        
+        .approval-header {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            cursor: pointer;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .approval-type-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .approval-type-badge.problem {
+            background: rgba(239, 68, 68, 0.1);
+            color: #DC2626;
+        }
+        
+        .approval-type-badge.announcement {
+            background: rgba(41, 171, 226, 0.1);
+            color: var(--admin-accent);
+        }
+        
+        .approval-type-badge.escalation {
+            background: rgba(245, 158, 11, 0.1);
+            color: #D97706;
+        }
+        
+        .approval-info {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .approval-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: #1F2933;
+            margin-bottom: 0.25rem;
+        }
+        
+        .approval-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: #6B7280;
+            flex-wrap: wrap;
+        }
+        
+        .approval-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        
+        .priority-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        
+        .priority-indicator.high { background: #EF4444; }
+        .priority-indicator.medium { background: #F59E0B; }
+        .priority-indicator.low { background: #3B82F6; }
+        
+        .approval-age {
+            padding: 0.25rem 0.5rem;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #6B7280;
+        }
+        
+        .approval-age.urgent {
+            background: rgba(239, 68, 68, 0.1);
+            color: #DC2626;
+            animation: pulse-urgent 2s infinite;
+        }
+        
+        @keyframes pulse-urgent {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .approval-expand-btn {
+            background: none;
+            border: none;
+            color: #6B7280;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .approval-item.expanded .approval-expand-btn {
+            transform: rotate(180deg);
+        }
+        
+        .approval-details {
+            display: none;
+            padding: 0 1.25rem 1.25rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            animation: slideDown 0.3s ease;
+        }
+        
+        .approval-item.expanded .approval-details {
+            display: block;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; }
+            to { opacity: 1; max-height: 500px; }
+        }
+        
+        .approval-description {
+            padding: 1rem 0;
+            color: #4B5563;
+            line-height: 1.6;
+        }
+        
+        .approval-path {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: rgba(41, 171, 226, 0.05);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            font-size: 0.9rem;
+        }
+        
+        .path-node {
+            padding: 0.25rem 0.75rem;
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+        }
+        
+        .path-arrow {
+            color: #9CA3AF;
+        }
+        
+        .approval-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        
+        .approval-actions .action-btn {
+            flex: 1;
+            min-width: 100px;
+            justify-content: center;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        
+        .action-btn.escalate {
+            background: rgba(245, 158, 11, 0.1);
+            color: #D97706;
+        }
+        
+        .action-btn.escalate:hover {
+            background: #F59E0B;
+            color: white;
+        }
+        
+        .action-btn.archive {
+            background: rgba(107, 114, 128, 0.1);
+            color: #6B7280;
+        }
+        
+        .action-btn.archive:hover {
+            background: #6B7280;
+            color: white;
+        }
+        
+        .action-btn.restore {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+        
+        .action-btn.restore:hover {
+            background: #10B981;
+            color: white;
+        }
+        
+        /* Announcement Moderation Specific */
+        .announcement-card {
+            background: #FAFAFA;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .announcement-card:hover {
+            border-color: var(--admin-accent);
+        }
+        
+        .announcement-card.urgent {
+            border-left: 4px solid #EF4444;
+        }
+        
+        .announcement-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .announcement-card-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: #1F2933;
+        }
+        
+        .announcement-badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .scope-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .scope-badge.global { background: rgba(139, 92, 246, 0.1); color: #7C3AED; }
+        .scope-badge.org { background: rgba(41, 171, 226, 0.1); color: var(--admin-accent); }
+        .scope-badge.node { background: rgba(16, 185, 129, 0.1); color: #059669; }
+        
+        .verified-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .announcement-card-content {
+            color: #4B5563;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        
+        .announcement-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .deadline-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: #6B7280;
+        }
+        
+        .deadline-info.expiring-soon {
+            color: #EF4444;
+        }
+        
+        .announcement-card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        /* Escalation Tabs */
+        .escalation-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            padding-bottom: 0.5rem;
+        }
+        
+        .esc-tab {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #6B7280;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .esc-tab:hover {
+            color: var(--admin-accent);
+        }
+        
+        .esc-tab.active {
+            color: var(--admin-accent);
+            border-bottom: 2px solid var(--admin-accent);
+        }
+        
+        .escalation-content {
+            display: none;
+        }
+        
+        .escalation-content.active {
+            display: block;
+        }
+        
+        /* Escalation Item */
+        .escalation-item {
+            background: #FAFAFA;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-left: 4px solid #F59E0B;
+            border-radius: 0 12px 12px 0;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .escalation-item:hover {
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.15);
+        }
+        
+        .escalation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .escalation-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: #1F2933;
+        }
+        
+        .escalation-reason {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.75rem;
+            background: rgba(245, 158, 11, 0.1);
+            color: #D97706;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .escalation-path-trail {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: rgba(245, 158, 11, 0.05);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+            animation: trailReveal 0.5s ease;
+        }
+        
+        @keyframes trailReveal {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .trail-node {
+            padding: 0.25rem 0.75rem;
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+        }
+        
+        .trail-node.current {
+            background: #F59E0B;
+            color: white;
+            border-color: #F59E0B;
+            animation: pulse-node 2s infinite;
+        }
+        
+        @keyframes pulse-node {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+        }
+        
+        .escalation-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn.send-back {
+            background: rgba(139, 92, 246, 0.1);
+            color: #7C3AED;
+        }
+        
+        .action-btn.send-back:hover {
+            background: #7C3AED;
+            color: white;
+        }
+        
+        .action-btn.force-escalate {
+            background: rgba(236, 72, 153, 0.1);
+            color: #DB2777;
+        }
+        
+        .action-btn.force-escalate:hover {
+            background: #DB2777;
+            color: white;
+        }
+        
+        /* Archive Item */
+        .archive-item {
+            background: #FAFAFA;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            opacity: 0.85;
+            transition: all 0.3s ease;
+        }
+        
+        .archive-item:hover {
+            opacity: 1;
+            border-color: #6B7280;
+        }
+        
+        .archive-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .archive-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: #6B7280;
+        }
+        
+        .archive-reason {
+            font-size: 0.85rem;
+            color: #9CA3AF;
+            margin-bottom: 0.75rem;
+        }
+        
+        .archive-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        /* Empty State */
+        .governance-empty {
+            text-align: center;
+            padding: 3rem;
+            color: #6B7280;
+        }
+        
+        .governance-empty i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .governance-empty h3 {
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 0.5rem;
+            color: #1F2933;
+        }
+        
+        /* Success Ripple Animation */
+        .approval-success-ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .approval-success-ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(16, 185, 129, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: ripple 0.6s ease-out;
+        }
+        
+        @keyframes ripple {
+            to {
+                width: 200%;
+                height: 200%;
+                opacity: 0;
+            }
+        }
+        
+        /* Toggle Label */
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #6B7280;
+            cursor: pointer;
+        }
+        
+        .toggle-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--admin-accent);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .governance-tabs {
+                flex-direction: column;
+            }
+            
+            .gov-tab {
+                justify-content: center;
+            }
+            
+            .panel-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .panel-filters {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            
+            .approval-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .approval-actions {
+                flex-direction: column;
+            }
+            
+            .approval-actions .action-btn {
+                width: 100%;
+            }
+        }
     </style>
 
     <!-- Details Modal -->
@@ -313,6 +1422,137 @@
         </div>
     </div>
     <div class="toast" id="toast"><i class="fas fa-check-circle" style="color:#10B981;"></i><span id="toastMessage">Success!</span></div>
+
+    <!-- Governance Action Modal - Reject with Reason -->
+    <div class="modal-overlay" id="govRejectModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-times-circle" style="color:#EF4444;margin-right:0.5rem;"></i>Reject Item</h2>
+                <button class="modal-close" onclick="closeModal('govRejectModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom:1rem;">Rejecting: <strong id="govRejectItemTitle"></strong></p>
+                <div class="form-group">
+                    <label class="form-label">Rejection Reason <span style="color:#EF4444;">*</span></label>
+                    <textarea class="form-input" id="govRejectReason" rows="3" placeholder="Please provide a reason for rejection..." required></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('govRejectModal')">Cancel</button>
+                <button class="btn-primary" style="background:linear-gradient(135deg, #EF4444, #DC2626);" id="confirmGovRejectBtn">Reject</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Governance Action Modal - Escalate -->
+    <div class="modal-overlay" id="govEscalateModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-level-up-alt" style="color:#F59E0B;margin-right:0.5rem;"></i>Escalate Item</h2>
+                <button class="modal-close" onclick="closeModal('govEscalateModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom:1rem;">Escalating: <strong id="govEscalateItemTitle"></strong></p>
+                <div class="form-group">
+                    <label class="form-label">Escalate To</label>
+                    <select class="form-input" id="govEscalateTo">
+                        <option value="parent">Parent Node Admin</option>
+                        <option value="org">Organization Admin</option>
+                        <option value="platform">Platform Admin (Super Admin)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Escalation Reason</label>
+                    <textarea class="form-input" id="govEscalateReason" rows="3" placeholder="Why is this being escalated?"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('govEscalateModal')">Cancel</button>
+                <button class="btn-primary" style="background:linear-gradient(135deg, #F59E0B, #D97706);" id="confirmGovEscalateBtn">Escalate</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Governance Action Modal - Archive -->
+    <div class="modal-overlay" id="govArchiveModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-archive" style="color:#6B7280;margin-right:0.5rem;"></i>Archive Item</h2>
+                <button class="modal-close" onclick="closeModal('govArchiveModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom:1rem;">Archiving: <strong id="govArchiveItemTitle"></strong></p>
+                <div class="form-group">
+                    <label class="form-label">Archive Reason</label>
+                    <textarea class="form-input" id="govArchiveReason" rows="3" placeholder="Why is this being archived?"></textarea>
+                </div>
+                <p style="font-size:0.85rem;color:#6B7280;"><i class="fas fa-info-circle"></i> Archived items can be restored by admins later.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('govArchiveModal')">Cancel</button>
+                <button class="btn-primary" style="background:linear-gradient(135deg, #6B7280, #4B5563);" id="confirmGovArchiveBtn">Archive</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Governance Action Modal - Edit Announcement -->
+    <div class="modal-overlay" id="govEditAnnouncementModal">
+        <div class="modal" style="max-width:600px;">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-edit" style="color:var(--admin-accent);margin-right:0.5rem;"></i>Edit Announcement</h2>
+                <button class="modal-close" onclick="closeModal('govEditAnnouncementModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Title</label>
+                    <input type="text" class="form-input" id="editAnnouncementTitle" placeholder="Announcement title">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Content</label>
+                    <textarea class="form-input" id="editAnnouncementContent" rows="4" placeholder="Announcement content"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Expiry Date</label>
+                    <input type="date" class="form-input" id="editAnnouncementExpiry">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Visibility Scope</label>
+                    <select class="form-input" id="editAnnouncementScope">
+                        <option value="node">Node Only</option>
+                        <option value="org">Organization Wide</option>
+                        <option value="global">Global</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="editAnnouncementVerified">
+                        Mark as Verified
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('govEditAnnouncementModal')">Cancel</button>
+                <button class="btn-primary" id="confirmEditAnnouncementBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Governance Confirmation Modal -->
+    <div class="modal-overlay" id="govConfirmModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="govConfirmTitle">Confirm Action</h2>
+                <button class="modal-close" onclick="closeModal('govConfirmModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="govConfirmMessage">Are you sure you want to proceed?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('govConfirmModal')">Cancel</button>
+                <button class="btn-primary" id="confirmGovActionBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Branch Merge Modal -->
     <div class="modal-overlay" id="branchMergeModal">
@@ -1825,6 +3065,570 @@
         
         // Event listener for restructure confirm button
         document.getElementById('confirmRestructureBtn').addEventListener('click', confirmRestructure);
+
+        // ========== GOVERNANCE & APPROVAL CENTER FUNCTIONALITY ==========
+        
+        // Mock data for governance features (frontend-only logic)
+        let pendingProblemApprovals = [];
+        let pendingAnnouncementApprovals = [];
+        let escalatedItems = [];
+        let archivedItems = [];
+        let currentGovAction = null;
+        
+        // Initialize mock governance data
+        function initGovernanceData() {
+            // Mock pending problem approvals
+            pendingProblemApprovals = [
+                {
+                    id: 'prob-1',
+                    type: 'problem',
+                    title: 'Network connectivity issues in Block A',
+                    description: 'Students are experiencing frequent disconnections from the campus WiFi network in Block A dormitory.',
+                    submittedBy: 'student@example.com',
+                    submittedByOrg: 'Hostel Management',
+                    hierarchyPath: ['IIIT Bhopal', 'Hostel', 'Block A'],
+                    priority: 'high',
+                    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+                    status: 'pending'
+                },
+                {
+                    id: 'prob-2',
+                    type: 'problem',
+                    title: 'Library AC not working',
+                    description: 'The air conditioning system in the main library reading hall has been malfunctioning for the past week.',
+                    submittedBy: 'faculty@example.com',
+                    submittedByOrg: 'Academic',
+                    hierarchyPath: ['IIIT Bhopal', 'Academic', 'Library'],
+                    priority: 'medium',
+                    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+                    status: 'pending'
+                }
+            ];
+            
+            // Mock pending announcement approvals
+            pendingAnnouncementApprovals = [
+                {
+                    id: 'ann-1',
+                    type: 'announcement',
+                    title: 'Upcoming Sports Day Event',
+                    content: 'Annual sports day will be held on January 15th. All students are encouraged to participate.',
+                    submittedBy: 'sports@example.com',
+                    submittedByOrg: 'Sports Department',
+                    hierarchyPath: ['IIIT Bhopal', 'Sports'],
+                    scope: 'org',
+                    deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+                    isUrgent: false,
+                    isVerified: false,
+                    createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+                    status: 'pending'
+                },
+                {
+                    id: 'ann-2',
+                    type: 'announcement',
+                    title: 'Emergency: Water Supply Disruption',
+                    content: 'Water supply will be disrupted tomorrow from 10 AM to 4 PM due to maintenance work.',
+                    submittedBy: 'admin@example.com',
+                    submittedByOrg: 'Administration',
+                    hierarchyPath: ['IIIT Bhopal'],
+                    scope: 'global',
+                    deadline: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day from now
+                    isUrgent: true,
+                    isVerified: false,
+                    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+                    status: 'pending'
+                }
+            ];
+            
+            // Mock escalated items
+            escalatedItems = [
+                {
+                    id: 'esc-1',
+                    type: 'problem',
+                    title: 'Persistent plumbing issues',
+                    description: 'Recurring water leakage in multiple rooms that local maintenance cannot resolve.',
+                    submittedBy: 'warden@example.com',
+                    previousLevel: 'Block A Admin',
+                    currentLevel: 'Hostel Admin',
+                    escalationReason: 'Auto-escalated: Unresolved for 7+ days',
+                    escalationPath: ['Block A', 'Hostel Management', 'Organization'],
+                    priority: 'high',
+                    createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+                    escalatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
+                }
+            ];
+            
+            // Mock archived items
+            archivedItems = [
+                {
+                    id: 'arch-1',
+                    type: 'problem',
+                    title: 'Old cafeteria complaint',
+                    archiveReason: 'Issue resolved and verified',
+                    archivedBy: 'admin@example.com',
+                    archivedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+                },
+                {
+                    id: 'arch-2',
+                    type: 'announcement',
+                    title: 'Past event notification',
+                    archiveReason: 'Event completed',
+                    archivedBy: 'admin@example.com',
+                    archivedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000)
+                }
+            ];
+            
+            updateGovernanceMetrics();
+            renderGovernancePanels();
+        }
+        
+        // Update governance metrics
+        function updateGovernanceMetrics() {
+            const totalPending = pendingProblemApprovals.length + pendingAnnouncementApprovals.length;
+            document.getElementById('pendingApprovalsCount').textContent = totalPending;
+            document.getElementById('pendingTabBadge').textContent = totalPending;
+            document.getElementById('announcementTabBadge').textContent = pendingAnnouncementApprovals.length;
+            document.getElementById('escalationTabBadge').textContent = escalatedItems.length;
+            document.getElementById('escalatedCount').textContent = escalatedItems.length;
+            document.getElementById('archivedCount').textContent = archivedItems.length;
+        }
+        
+        // Setup governance tabs
+        function setupGovernanceTabs() {
+            // Main governance tabs
+            document.querySelectorAll('.gov-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.dataset.tab;
+                    document.querySelectorAll('.gov-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.querySelectorAll('.governance-panel').forEach(p => p.classList.remove('active'));
+                    document.getElementById(`${tabId}-panel`).classList.add('active');
+                });
+            });
+            
+            // Escalation sub-tabs
+            document.querySelectorAll('.esc-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.dataset.esctab;
+                    document.querySelectorAll('.esc-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.querySelectorAll('.escalation-content').forEach(c => c.classList.remove('active'));
+                    document.getElementById(`${tabId}-content`).classList.add('active');
+                });
+            });
+            
+            // Filter chips
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    renderPendingApprovals(chip.dataset.filter);
+                });
+            });
+            
+            // Urgent only toggle
+            document.getElementById('showUrgentOnly')?.addEventListener('change', (e) => {
+                renderAnnouncementModeration(e.target.checked);
+            });
+        }
+        
+        // Render all governance panels
+        function renderGovernancePanels() {
+            renderPendingApprovals('all');
+            renderAnnouncementModeration(false);
+            renderEscalations();
+            renderArchive();
+        }
+        
+        // Render pending approvals
+        function renderPendingApprovals(filter = 'all') {
+            const container = document.getElementById('pendingApprovalsList');
+            let items = [...pendingProblemApprovals, ...pendingAnnouncementApprovals];
+            
+            if (filter === 'problem') items = pendingProblemApprovals;
+            else if (filter === 'announcement') items = pendingAnnouncementApprovals;
+            else if (filter === 'escalation') items = escalatedItems.map(e => ({...e, type: 'escalation'}));
+            
+            if (items.length === 0) {
+                container.innerHTML = `<div class="governance-empty"><i class="fas fa-clipboard-check"></i><h3>No Pending Approvals</h3><p>All items have been reviewed.</p></div>`;
+                return;
+            }
+            
+            container.innerHTML = items.map(item => {
+                const age = getAge(item.createdAt);
+                const isUrgent = age.days >= 3;
+                
+                return `
+                <div class="approval-item" data-id="${item.id}">
+                    <div class="approval-header" onclick="toggleApprovalExpand('${item.id}')">
+                        <span class="approval-type-badge ${item.type}">${item.type}</span>
+                        <div class="approval-info">
+                            <div class="approval-title">${item.title}</div>
+                            <div class="approval-meta">
+                                <span><i class="fas fa-user"></i> ${item.submittedBy}</span>
+                                <span><i class="fas fa-building"></i> ${item.submittedByOrg || 'Unknown'}</span>
+                                ${item.priority ? `<span><span class="priority-indicator ${item.priority}"></span> ${item.priority}</span>` : ''}
+                            </div>
+                        </div>
+                        <span class="approval-age ${isUrgent ? 'urgent' : ''}">${age.text}</span>
+                        <button class="approval-expand-btn"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="approval-details">
+                        <div class="approval-path">
+                            <i class="fas fa-sitemap"></i>
+                            ${(item.hierarchyPath || []).map((node, i) => `
+                                <span class="path-node">${node}</span>
+                                ${i < item.hierarchyPath.length - 1 ? '<span class="path-arrow">→</span>' : ''}
+                            `).join('')}
+                        </div>
+                        <div class="approval-description">${item.description || item.content || 'No description provided.'}</div>
+                        <div class="approval-actions">
+                            <button class="action-btn approve" onclick="govApprove('${item.id}', '${item.type}')"><i class="fas fa-check"></i> Approve</button>
+                            <button class="action-btn reject" onclick="openGovRejectModal('${item.id}', '${item.title}', '${item.type}')"><i class="fas fa-times"></i> Reject</button>
+                            <button class="action-btn escalate" onclick="openGovEscalateModal('${item.id}', '${item.title}', '${item.type}')"><i class="fas fa-level-up-alt"></i> Escalate</button>
+                            <button class="action-btn archive" onclick="openGovArchiveModal('${item.id}', '${item.title}', '${item.type}')"><i class="fas fa-archive"></i> Archive</button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+        
+        // Render announcement moderation
+        function renderAnnouncementModeration(urgentOnly = false) {
+            const container = document.getElementById('announcementModerationList');
+            let items = pendingAnnouncementApprovals;
+            
+            if (urgentOnly) items = items.filter(a => a.isUrgent);
+            
+            if (items.length === 0) {
+                container.innerHTML = `<div class="governance-empty"><i class="fas fa-bullhorn"></i><h3>No Announcements to Moderate</h3><p>${urgentOnly ? 'No urgent announcements pending.' : 'All announcements have been reviewed.'}</p></div>`;
+                return;
+            }
+            
+            container.innerHTML = items.map(item => {
+                const deadline = item.deadline ? new Date(item.deadline) : null;
+                const isExpiringSoon = deadline && (deadline - new Date()) < 3 * 24 * 60 * 60 * 1000;
+                
+                return `
+                <div class="announcement-card ${item.isUrgent ? 'urgent' : ''}">
+                    <div class="announcement-card-header">
+                        <div class="announcement-card-title">${item.title}</div>
+                        <div class="announcement-badges">
+                            <span class="scope-badge ${item.scope}">${item.scope === 'global' ? 'Global' : item.scope === 'org' ? 'Organization' : 'Node'}</span>
+                            ${item.isVerified ? '<span class="verified-badge"><i class="fas fa-check-circle"></i> Verified</span>' : ''}
+                            ${item.isUrgent ? '<span class="status-badge high">Urgent</span>' : ''}
+                        </div>
+                    </div>
+                    <div class="announcement-card-content">${item.content}</div>
+                    <div class="announcement-card-footer">
+                        <div class="deadline-info ${isExpiringSoon ? 'expiring-soon' : ''}">
+                            <i class="fas fa-clock"></i>
+                            ${deadline ? `Expires: ${deadline.toLocaleDateString()}` : 'No expiry set'}
+                            ${isExpiringSoon ? ' (Soon!)' : ''}
+                        </div>
+                        <div class="announcement-card-actions">
+                            <button class="action-btn approve" onclick="govApproveAnnouncement('${item.id}')"><i class="fas fa-check"></i> Approve</button>
+                            <button class="action-btn view" onclick="openEditAnnouncementModal('${item.id}')"><i class="fas fa-edit"></i> Edit</button>
+                            <button class="action-btn reject" onclick="openGovRejectModal('${item.id}', '${item.title}', 'announcement')"><i class="fas fa-times"></i> Reject</button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+        
+        // Render escalations
+        function renderEscalations() {
+            const container = document.getElementById('escalationList');
+            
+            if (escalatedItems.length === 0) {
+                container.innerHTML = `<div class="governance-empty"><i class="fas fa-level-up-alt"></i><h3>No Escalated Items</h3><p>No problems have been escalated to your level.</p></div>`;
+                return;
+            }
+            
+            container.innerHTML = escalatedItems.map(item => `
+                <div class="escalation-item">
+                    <div class="escalation-header">
+                        <div class="escalation-title">${item.title}</div>
+                        <span class="escalation-reason"><i class="fas fa-exclamation-circle"></i> ${item.escalationReason}</span>
+                    </div>
+                    <div class="escalation-path-trail">
+                        <i class="fas fa-route"></i>
+                        ${(item.escalationPath || []).map((node, i) => `
+                            <span class="trail-node ${i === item.escalationPath.length - 1 ? 'current' : ''}">${node}</span>
+                            ${i < item.escalationPath.length - 1 ? '<span class="path-arrow">→</span>' : ''}
+                        `).join('')}
+                    </div>
+                    <p style="color:#6B7280;font-size:0.9rem;margin-bottom:1rem;">${item.description}</p>
+                    <div class="escalation-actions">
+                        <button class="action-btn approve" onclick="govApproveEscalation('${item.id}')"><i class="fas fa-check"></i> Approve & Resolve</button>
+                        <button class="action-btn send-back" onclick="govSendBack('${item.id}')"><i class="fas fa-undo"></i> Send Back</button>
+                        <button class="action-btn force-escalate" onclick="govForceEscalate('${item.id}')"><i class="fas fa-arrow-up"></i> Force Escalate</button>
+                        <button class="action-btn archive" onclick="openGovArchiveModal('${item.id}', '${item.title}', 'escalation')"><i class="fas fa-archive"></i> Archive</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Render archive
+        function renderArchive() {
+            const container = document.getElementById('archiveList');
+            
+            if (archivedItems.length === 0) {
+                container.innerHTML = `<div class="governance-empty"><i class="fas fa-archive"></i><h3>No Archived Items</h3><p>Archived problems and announcements will appear here.</p></div>`;
+                return;
+            }
+            
+            container.innerHTML = archivedItems.map(item => `
+                <div class="archive-item">
+                    <div class="archive-header">
+                        <div class="archive-title">${item.title}</div>
+                        <span class="approval-type-badge ${item.type}">${item.type}</span>
+                    </div>
+                    <div class="archive-reason"><i class="fas fa-info-circle"></i> ${item.archiveReason}</div>
+                    <div class="archive-actions">
+                        <button class="action-btn restore" onclick="govRestore('${item.id}')"><i class="fas fa-undo"></i> Restore</button>
+                        <button class="action-btn view" onclick="viewArchivedItem('${item.id}')"><i class="fas fa-eye"></i> View</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Helper: Get age text
+        function getAge(date) {
+            const now = new Date();
+            const diff = now - new Date(date);
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            
+            if (days > 0) return { days, text: `${days}d ago` };
+            if (hours > 0) return { days: 0, text: `${hours}h ago` };
+            return { days: 0, text: 'Just now' };
+        }
+        
+        // Toggle approval item expand
+        window.toggleApprovalExpand = function(id) {
+            const item = document.querySelector(`.approval-item[data-id="${id}"]`);
+            if (item) item.classList.toggle('expanded');
+        };
+        
+        // Governance Actions
+        window.govApprove = function(id, type) {
+            // Add ripple effect
+            const item = document.querySelector(`.approval-item[data-id="${id}"]`);
+            if (item) item.classList.add('approval-success-ripple');
+            
+            setTimeout(() => {
+                if (type === 'problem') {
+                    pendingProblemApprovals = pendingProblemApprovals.filter(p => p.id !== id);
+                } else if (type === 'announcement') {
+                    pendingAnnouncementApprovals = pendingAnnouncementApprovals.filter(a => a.id !== id);
+                }
+                updateGovernanceMetrics();
+                renderGovernancePanels();
+                showToast('Item approved successfully!', 'success');
+            }, 300);
+        };
+        
+        window.govApproveAnnouncement = function(id) {
+            const ann = pendingAnnouncementApprovals.find(a => a.id === id);
+            if (ann) {
+                ann.isVerified = true;
+                ann.status = 'approved';
+                pendingAnnouncementApprovals = pendingAnnouncementApprovals.filter(a => a.id !== id);
+                updateGovernanceMetrics();
+                renderGovernancePanels();
+                showToast('Announcement approved and published!', 'success');
+            }
+        };
+        
+        window.govApproveEscalation = function(id) {
+            escalatedItems = escalatedItems.filter(e => e.id !== id);
+            updateGovernanceMetrics();
+            renderGovernancePanels();
+            showToast('Escalation resolved!', 'success');
+        };
+        
+        window.govSendBack = function(id) {
+            escalatedItems = escalatedItems.filter(e => e.id !== id);
+            updateGovernanceMetrics();
+            renderGovernancePanels();
+            showToast('Item sent back to lower node.', 'success');
+        };
+        
+        window.govForceEscalate = function(id) {
+            showToast('Item escalated to platform admin.', 'success');
+        };
+        
+        window.govRestore = function(id) {
+            const item = archivedItems.find(a => a.id === id);
+            if (item) {
+                archivedItems = archivedItems.filter(a => a.id !== id);
+                if (item.type === 'problem') {
+                    pendingProblemApprovals.push({...item, status: 'pending'});
+                } else {
+                    pendingAnnouncementApprovals.push({...item, status: 'pending'});
+                }
+                updateGovernanceMetrics();
+                renderGovernancePanels();
+                showToast('Item restored to pending approvals.', 'success');
+            }
+        };
+        
+        window.viewArchivedItem = function(id) {
+            const item = archivedItems.find(a => a.id === id);
+            if (item) {
+                document.getElementById('modalTitle').textContent = 'Archived Item';
+                document.getElementById('modalContent').innerHTML = `
+                    <div class="detail-row"><span class="detail-label">Title</span><span class="detail-value">${item.title}</span></div>
+                    <div class="detail-row"><span class="detail-label">Type</span><span class="detail-value">${item.type}</span></div>
+                    <div class="detail-row"><span class="detail-label">Archive Reason</span><span class="detail-value">${item.archiveReason}</span></div>
+                    <div class="detail-row"><span class="detail-label">Archived By</span><span class="detail-value">${item.archivedBy}</span></div>
+                    <div class="detail-row"><span class="detail-label">Archived At</span><span class="detail-value">${new Date(item.archivedAt).toLocaleDateString()}</span></div>
+                `;
+                document.getElementById('detailsModal').classList.add('show');
+            }
+        };
+        
+        // Modal openers
+        window.openGovRejectModal = function(id, title, type) {
+            currentGovAction = { id, type, action: 'reject' };
+            document.getElementById('govRejectItemTitle').textContent = title;
+            document.getElementById('govRejectReason').value = '';
+            document.getElementById('govRejectModal').classList.add('show');
+        };
+        
+        window.openGovEscalateModal = function(id, title, type) {
+            currentGovAction = { id, type, action: 'escalate' };
+            document.getElementById('govEscalateItemTitle').textContent = title;
+            document.getElementById('govEscalateReason').value = '';
+            document.getElementById('govEscalateModal').classList.add('show');
+        };
+        
+        window.openGovArchiveModal = function(id, title, type) {
+            currentGovAction = { id, type, action: 'archive' };
+            document.getElementById('govArchiveItemTitle').textContent = title;
+            document.getElementById('govArchiveReason').value = '';
+            document.getElementById('govArchiveModal').classList.add('show');
+        };
+        
+        window.openEditAnnouncementModal = function(id) {
+            const ann = pendingAnnouncementApprovals.find(a => a.id === id);
+            if (ann) {
+                currentGovAction = { id, type: 'announcement', action: 'edit' };
+                document.getElementById('editAnnouncementTitle').value = ann.title;
+                document.getElementById('editAnnouncementContent').value = ann.content;
+                document.getElementById('editAnnouncementScope').value = ann.scope || 'node';
+                document.getElementById('editAnnouncementVerified').checked = ann.isVerified || false;
+                if (ann.deadline) {
+                    document.getElementById('editAnnouncementExpiry').value = new Date(ann.deadline).toISOString().split('T')[0];
+                }
+                document.getElementById('govEditAnnouncementModal').classList.add('show');
+            }
+        };
+        
+        // Confirm actions
+        document.getElementById('confirmGovRejectBtn')?.addEventListener('click', function() {
+            if (!currentGovAction) return;
+            const reason = document.getElementById('govRejectReason').value.trim();
+            if (!reason) {
+                showToast('Please provide a rejection reason.', 'error');
+                return;
+            }
+            
+            if (currentGovAction.type === 'problem') {
+                pendingProblemApprovals = pendingProblemApprovals.filter(p => p.id !== currentGovAction.id);
+            } else if (currentGovAction.type === 'announcement') {
+                pendingAnnouncementApprovals = pendingAnnouncementApprovals.filter(a => a.id !== currentGovAction.id);
+            }
+            
+            closeModal('govRejectModal');
+            updateGovernanceMetrics();
+            renderGovernancePanels();
+            showToast('Item rejected.', 'success');
+        });
+        
+        document.getElementById('confirmGovEscalateBtn')?.addEventListener('click', function() {
+            if (!currentGovAction) return;
+            const escalateTo = document.getElementById('govEscalateTo').value;
+            const reason = document.getElementById('govEscalateReason').value.trim();
+            
+            let item;
+            if (currentGovAction.type === 'problem') {
+                item = pendingProblemApprovals.find(p => p.id === currentGovAction.id);
+                pendingProblemApprovals = pendingProblemApprovals.filter(p => p.id !== currentGovAction.id);
+            } else if (currentGovAction.type === 'announcement') {
+                item = pendingAnnouncementApprovals.find(a => a.id === currentGovAction.id);
+                pendingAnnouncementApprovals = pendingAnnouncementApprovals.filter(a => a.id !== currentGovAction.id);
+            }
+            
+            if (item) {
+                escalatedItems.push({
+                    ...item,
+                    escalationReason: reason || `Escalated to ${escalateTo}`,
+                    escalationPath: [...(item.hierarchyPath || []), escalateTo],
+                    escalatedAt: new Date()
+                });
+            }
+            
+            closeModal('govEscalateModal');
+            updateGovernanceMetrics();
+            renderGovernancePanels();
+            showToast(`Item escalated to ${escalateTo}.`, 'success');
+        });
+        
+        document.getElementById('confirmGovArchiveBtn')?.addEventListener('click', function() {
+            if (!currentGovAction) return;
+            const reason = document.getElementById('govArchiveReason').value.trim() || 'Archived by admin';
+            
+            let item;
+            if (currentGovAction.type === 'problem') {
+                item = pendingProblemApprovals.find(p => p.id === currentGovAction.id);
+                pendingProblemApprovals = pendingProblemApprovals.filter(p => p.id !== currentGovAction.id);
+            } else if (currentGovAction.type === 'announcement') {
+                item = pendingAnnouncementApprovals.find(a => a.id === currentGovAction.id);
+                pendingAnnouncementApprovals = pendingAnnouncementApprovals.filter(a => a.id !== currentGovAction.id);
+            } else if (currentGovAction.type === 'escalation') {
+                item = escalatedItems.find(e => e.id === currentGovAction.id);
+                escalatedItems = escalatedItems.filter(e => e.id !== currentGovAction.id);
+            }
+            
+            if (item) {
+                archivedItems.push({
+                    ...item,
+                    archiveReason: reason,
+                    archivedBy: currentUser?.email || 'admin',
+                    archivedAt: new Date()
+                });
+            }
+            
+            closeModal('govArchiveModal');
+            updateGovernanceMetrics();
+            renderGovernancePanels();
+            showToast('Item archived.', 'success');
+        });
+        
+        document.getElementById('confirmEditAnnouncementBtn')?.addEventListener('click', function() {
+            if (!currentGovAction) return;
+            
+            const ann = pendingAnnouncementApprovals.find(a => a.id === currentGovAction.id);
+            if (ann) {
+                ann.title = document.getElementById('editAnnouncementTitle').value;
+                ann.content = document.getElementById('editAnnouncementContent').value;
+                ann.scope = document.getElementById('editAnnouncementScope').value;
+                ann.isVerified = document.getElementById('editAnnouncementVerified').checked;
+                const expiry = document.getElementById('editAnnouncementExpiry').value;
+                if (expiry) ann.deadline = new Date(expiry);
+            }
+            
+            closeModal('govEditAnnouncementModal');
+            renderGovernancePanels();
+            showToast('Announcement updated.', 'success');
+        });
+        
+        // Initialize governance on page load
+        setTimeout(() => {
+            initGovernanceData();
+            setupGovernanceTabs();
+        }, 1000);
 
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');

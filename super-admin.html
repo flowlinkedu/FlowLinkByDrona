@@ -16,6 +16,11 @@
             --danger-color: #EF4444;
             --success-color: #10B981;
             --warning-color: #F59E0B;
+            --border: rgba(139, 92, 246, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         .super-admin-page {
@@ -36,6 +41,11 @@
             display: flex;
             flex-direction: column;
             box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .admin-sidebar.collapsed {
+            transform: translateX(-280px);
         }
 
         .sidebar-header {
@@ -142,11 +152,18 @@
             font-size: 1.2rem;
         }
 
+        .admin-info {
+            overflow: hidden;
+        }
+
         .admin-info .admin-name {
             font-family: 'Poppins', sans-serif;
             font-weight: 600;
             color: white;
             font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .admin-info .admin-role {
@@ -160,6 +177,11 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .admin-main.expanded {
+            margin-left: 0;
         }
 
         .admin-topbar {
@@ -173,12 +195,32 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .topbar-left {
             display: flex;
             align-items: center;
             gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #4B5563;
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu-btn:hover {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--super-admin-accent);
         }
 
         .page-title {
@@ -313,11 +355,13 @@
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
         }
 
         .data-table table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 600px;
         }
 
         .data-table th,
@@ -751,9 +795,79 @@
                 margin-left: 0;
             }
 
+            .mobile-menu-btn {
+                display: block;
+            }
+
             .metrics-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+
+            .admin-topbar {
+                padding: 1rem;
+            }
+
+            .sign-out-btn span {
+                display: none;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 0.75rem 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-content {
+                padding: 1rem;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .page-title {
+                font-size: 1.25rem;
+            }
+
+            .modal {
+                margin: 0.5rem;
+                max-height: calc(100vh - 1rem);
+            }
+
+            .modal-header,
+            .modal-body,
+            .modal-footer {
+                padding: 1rem;
+            }
+
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Mobile Overlay */
+        .mobile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-overlay.show {
+            opacity: 1;
+            visibility: visible;
         }
     </style>
 </head>
@@ -794,10 +908,14 @@
         </div>
     </aside>
 
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
     <!-- Main Content -->
-    <main class="admin-main">
+    <main class="admin-main" id="adminMain">
         <header class="admin-topbar">
             <div class="topbar-left">
+                <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
                 <h1 class="page-title" id="pageTitle">Dashboard</h1>
                 <span class="topbar-badge">Super Admin</span>
             </div>
@@ -1141,6 +1259,28 @@
             document.querySelectorAll('.toggle-input').forEach(toggle => {
                 toggle.addEventListener('click', () => toggle.classList.toggle('active'));
             });
+
+            // Mobile menu functionality
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileOverlay = document.getElementById('mobileOverlay');
+            const adminSidebar = document.querySelector('.admin-sidebar');
+            const adminMain = document.getElementById('adminMain');
+
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    adminSidebar.classList.toggle('open');
+                    mobileOverlay.classList.toggle('show');
+                    adminMain.classList.toggle('expanded');
+                });
+            }
+
+            if (mobileOverlay) {
+                mobileOverlay.addEventListener('click', () => {
+                    adminSidebar.classList.remove('open');
+                    mobileOverlay.classList.remove('show');
+                    adminMain.classList.remove('expanded');
+                });
+            }
         }
 
         async function loadAllData() {

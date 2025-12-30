@@ -197,6 +197,73 @@ service cloud.firestore {
     }
     
     //-------------------------------------------------------------------------
+    // Pending Problem Approvals Collection Rules
+    // Problem governance system:
+    // - Users submit problems for approval
+    // - Assigned node admins review and approve/reject/escalate
+    // - Super Admin has full access
+    //-------------------------------------------------------------------------
+    match /pendingProblemApprovals/{problemId} {
+      // Super admin can read/write all pending problem approvals
+      allow read, write: if isSuperAdmin();
+      
+      // Any signed-in user can read (admins need to see problems assigned to them)
+      allow read: if isSignedIn();
+      
+      // Any signed-in user can create a pending problem approval
+      allow create: if isSignedIn();
+      
+      // Assigned admins can update (approve/reject/escalate)
+      allow update: if isSignedIn() && (
+        request.auth.token.email in resource.data.assignedAdminEmails ||
+        resource.data.createdBy == request.auth.token.email
+      );
+      
+      // Assigned admins or creator can delete
+      allow delete: if isSignedIn() && (
+        request.auth.token.email in resource.data.assignedAdminEmails ||
+        resource.data.createdBy == request.auth.token.email
+      );
+      
+      // Allow listing for admins
+      allow list: if isSignedIn();
+    }
+    
+    //-------------------------------------------------------------------------
+    // Pending Announcement Approvals Collection Rules
+    //-------------------------------------------------------------------------
+    match /pendingAnnouncementApprovals/{announcementId} {
+      allow read, write: if isSuperAdmin();
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && (
+        request.auth.token.email in resource.data.assignedAdminEmails ||
+        resource.data.createdBy == request.auth.token.email
+      );
+      allow list: if isSignedIn();
+    }
+    
+    //-------------------------------------------------------------------------
+    // Archived Problems Collection Rules
+    //-------------------------------------------------------------------------
+    match /archivedProblems/{problemId} {
+      allow read, write: if isSuperAdmin();
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn();
+      allow delete: if isSuperAdmin();
+    }
+    
+    //-------------------------------------------------------------------------
+    // Escalated Problems Collection Rules
+    //-------------------------------------------------------------------------
+    match /escalatedProblems/{problemId} {
+      allow read, write: if isSuperAdmin();
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn();
+      allow list: if isSignedIn();
+    }
+    
+    //-------------------------------------------------------------------------
     // Super Admin Collection Rules (Optional - for tracking)
     // Only super admin can access
     //-------------------------------------------------------------------------
@@ -287,6 +354,10 @@ service cloud.firestore {
 | `/hierarchies/{orgId}` | Signed-in | Signed-in | Member/Org Admin/Super Admin | Org Admin/Super Admin |
 | `/hierarchies/{orgId}/sub-nodes/**` | Signed-in | Signed-in | Org Admin/Super Admin | Org Admin/Super Admin |
 | `/pendingApprovals/{id}` | Super Admin / Assigned Admin / Requester | Signed-in | Super Admin (org) / Assigned Admin (join/branch) | Super Admin (org) / Assigned Admin (join/branch) |
+| `/pendingProblemApprovals/{id}` | Signed-in | Signed-in | Assigned Admins / Creator | Assigned Admins / Creator |
+| `/pendingAnnouncementApprovals/{id}` | Signed-in | Signed-in | Assigned Admins / Creator | Assigned Admins / Creator |
+| `/archivedProblems/{id}` | Signed-in | Signed-in | Signed-in | Super Admin |
+| `/escalatedProblems/{id}` | Signed-in | Signed-in | Signed-in | Super Admin |
 | `/superAdmin/**` | Super Admin | Super Admin | Super Admin | Super Admin |
 | `/problems/{id}` | Signed-in | Signed-in | Owner/Org Admin/Super Admin | Owner/Super Admin |
 | `/solutions/{id}` | Signed-in | Signed-in | Owner/Super Admin | Owner/Super Admin |
@@ -453,5 +524,152 @@ This notification system allows admins to quickly fetch only their pending reque
   processedBy: "orgadmin@example.com",
   processedAt: Timestamp,
   rejectionReason: "Optional reason"
+}
+```
+
+---
+
+## Problem Governance System
+
+FlowLink includes a Problem Governance & Approval Center where:
+
+1. **Users** submit problems through the Compose Problem feature
+2. **Node Admins** review, approve, reject, escalate, or archive problems
+3. **Super Admin** has full oversight of all problems
+
+### Problem Approval Flow
+
+```
+User submits problem → pendingProblemApprovals collection
+                              ↓
+              Node Admin reviews (from notifications)
+                              ↓
+         ┌────────────────────┼────────────────────┐
+         ↓                    ↓                    ↓
+      Approve              Reject              Escalate
+         ↓                    ↓                    ↓
+   Move to /problems    Delete from pending   Move to higher admin
+   Notify user          Notify user           Update escalation chain
+```
+
+### Pending Problem Approval Document Structure
+Path: `/pendingProblemApprovals/{problemId}`
+```javascript
+{
+  title: "Problem Title",
+  description: "Detailed problem description",
+  category: "academic" | "hostel" | "infrastructure" | "sports" | "technical" | "general" | "other",
+  priority: "low" | "medium" | "high",
+  targetNodes: [
+    { path: "hierarchies/org-id/sub-nodes/node-id", name: "Node Name" }
+  ],
+  hierarchyPaths: ["hierarchies/org-id/sub-nodes/node-id"],
+  assignedAdminEmails: ["admin1@example.com", "admin2@example.com"],
+  status: "pending" | "approved" | "rejected" | "escalated" | "archived",
+  createdBy: "user@example.com",
+  createdAt: Timestamp,
+  updatedAt: Timestamp,
+  // Filled when processed
+  processedBy: "admin@example.com",
+  processedAt: Timestamp,
+  rejectionReason: "Optional reason for rejection",
+  escalationReason: "Optional reason for escalation",
+  escalationPath: ["node-admin@example.com", "org-admin@example.com"]
+}
+```
+
+### Admin Notifications for Problem Approvals
+Path: `/users/{adminEmail}/notifications/pending`
+```javascript
+{
+  joinRequests: ["join-123456"],
+  branchRequests: ["branch-123456"],
+  problemApprovals: ["problem-123456", "problem-789012"],  // NEW: Problem approval IDs
+  updatedAt: Timestamp
+}
+```
+
+### Archived Problem Document Structure
+Path: `/archivedProblems/{problemId}`
+```javascript
+{
+  // All fields from original problem
+  ...problemData,
+  archivedBy: "admin@example.com",
+  archivedAt: Timestamp,
+  archiveReason: "Duplicate" | "Resolved" | "Invalid" | "Other",
+  originalCollection: "pendingProblemApprovals" | "problems"
+}
+```
+
+### Escalated Problem Document Structure
+Path: `/escalatedProblems/{problemId}`
+```javascript
+{
+  // All fields from original problem
+  ...problemData,
+  escalatedBy: "node-admin@example.com",
+  escalatedAt: Timestamp,
+  escalationReason: "Requires higher authority",
+  previousAdminEmail: "node-admin@example.com",
+  currentAdminEmail: "org-admin@example.com",
+  escalationLevel: 1 | 2 | 3,  // How many times escalated
+  escalationHistory: [
+    {
+      from: "node-admin@example.com",
+      to: "org-admin@example.com",
+      reason: "Beyond node scope",
+      timestamp: Timestamp
+    }
+  ]
+}
+```
+
+---
+
+## Admin Dashboard Access
+
+Node admins and organization admins can access the Admin Dashboard from the user dashboard. The "Admin Panel" link appears in the sidebar only if the user is an admin of at least one node or organization.
+
+### Admin Check Logic
+The system checks if a user is an admin by:
+1. Checking if user email is in any organization's `adminEmails` array
+2. Recursively checking all sub-nodes for the user's email in `adminEmails`
+
+### Admin Dashboard Capabilities
+
+| Feature | Org Admin | Node Admin |
+|---------|-----------|------------|
+| View all pending approvals | ✓ | Only their node |
+| Approve/Reject join requests | ✓ | Only their node |
+| Approve/Reject branch requests | ✓ | Only their node |
+| Approve/Reject problem submissions | ✓ | Only their node |
+| Escalate problems | ✓ | ✓ |
+| Archive problems | ✓ | ✓ |
+| Moderate announcements | ✓ | Only their node |
+| Create sub-nodes | ✓ | Under their node |
+| Assign node admins | ✓ | Under their node |
+
+---
+
+## Announcement Moderation
+
+Similar to problems, announcements can go through a moderation flow:
+
+### Pending Announcement Approval Document Structure
+Path: `/pendingAnnouncementApprovals/{announcementId}`
+```javascript
+{
+  title: "Announcement Title",
+  content: "Announcement content",
+  targetNodes: [{ path: "...", name: "..." }],
+  assignedAdminEmails: ["admin@example.com"],
+  visibility: "node" | "organization" | "global",
+  isUrgent: true | false,
+  expiryDate: Timestamp,
+  status: "pending" | "approved" | "rejected",
+  createdBy: "user@example.com",
+  createdAt: Timestamp,
+  updatedAt: Timestamp
 }
 ```

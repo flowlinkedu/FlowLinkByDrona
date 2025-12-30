@@ -158,6 +158,103 @@ service cloud.firestore {
     }
     
     //-------------------------------------------------------------------------
+    // Pending Problem Approvals Collection Rules
+    // Problem governance system:
+    // - Users submit problems for approval
+    // - Assigned node admins review and approve/reject/escalate
+    // - Super Admin has full access
+    //-------------------------------------------------------------------------
+    match /pendingProblemApprovals/{problemId} {
+      // Super admin can read/write all pending problem approvals
+      allow read, write: if isSuperAdmin();
+      
+      // Any signed-in user can read (admins need to see problems assigned to them)
+      allow read: if isSignedIn();
+      
+      // Any signed-in user can create a pending problem approval
+      allow create: if isSignedIn();
+      
+      // Assigned admins can update (approve/reject/escalate)
+      // Check if user's email is in the assignedAdminEmails array
+      allow update: if isSignedIn() && (
+        request.auth.token.email in resource.data.assignedAdminEmails ||
+        resource.data.createdBy == request.auth.token.email
+      );
+      
+      // Assigned admins or creator can delete (after approval moves to problems collection)
+      allow delete: if isSignedIn() && (
+        request.auth.token.email in resource.data.assignedAdminEmails ||
+        resource.data.createdBy == request.auth.token.email
+      );
+      
+      // Allow listing for admins to find their pending problems
+      allow list: if isSignedIn();
+    }
+    
+    //-------------------------------------------------------------------------
+    // Pending Announcement Approvals Collection Rules
+    // Announcement moderation system
+    //-------------------------------------------------------------------------
+    match /pendingAnnouncementApprovals/{announcementId} {
+      // Super admin can read/write all
+      allow read, write: if isSuperAdmin();
+      
+      // Any signed-in user can read
+      allow read: if isSignedIn();
+      
+      // Any signed-in user can create
+      allow create: if isSignedIn();
+      
+      // Assigned admins can update/delete
+      allow update, delete: if isSignedIn() && (
+        request.auth.token.email in resource.data.assignedAdminEmails ||
+        resource.data.createdBy == request.auth.token.email
+      );
+      
+      // Allow listing
+      allow list: if isSignedIn();
+    }
+    
+    //-------------------------------------------------------------------------
+    // Archived Problems Collection Rules
+    // For storing archived/escalated problems
+    //-------------------------------------------------------------------------
+    match /archivedProblems/{problemId} {
+      // Super admin has full access
+      allow read, write: if isSuperAdmin();
+      
+      // Any signed-in user can read
+      allow read: if isSignedIn();
+      
+      // Admins can create (when archiving)
+      allow create: if isSignedIn();
+      
+      // Admins can update (restore from archive)
+      allow update: if isSignedIn();
+      
+      // Only super admin can permanently delete (covered above)
+      allow delete: if isSuperAdmin();
+    }
+    
+    //-------------------------------------------------------------------------
+    // Escalated Problems Collection Rules
+    // For tracking escalation chain
+    //-------------------------------------------------------------------------
+    match /escalatedProblems/{problemId} {
+      // Super admin has full access
+      allow read, write: if isSuperAdmin();
+      
+      // Any signed-in user can read
+      allow read: if isSignedIn();
+      
+      // Admins can create/update (when escalating)
+      allow create, update: if isSignedIn();
+      
+      // Allow listing
+      allow list: if isSignedIn();
+    }
+    
+    //-------------------------------------------------------------------------
     // Super Admin Collection Rules (Optional - for tracking)
     // Only super admin can access
     //-------------------------------------------------------------------------
