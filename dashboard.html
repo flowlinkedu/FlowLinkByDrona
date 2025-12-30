@@ -7,9 +7,7 @@
     <title>Dashboard - FlowLink</title>
 
     <!-- Google Fonts -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=PT+Sans:wght@400;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,20 +16,34 @@
     <link rel="stylesheet" href="global.css">
 
     <style>
+        :root {
+            --primary: #6366F1;
+            --primary-dark: #4F46E5;
+            --secondary: #22D3EE;
+            --accent: #F472B6;
+            --dark: #0F172A;
+            --gray: #64748B;
+            --light: #F8FAFC;
+            --white: #FFFFFF;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
+
         /* Dashboard Specific Styles */
         .dashboard-page {
-            background: linear-gradient(135deg, #E5F6FD 0%, rgba(41, 171, 226, 0.1) 100%);
+            background: linear-gradient(135deg, #EEF2FF 0%, #F8FAFC 50%, #ECFEFF 100%);
             min-height: 100vh;
             display: flex;
-            font-family: 'PT Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         /* Sidebar Styles */
         .dashboard-sidebar {
             width: 280px;
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--white);
             backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(41, 171, 226, 0.1);
+            border-right: 1px solid rgba(99, 102, 241, 0.1);
             position: fixed;
             top: 0;
             left: 0;
@@ -39,7 +51,7 @@
             z-index: 1000;
             transform: translateX(0);
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
             display: flex;
             flex-direction: column;
         }
@@ -50,8 +62,8 @@
 
         .sidebar-header {
             padding: 2rem 1.5rem;
-            border-bottom: 1px solid rgba(41, 171, 226, 0.1);
-            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
         }
 
@@ -59,14 +71,14 @@
             display: flex;
             align-items: center;
             gap: 1rem;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.5rem;
             font-weight: 700;
         }
 
         .sidebar-logo i {
             font-size: 2rem;
-            color: #29E2D0;
+            color: rgba(255, 255, 255, 0.9);
         }
 
         .sidebar-nav {
@@ -89,7 +101,7 @@
             align-items: center;
             gap: 1rem;
             padding: 1rem 1.5rem;
-            color: #4B5563;
+            color: var(--gray);
             text-decoration: none;
             font-weight: 500;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -106,7 +118,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(41, 171, 226, 0.1), transparent);
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
             transition: left 0.6s;
         }
 
@@ -115,15 +127,15 @@
         }
 
         .nav-link:hover {
-            background: rgba(41, 171, 226, 0.1);
-            color: #29ABE2;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
             transform: translateX(8px);
         }
 
         .nav-item.active .nav-link {
-            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            box-shadow: 0 4px 15px rgba(41, 171, 226, 0.3);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
         }
 
         .nav-icon {
@@ -134,8 +146,8 @@
 
         .sidebar-footer {
             padding: 1.5rem;
-            border-top: 1px solid rgba(41, 171, 226, 0.1);
-            background: rgba(41, 171, 226, 0.05);
+            border-top: 1px solid rgba(99, 102, 241, 0.1);
+            background: rgba(99, 102, 241, 0.03);
         }
 
         .user-profile {
@@ -148,13 +160,13 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-size: 1.3rem;
-            box-shadow: 0 4px 15px rgba(41, 171, 226, 0.3);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
         }
 
         .user-info {
@@ -162,28 +174,28 @@
         }
 
         .user-name {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-weight: 600;
-            color: #1F2933;
+            color: var(--dark);
             font-size: 1rem;
             margin-bottom: 0.25rem;
         }
 
         .user-role {
-            color: #4B5563;
+            color: var(--gray);
             font-size: 0.85rem;
         }
 
         .org-info {
             margin-top: 0.5rem;
             padding-top: 0.5rem;
-            border-top: 1px solid rgba(41, 171, 226, 0.1);
+            border-top: 1px solid rgba(99, 102, 241, 0.1);
         }
 
         .org-name {
             font-size: 0.8rem;
             font-weight: 600;
-            color: #29ABE2;
+            color: var(--primary);
             margin-bottom: 0.25rem;
         }
 
@@ -210,7 +222,7 @@
         .dashboard-topbar {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(41, 171, 226, 0.1);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.1);
             padding: 1.5rem 2rem;
             display: flex;
             align-items: center;
@@ -231,7 +243,7 @@
             display: none;
             background: none;
             border: none;
-            color: #4B5563;
+            color: var(--gray);
             font-size: 1.3rem;
             cursor: pointer;
             padding: 0.5rem;
@@ -240,15 +252,15 @@
         }
 
         .mobile-menu-btn:hover {
-            background: rgba(41, 171, 226, 0.1);
-            color: #29ABE2;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
         }
 
         .page-title {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 2rem;
-            font-weight: 600;
-            color: #1F2933;
+            font-weight: 700;
+            color: var(--dark);
             margin: 0;
         }
 
@@ -264,10 +276,10 @@
 
         .search-input {
             padding: 0.75rem 1rem 0.75rem 3rem;
-            border: 2px solid rgba(41, 171, 226, 0.2);
+            border: 2px solid rgba(99, 102, 241, 0.2);
             border-radius: 25px;
             background: rgba(255, 255, 255, 0.8);
-            color: #1F2933;
+            color: var(--dark);
             font-size: 0.9rem;
             width: 300px;
             transition: all 0.3s ease;
@@ -275,8 +287,8 @@
         }
 
         .search-input:focus {
-            border-color: #29ABE2;
-            box-shadow: 0 0 0 4px rgba(41, 171, 226, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
             width: 350px;
         }
 
@@ -285,7 +297,7 @@
             left: 1rem;
             top: 50%;
             transform: translateY(-50%);
-            color: #4B5563;
+            color: var(--gray);
             font-size: 1rem;
         }
 
@@ -296,7 +308,7 @@
         .notification-btn {
             background: none;
             border: none;
-            color: #4B5563;
+            color: var(--gray);
             font-size: 1.3rem;
             cursor: pointer;
             padding: 0.75rem;
@@ -306,15 +318,15 @@
         }
 
         .notification-btn:hover {
-            background: rgba(41, 171, 226, 0.1);
-            color: #29ABE2;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
         }
 
         .notification-badge {
             position: absolute;
             top: 0.25rem;
             right: 0.25rem;
-            background: #EF4444;
+            background: var(--danger);
             color: white;
             font-size: 0.75rem;
             font-weight: 600;
@@ -342,20 +354,20 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.75rem 1.5rem;
-            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             border: none;
             border-radius: 12px;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(41, 171, 226, 0.3);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
         }
 
         .sign-out-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(41, 171, 226, 0.4);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
         }
 
         /* Dashboard Content */
@@ -451,10 +463,10 @@
         }
 
         .section-title {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.3rem;
             font-weight: 600;
-            color: #1F2933;
+            color: var(--dark);
             margin-bottom: 1rem;
         }
 
@@ -469,11 +481,11 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.75rem 1.5rem;
-            border: 2px solid rgba(41, 171, 226, 0.2);
+            border: 2px solid rgba(99, 102, 241, 0.2);
             border-radius: 25px;
             background: rgba(255, 255, 255, 0.8);
-            color: #4B5563;
-            font-family: 'Poppins', sans-serif;
+            color: var(--gray);
+            font-family: 'Inter', sans-serif;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -481,17 +493,17 @@
         }
 
         .filter-btn:hover {
-            border-color: #29ABE2;
-            color: #29ABE2;
+            border-color: var(--primary);
+            color: var(--primary);
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(41, 171, 226, 0.2);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
         }
 
         .filter-btn.active {
-            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border-color: transparent;
             color: white;
-            box-shadow: 0 4px 15px rgba(41, 171, 226, 0.3);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
         }
 
         /* Dashboard Grid */
@@ -508,7 +520,7 @@
             border-radius: 24px;
             padding: 2rem;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(41, 171, 226, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.1);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
@@ -539,7 +551,7 @@
         .dashboard-card:hover {
             transform: translateY(-8px);
             box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
-            border-color: #29ABE2;
+            border-color: var(--primary);
         }
 
         .dashboard-card::before {
@@ -549,7 +561,7 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, #29ABE2, #29E2D0);
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -595,15 +607,15 @@
         }
 
         .card-icon.problems {
-            background: linear-gradient(135deg, #EF4444, #F97316);
+            background: linear-gradient(135deg, var(--danger), #F97316);
         }
 
         .card-icon.solved {
-            background: linear-gradient(135deg, #10B981, #059669);
+            background: linear-gradient(135deg, var(--success), #059669);
         }
 
         .card-icon.announcements {
-            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
         }
 
         .card-title-section {
@@ -611,15 +623,15 @@
         }
 
         .card-title {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.4rem;
             font-weight: 600;
-            color: #1F2933;
+            color: var(--dark);
             margin: 0 0 0.5rem 0;
         }
 
         .card-count {
-            color: #4B5563;
+            color: var(--gray);
             font-size: 1rem;
             font-weight: 500;
         }
@@ -637,7 +649,7 @@
 
         .list-item {
             padding: 1.25rem;
-            border: 1px solid rgba(41, 171, 226, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.1);
             border-radius: 16px;
             transition: all 0.3s ease;
             cursor: pointer;
@@ -645,8 +657,8 @@
         }
 
         .list-item:hover {
-            border-color: #29ABE2;
-            box-shadow: 0 4px 15px rgba(41, 171, 226, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.1);
             transform: translateX(5px);
         }
 
@@ -658,9 +670,9 @@
         }
 
         .item-title {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-weight: 600;
-            color: #1F2933;
+            color: var(--dark);
             margin: 0;
             font-size: 1rem;
         }
@@ -693,7 +705,7 @@
             display: flex;
             align-items: center;
             gap: 1rem;
-            color: #4B5563;
+            color: var(--gray);
             font-size: 0.85rem;
         }
 
@@ -714,11 +726,11 @@
         .card-btn {
             flex: 1;
             padding: 1rem;
-            border: 2px solid #29ABE2;
+            border: 2px solid var(--primary);
             border-radius: 12px;
             background: transparent;
-            color: #29ABE2;
-            font-family: 'Poppins', sans-serif;
+            color: var(--primary);
+            font-family: 'Inter', sans-serif;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -729,19 +741,19 @@
         }
 
         .card-btn:hover {
-            background: #29ABE2;
+            background: var(--primary);
             color: white;
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(41, 171, 226, 0.3);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
         }
 
         .card-btn.secondary {
-            border-color: #4B5563;
-            color: #4B5563;
+            border-color: var(--gray);
+            color: var(--gray);
         }
 
         .card-btn.secondary:hover {
-            background: #4B5563;
+            background: var(--gray);
             color: white;
         }
 
@@ -778,8 +790,8 @@
         .loading-spinner {
             width: 50px;
             height: 50px;
-            border: 4px solid rgba(41, 171, 226, 0.3);
-            border-top: 4px solid #29ABE2;
+            border: 4px solid rgba(99, 102, 241, 0.3);
+            border-top: 4px solid var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin-bottom: 1.5rem;
@@ -796,7 +808,7 @@
         }
 
         .loading-text {
-            color: #4B5563;
+            color: var(--gray);
             font-size: 1.1rem;
             margin: 0;
         }
@@ -810,7 +822,7 @@
         }
 
         .user-profile:hover {
-            background: rgba(41, 171, 226, 0.1);
+            background: rgba(99, 102, 241, 0.1);
             transform: translateY(-2px);
         }
 
@@ -818,7 +830,7 @@
             position: absolute;
             top: 0.25rem;
             right: 0.25rem;
-            background: #EF4444;
+            background: var(--danger);
             color: white;
             font-size: 0.75rem;
             font-weight: 600;
@@ -843,7 +855,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(41, 171, 226, 0.1), transparent);
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
             transition: left 0.6s;
         }
 
@@ -1138,10 +1150,10 @@
             gap: 1rem;
         }
         .section-header-title {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.5rem;
             font-weight: 600;
-            color: #1F2933;
+            color: var(--dark);
         }
         .section-actions {
             display: flex;
@@ -1153,11 +1165,11 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.75rem 1.25rem;
-            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
             border: none;
             border-radius: 12px;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-weight: 600;
             font-size: 0.9rem;
             cursor: pointer;
@@ -1165,7 +1177,7 @@
         }
         .action-btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(41, 171, 226, 0.4);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
         }
         .action-btn-secondary {
             display: flex;
@@ -1173,10 +1185,10 @@
             gap: 0.5rem;
             padding: 0.75rem 1.25rem;
             background: rgba(107, 114, 128, 0.1);
-            color: #4B5563;
+            color: var(--gray);
             border: 1px solid rgba(107, 114, 128, 0.2);
             border-radius: 12px;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-weight: 600;
             font-size: 0.9rem;
             cursor: pointer;
@@ -1191,7 +1203,7 @@
             display: flex;
             gap: 0.5rem;
             margin-bottom: 1.5rem;
-            border-bottom: 2px solid rgba(41, 171, 226, 0.1);
+            border-bottom: 2px solid rgba(99, 102, 241, 0.1);
             padding-bottom: 0.5rem;
             overflow-x: auto;
         }
@@ -1204,7 +1216,7 @@
             color: #6B7280;
             border: none;
             border-radius: 10px 10px 0 0;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-weight: 500;
             font-size: 0.9rem;
             cursor: pointer;
@@ -1212,11 +1224,11 @@
             white-space: nowrap;
         }
         .tab-btn:hover {
-            background: rgba(41, 171, 226, 0.1);
-            color: #29ABE2;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
         }
         .tab-btn.active {
-            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
         }
         .tab-btn .tab-count {
@@ -1236,7 +1248,7 @@
             border-radius: 20px;
             padding: 1.5rem;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(41, 171, 226, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.1);
         }
         .items-list {
             display: flex;
@@ -1245,15 +1257,15 @@
         }
         .item-card {
             background: white;
-            border: 1px solid rgba(41, 171, 226, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.1);
             border-radius: 16px;
             padding: 1.25rem;
             transition: all 0.3s ease;
             cursor: pointer;
         }
         .item-card:hover {
-            border-color: #29ABE2;
-            box-shadow: 0 4px 15px rgba(41, 171, 226, 0.15);
+            border-color: var(--primary);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.15);
             transform: translateX(5px);
         }
         .item-card.solved {
@@ -1263,7 +1275,7 @@
             border-left: 4px solid #EF4444;
         }
         .item-card.announcement {
-            border-left: 4px solid #29ABE2;
+            border-left: 4px solid var(--primary);
         }
         .item-card-header {
             display: flex;
@@ -1273,9 +1285,9 @@
             gap: 1rem;
         }
         .item-card-title {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-weight: 600;
-            color: #1F2933;
+            color: var(--dark);
             font-size: 1rem;
             margin: 0;
             flex: 1;
@@ -1341,12 +1353,12 @@
             gap: 0.35rem;
         }
         .item-action-btn.primary {
-            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
         }
         .item-action-btn.primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(41, 171, 226, 0.3);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
         .item-action-btn.success {
             background: rgba(16, 185, 129, 0.1);
@@ -1366,7 +1378,7 @@
         }
         .item-action-btn.secondary {
             background: rgba(107, 114, 128, 0.1);
-            color: #4B5563;
+            color: var(--gray);
         }
         .item-action-btn.secondary:hover {
             background: rgba(107, 114, 128, 0.2);
@@ -1381,7 +1393,7 @@
         }
         .bookmark-announcement-btn {
             background: rgba(107, 114, 128, 0.1);
-            color: #4B5563;
+            color: var(--gray);
             border: 1px solid rgba(107, 114, 128, 0.2);
         }
         .bookmark-announcement-btn:hover {
@@ -1397,7 +1409,7 @@
             gap: 0.5rem;
             margin-top: 0.75rem;
             padding: 0.75rem;
-            background: rgba(41, 171, 226, 0.05);
+            background: rgba(99, 102, 241, 0.05);
             border-radius: 12px;
         }
         .vote-btn {
@@ -1443,12 +1455,12 @@
             transform: none;
         }
         .vote-score {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.1rem;
             font-weight: 700;
             min-width: 40px;
             text-align: center;
-            color: #4B5563;
+            color: var(--gray);
         }
         .vote-score.positive {
             color: #10B981;
@@ -1488,7 +1500,7 @@
         .view-all-solutions-btn {
             background: none;
             border: none;
-            color: #29ABE2;
+            color: var(--primary);
             font-size: 0.75rem;
             font-weight: 600;
             cursor: pointer;
@@ -1500,7 +1512,7 @@
             transition: all 0.2s ease;
         }
         .view-all-solutions-btn:hover {
-            background: rgba(41, 171, 226, 0.1);
+            background: rgba(99, 102, 241, 0.1);
         }
         .solution-item {
             padding: 0.5rem;
@@ -1517,7 +1529,7 @@
             border-left-color: #F59E0B;
         }
         .solution-item.latest {
-            border-left-color: #29ABE2;
+            border-left-color: var(--primary);
         }
         .solution-item-header {
             display: flex;
@@ -1547,7 +1559,7 @@
         }
         .solution-text {
             font-size: 0.8rem;
-            color: #4B5563;
+            color: var(--gray);
             margin: 0;
             line-height: 1.4;
         }
@@ -1586,7 +1598,7 @@
             gap: 0.5rem;
         }
         .solution-card-content {
-            color: #1F2933;
+            color: var(--dark);
             line-height: 1.6;
             margin-bottom: 0.75rem;
             white-space: pre-wrap;
@@ -1707,7 +1719,7 @@
             background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
         }
         .solution-modal-header h2 {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.25rem;
             font-weight: 600;
             color: #059669;
@@ -1725,13 +1737,13 @@
         }
         .solution-problem-info {
             padding: 1rem;
-            background: rgba(41, 171, 226, 0.05);
+            background: rgba(99, 102, 241, 0.05);
             border-radius: 12px;
             margin-bottom: 1rem;
         }
         .solution-problem-title {
             font-weight: 600;
-            color: #1F2933;
+            color: var(--dark);
             margin-bottom: 0.25rem;
         }
         .solution-problem-desc {
@@ -1769,7 +1781,7 @@
         .solution-btn.cancel {
             background: rgba(107, 114, 128, 0.1);
             border: none;
-            color: #4B5563;
+            color: var(--gray);
         }
         .solution-btn.submit {
             background: linear-gradient(135deg, #10B981, #059669);
@@ -1791,13 +1803,13 @@
             font-size: 4rem;
             margin-bottom: 1rem;
             opacity: 0.5;
-            color: #29ABE2;
+            color: var(--primary);
         }
         .empty-state h3 {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.25rem;
             margin-bottom: 0.5rem;
-            color: #1F2933;
+            color: var(--dark);
         }
         .empty-state p {
             margin-bottom: 1.5rem;
@@ -1815,7 +1827,7 @@
             border-radius: 16px;
             padding: 1.25rem;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(41, 171, 226, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.1);
             display: flex;
             align-items: center;
             gap: 1rem;
@@ -1837,13 +1849,13 @@
         }
         .stat-icon.problems { background: linear-gradient(135deg, #EF4444, #F97316); }
         .stat-icon.solved { background: linear-gradient(135deg, #10B981, #059669); }
-        .stat-icon.announcements { background: linear-gradient(135deg, #29ABE2, #29E2D0); }
+        .stat-icon.announcements { background: linear-gradient(135deg, var(--primary), var(--secondary)); }
         .stat-icon.my-problems { background: linear-gradient(135deg, #8B5CF6, #A78BFA); }
         .stat-info h4 {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.5rem;
             font-weight: 700;
-            color: #1F2933;
+            color: var(--dark);
             margin: 0;
         }
         .stat-info p {
@@ -1862,7 +1874,7 @@
         }
         .section-loading i {
             font-size: 2rem;
-            color: #29ABE2;
+            color: var(--primary);
             animation: spin 1s linear infinite;
         }
 
@@ -1879,7 +1891,7 @@
             border-radius: 24px;
             padding: 2rem;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(41, 171, 226, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.1);
             overflow-x: auto;
         }
         .flowchart-header {
@@ -1891,10 +1903,10 @@
             gap: 1rem;
         }
         .flowchart-title {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.5rem;
             font-weight: 600;
-            color: #1F2933;
+            color: var(--dark);
         }
         .flowchart-actions {
             display: flex;
@@ -1906,7 +1918,7 @@
             gap: 0.5rem;
             padding: 0.75rem 1.25rem;
             border-radius: 12px;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-weight: 600;
             font-size: 0.9rem;
             cursor: pointer;
@@ -1914,12 +1926,12 @@
             border: none;
         }
         .flowchart-btn.primary {
-            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
         }
         .flowchart-btn.primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(41, 171, 226, 0.4);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
         }
         .flowchart-btn.secondary {
             background: rgba(139, 92, 246, 0.1);
@@ -1947,13 +1959,13 @@
             font-size: 4rem;
             margin-bottom: 1rem;
             opacity: 0.5;
-            color: #29ABE2;
+            color: var(--primary);
         }
         .flowchart-empty h3 {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.25rem;
             margin-bottom: 0.5rem;
-            color: #1F2933;
+            color: var(--dark);
         }
         .flowchart-node {
             display: flex;
@@ -1973,11 +1985,11 @@
         }
         .node-card:hover {
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            border-color: #29ABE2;
+            border-color: var(--primary);
             transform: translateY(-4px);
         }
         .node-card.root {
-            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
             border: none;
         }
@@ -1997,7 +2009,7 @@
             margin-bottom: 0.5rem;
         }
         .node-title {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-weight: 600;
             font-size: 1rem;
             line-height: 1.25;
@@ -2027,14 +2039,14 @@
             border: none;
             border-radius: 8px;
             background: rgba(0, 0, 0, 0.05);
-            color: #4B5563;
+            color: var(--gray);
             cursor: pointer;
             transition: all 0.2s ease;
             font-size: 0.85rem;
         }
         .node-btn:hover {
-            background: rgba(41, 171, 226, 0.1);
-            color: #29ABE2;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
         }
         .node-card.root .node-btn {
             background: rgba(255, 255, 255, 0.2);
@@ -2092,7 +2104,7 @@
         }
         .flowchart-loading i {
             font-size: 2rem;
-            color: #29ABE2;
+            color: var(--primary);
             animation: spin 1s linear infinite;
         }
         @media (max-width: 768px) {
@@ -2121,9 +2133,9 @@
             margin-bottom: 1rem;
         }
         .browse-header h3 {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.1rem;
-            color: #1F2933;
+            color: var(--dark);
             margin: 0;
         }
         .browse-search {
@@ -2132,15 +2144,15 @@
         .browse-search-input {
             width: 100%;
             padding: 0.75rem 1rem;
-            border: 2px solid rgba(41, 171, 226, 0.2);
+            border: 2px solid rgba(99, 102, 241, 0.2);
             border-radius: 10px;
             font-size: 0.95rem;
             transition: all 0.3s ease;
         }
         .browse-search-input:focus {
             outline: none;
-            border-color: #29ABE2;
-            box-shadow: 0 0 0 3px rgba(41, 171, 226, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
         .browse-list {
             display: flex;
@@ -2154,19 +2166,19 @@
             justify-content: space-between;
             align-items: center;
             padding: 1rem;
-            background: rgba(41, 171, 226, 0.05);
+            background: rgba(99, 102, 241, 0.05);
             border-radius: 12px;
-            border: 1px solid rgba(41, 171, 226, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.1);
             transition: all 0.3s ease;
         }
         .browse-org-item:hover {
-            background: rgba(41, 171, 226, 0.1);
-            border-color: #29ABE2;
+            background: rgba(99, 102, 241, 0.1);
+            border-color: var(--primary);
         }
         .browse-org-info h4 {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1rem;
-            color: #1F2933;
+            color: var(--dark);
             margin: 0 0 0.25rem 0;
         }
         .browse-org-info p {
@@ -2183,10 +2195,10 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
             border: none;
-            box-shadow: 0 4px 20px rgba(41, 171, 226, 0.4);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
             cursor: pointer;
             z-index: 1500;
             display: flex;
@@ -2198,7 +2210,7 @@
         
         .compose-problem-fab:hover {
             transform: scale(1.1) rotate(90deg);
-            box-shadow: 0 8px 30px rgba(41, 171, 226, 0.5);
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.5);
         }
         
         .compose-problem-fab.expanded {
@@ -2210,7 +2222,7 @@
         
         .compose-problem-fab .fab-text {
             display: none;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-weight: 600;
             font-size: 0.95rem;
             white-space: nowrap;
@@ -2265,12 +2277,12 @@
             align-items: center;
             justify-content: space-between;
             padding: 1.25rem 1.5rem;
-            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
         }
         
         .compose-header h2 {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.25rem;
             font-weight: 600;
             display: flex;
@@ -2310,13 +2322,13 @@
             align-items: center;
             gap: 0.5rem;
             font-weight: 600;
-            color: #1F2933;
+            color: var(--dark);
             margin-bottom: 0.5rem;
             font-size: 0.95rem;
         }
         
         .compose-label i {
-            color: #29ABE2;
+            color: var(--primary);
             font-size: 0.9rem;
         }
         
@@ -2327,18 +2339,18 @@
         .compose-input {
             width: 100%;
             padding: 0.875rem 1rem;
-            border: 2px solid rgba(41, 171, 226, 0.2);
+            border: 2px solid rgba(99, 102, 241, 0.2);
             border-radius: 12px;
             font-size: 1rem;
             font-family: 'PT Sans', sans-serif;
-            color: #1F2933;
+            color: var(--dark);
             transition: all 0.3s ease;
         }
         
         .compose-input:focus {
             outline: none;
-            border-color: #29ABE2;
-            box-shadow: 0 0 0 4px rgba(41, 171, 226, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
         }
         
         .compose-input::placeholder {
@@ -2366,10 +2378,10 @@
             justify-content: space-between;
             width: 100%;
             padding: 0.875rem 1rem;
-            border: 2px solid rgba(41, 171, 226, 0.2);
+            border: 2px solid rgba(99, 102, 241, 0.2);
             border-radius: 12px;
             background: white;
-            color: #1F2933;
+            color: var(--dark);
             font-size: 1rem;
             font-family: 'PT Sans', sans-serif;
             cursor: pointer;
@@ -2377,13 +2389,13 @@
         }
         
         .hierarchy-selector-btn:hover {
-            border-color: #29ABE2;
-            background: rgba(41, 171, 226, 0.05);
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
         }
         
         .hierarchy-selector-btn.has-selection {
-            border-color: #29ABE2;
-            background: rgba(41, 171, 226, 0.05);
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
         }
         
         .hierarchy-selector-btn .btn-content {
@@ -2398,7 +2410,7 @@
         }
         
         .hierarchy-selector-btn .btn-icon {
-            color: #29ABE2;
+            color: var(--primary);
         }
         
         .selected-nodes-preview {
@@ -2413,11 +2425,11 @@
             align-items: center;
             gap: 0.35rem;
             padding: 0.35rem 0.75rem;
-            background: linear-gradient(135deg, rgba(41, 171, 226, 0.1), rgba(41, 226, 208, 0.1));
-            border: 1px solid rgba(41, 171, 226, 0.3);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(34, 211, 238, 0.1));
+            border: 1px solid rgba(99, 102, 241, 0.3);
             border-radius: 20px;
             font-size: 0.85rem;
-            color: #29ABE2;
+            color: var(--primary);
             font-weight: 500;
         }
         
@@ -2428,7 +2440,7 @@
         .selected-node-chip .remove-chip {
             background: none;
             border: none;
-            color: #29ABE2;
+            color: var(--primary);
             cursor: pointer;
             padding: 0;
             margin-left: 0.25rem;
@@ -2520,7 +2532,7 @@
             gap: 0.5rem;
             padding: 0.75rem 1.5rem;
             border-radius: 12px;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-weight: 600;
             font-size: 0.95rem;
             cursor: pointer;
@@ -2538,13 +2550,13 @@
         }
         
         .compose-btn.submit {
-            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
         }
         
         .compose-btn.submit:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(41, 171, 226, 0.4);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
         }
         
         .compose-btn.submit:disabled {
@@ -2593,7 +2605,7 @@
         }
         
         .hierarchy-modal-header h2 {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.25rem;
             font-weight: 600;
             display: flex;
@@ -2718,13 +2730,13 @@
         }
         
         .tree-node-selectable.root {
-            background: linear-gradient(135deg, #29ABE2, #29E2D0);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
             border: none;
         }
         
         .tree-node-selectable.root:hover {
-            box-shadow: 0 8px 25px rgba(41, 171, 226, 0.4);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
         }
         
         .tree-node-selectable.root.selected {
@@ -2738,7 +2750,7 @@
         }
         
         .tree-node-name {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-weight: 600;
             font-size: 0.95rem;
             margin-bottom: 0.25rem;
@@ -2836,7 +2848,7 @@
             gap: 0.5rem;
             padding: 0.75rem 1.5rem;
             border-radius: 12px;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-weight: 600;
             font-size: 0.95rem;
             cursor: pointer;
@@ -2966,9 +2978,9 @@
                     </a>
                 </li>
                 <li class="nav-item" id="adminPanelLink" style="display: none;">
-                    <a href="admin-dashboard.html" class="nav-link" style="background: linear-gradient(135deg, rgba(41, 171, 226, 0.15), rgba(41, 226, 208, 0.15)); border-left: 3px solid #29ABE2;">
-                        <i class="fas fa-user-shield nav-icon" style="color: #29ABE2;"></i>
-                        <span class="nav-text" style="color: #29ABE2; font-weight: 600;">Admin Panel</span>
+                    <a href="admin-dashboard.html" class="nav-link" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(34, 211, 238, 0.15)); border-left: 3px solid var(--primary);">
+                        <i class="fas fa-user-shield nav-icon" style="color: var(--primary);"></i>
+                        <span class="nav-text" style="color: var(--primary); font-weight: 600;">Admin Panel</span>
                     </a>
                 </li>
             </ul>
@@ -3255,7 +3267,7 @@
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #6B7280, #4B5563);"><i class="fas fa-archive"></i></div>
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #6B7280, var(--gray));"><i class="fas fa-archive"></i></div>
                         <div class="stat-info">
                             <h4 id="archivedProblemsCount">0</h4>
                             <p>Archived</p>
@@ -3453,27 +3465,27 @@
                 </div>
                 <div class="profile-card" style="background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
                     <div class="profile-header" style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;">
-                        <div class="profile-avatar" id="profileAvatar" style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #29ABE2, #29E2D0); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem;">
+                        <div class="profile-avatar" id="profileAvatar" style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem;">
                             <i class="fas fa-user"></i>
                         </div>
                         <div class="profile-info">
-                            <h3 id="profileName" style="font-family: 'Poppins', sans-serif; font-size: 1.5rem; color: #1F2933; margin: 0;">Loading...</h3>
+                            <h3 id="profileName" style="font-family: 'Inter', sans-serif; font-size: 1.5rem; color: var(--dark); margin: 0;">Loading...</h3>
                             <p id="profileEmail" style="color: #6B7280; margin: 0.25rem 0;">Loading...</p>
-                            <span id="profileRole" style="display: inline-block; background: rgba(41, 171, 226, 0.1); color: #29ABE2; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">Member</span>
+                            <span id="profileRole" style="display: inline-block; background: rgba(99, 102, 241, 0.1); color: var(--primary); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">Member</span>
                         </div>
                     </div>
                     <div class="profile-details">
                         <div class="detail-item" style="display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid rgba(0,0,0,0.05);">
                             <span style="color: #6B7280;">Organization</span>
-                            <span id="profileOrg" style="font-weight: 600; color: #1F2933;">Not joined</span>
+                            <span id="profileOrg" style="font-weight: 600; color: var(--dark);">Not joined</span>
                         </div>
                         <div class="detail-item" style="display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid rgba(0,0,0,0.05);">
                             <span style="color: #6B7280;">Member Since</span>
-                            <span id="profileJoined" style="font-weight: 600; color: #1F2933;">-</span>
+                            <span id="profileJoined" style="font-weight: 600; color: var(--dark);">-</span>
                         </div>
                         <div class="detail-item" style="display: flex; justify-content: space-between; padding: 1rem 0;">
                             <span style="color: #6B7280;">Problems Reported</span>
-                            <span id="profileProblemsCount" style="font-weight: 600; color: #1F2933;">0</span>
+                            <span id="profileProblemsCount" style="font-weight: 600; color: var(--dark);">0</span>
                         </div>
                     </div>
                 </div>
@@ -3536,8 +3548,8 @@
     <!-- Post Announcement Modal -->
     <div class="modal-overlay" id="postAnnouncementModal">
         <div class="modal-content" style="max-width: 600px;">
-            <div class="modal-header" style="background: linear-gradient(135deg, rgba(41, 171, 226, 0.1), rgba(41, 226, 208, 0.1));">
-                <h2 class="modal-title" style="color: #29ABE2;"><i class="fas fa-bullhorn"></i> Post Announcement</h2>
+            <div class="modal-header" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(34, 211, 238, 0.1));">
+                <h2 class="modal-title" style="color: var(--primary);"><i class="fas fa-bullhorn"></i> Post Announcement</h2>
                 <button class="modal-close" id="closePostAnnouncementModal">&times;</button>
             </div>
             <div class="modal-body">
@@ -3857,10 +3869,10 @@
             border-bottom: 1px solid rgba(0, 0, 0, 0.1);
         }
         .modal-title {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1.25rem;
             font-weight: 600;
-            color: #1F2933;
+            color: var(--dark);
             margin: 0;
         }
         .modal-close {
@@ -3871,7 +3883,7 @@
             color: #6B7280;
             padding: 0.25rem;
         }
-        .modal-close:hover { color: #1F2933; }
+        .modal-close:hover { color: var(--dark); }
         .modal-body { padding: 1.5rem; }
         .modal-footer {
             display: flex;
@@ -3886,21 +3898,21 @@
             font-size: 0.875rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
-            color: #1F2933;
+            color: var(--dark);
         }
         .form-input {
             width: 100%;
             padding: 0.75rem 1rem;
             font-size: 0.9rem;
-            border: 2px solid rgba(41, 171, 226, 0.2);
+            border: 2px solid rgba(99, 102, 241, 0.2);
             border-radius: 10px;
             background: white;
             transition: all 0.3s ease;
             outline: none;
         }
         .form-input:focus {
-            border-color: #29ABE2;
-            box-shadow: 0 0 0 4px rgba(41, 171, 226, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
         }
         .form-error {
             font-size: 0.8rem;
@@ -3933,19 +3945,19 @@
         /* Browse Organization Card */
         .org-browse-card {
             background: white;
-            border: 1px solid rgba(41, 171, 226, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.2);
             border-radius: 12px;
             padding: 1rem;
             transition: all 0.3s ease;
         }
         .org-browse-card:hover {
-            border-color: #29ABE2;
-            box-shadow: 0 4px 15px rgba(41, 171, 226, 0.15);
+            border-color: var(--primary);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.15);
         }
         .org-browse-name {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-weight: 600;
-            color: #1F2933;
+            color: var(--dark);
             margin-bottom: 0.25rem;
         }
         .org-browse-meta {
@@ -5601,7 +5613,7 @@
                 } else if (isSolved) {
                     statusBadge = `<span class="badge badge-solved">Solved</span>`;
                 } else if (isArchived) {
-                    statusBadge = `<span class="badge badge-archived" style="background: rgba(107, 114, 128, 0.1); color: #4B5563;">Archived</span>`;
+                    statusBadge = `<span class="badge badge-archived" style="background: rgba(107, 114, 128, 0.1); color: var(--gray);">Archived</span>`;
                     cardStyle = 'opacity: 0.7; border-left: 4px solid #6B7280;';
                 } else {
                     statusBadge = `<span class="badge badge-open">Open</span>`;
@@ -5746,16 +5758,16 @@
                     <div style="margin-bottom: 1rem;">
                         <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
                             <span class="badge badge-${calculatedPriority}">${calculatedPriority.charAt(0).toUpperCase() + calculatedPriority.slice(1)}</span>
-                            <span class="badge ${problem.status === 'solved' ? 'badge-solved' : problem.status === 'archived' ? 'badge-archived' : 'badge-open'}" ${problem.status === 'archived' ? 'style="background: rgba(107, 114, 128, 0.1); color: #4B5563;"' : ''}>${problem.status === 'solved' ? 'Solved' : problem.status === 'archived' ? 'Archived' : 'Open'}</span>
+                            <span class="badge ${problem.status === 'solved' ? 'badge-solved' : problem.status === 'archived' ? 'badge-archived' : 'badge-open'}" ${problem.status === 'archived' ? 'style="background: rgba(107, 114, 128, 0.1); color: var(--gray);"' : ''}>${problem.status === 'solved' ? 'Solved' : problem.status === 'archived' ? 'Archived' : 'Open'}</span>
                         </div>
                     </div>
                     <div style="margin-bottom: 1.5rem;">
                         <h4 style="font-size: 0.9rem; color: #6B7280; margin-bottom: 0.5rem;">Description</h4>
-                        <p style="color: #1F2933; line-height: 1.6;">${this.escapeHtml(problem.description || 'No description provided.')}</p>
+                        <p style="color: var(--dark); line-height: 1.6;">${this.escapeHtml(problem.description || 'No description provided.')}</p>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(41, 171, 226, 0.05); border-radius: 12px; margin-bottom: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(99, 102, 241, 0.05); border-radius: 12px; margin-bottom: 1rem;">
                         <div style="text-align: center;">
-                            <div style="font-size: 1.5rem; font-weight: 700; color: ${voteScore > 0 ? '#10B981' : voteScore < 0 ? '#EF4444' : '#4B5563'};">${voteScore}</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: ${voteScore > 0 ? '#10B981' : voteScore < 0 ? '#EF4444' : 'var(--gray)'};">${voteScore}</div>
                             <div style="font-size: 0.75rem; color: #6B7280;">Vote Score</div>
                         </div>
                         <div style="height: 40px; width: 1px; background: rgba(0,0,0,0.1);"></div>
@@ -5770,30 +5782,30 @@
                             </div>
                         </div>
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1rem; background: rgba(41, 171, 226, 0.05); border-radius: 12px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1rem; background: rgba(99, 102, 241, 0.05); border-radius: 12px;">
                         <div>
                             <span style="font-size: 0.85rem; color: #6B7280;">Category</span>
-                            <p style="font-weight: 600; color: #1F2933;">${problem.category || 'General'}</p>
+                            <p style="font-weight: 600; color: var(--dark);">${problem.category || 'General'}</p>
                         </div>
                         <div>
                             <span style="font-size: 0.85rem; color: #6B7280;">Reported By</span>
-                            <p style="font-weight: 600; color: #1F2933;">${problem.createdBy?.split('@')[0] || 'Anonymous'}</p>
+                            <p style="font-weight: 600; color: var(--dark);">${problem.createdBy?.split('@')[0] || 'Anonymous'}</p>
                         </div>
                         <div>
                             <span style="font-size: 0.85rem; color: #6B7280;">Created</span>
-                            <p style="font-weight: 600; color: #1F2933;">${this.formatDate(problem.createdAt)}</p>
+                            <p style="font-weight: 600; color: var(--dark);">${this.formatDate(problem.createdAt)}</p>
                         </div>
                         ${problem.targetOrg ? `
                             <div>
                                 <span style="font-size: 0.85rem; color: #6B7280;">Organization</span>
-                                <p style="font-weight: 600; color: #1F2933;">${problem.targetOrg}</p>
+                                <p style="font-weight: 600; color: var(--dark);">${problem.targetOrg}</p>
                             </div>
                         ` : ''}
                     </div>
                     ${problem.solution ? `
                         <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(16, 185, 129, 0.1); border-radius: 12px; border-left: 4px solid #10B981;">
                             <h4 style="font-size: 0.9rem; color: #059669; margin-bottom: 0.5rem;"><i class="fas fa-check-circle"></i> Solution</h4>
-                            <p style="color: #1F2933;">${this.escapeHtml(problem.solution)}</p>
+                            <p style="color: var(--dark);">${this.escapeHtml(problem.solution)}</p>
                         </div>
                     ` : ''}
                 `;
@@ -6806,7 +6818,7 @@
                 const contentEl = document.getElementById('allSolutionsContent');
                 
                 titleEl.textContent = `Solutions for: ${problem.title}`;
-                contentEl.innerHTML = '<div style="text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #29ABE2;"></i><p>Loading solutions...</p></div>';
+                contentEl.innerHTML = '<div style="text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary);"></i><p>Loading solutions...</p></div>';
                 
                 modal.classList.add('show');
                 
@@ -7744,7 +7756,7 @@
                             <div class="item-card-badges">
                                 ${isImportant ? '<span class="badge badge-important"><i class="fas fa-exclamation-circle"></i> Important</span>' : ''}
                                 ${adminBadge}
-                                <span class="badge" style="background: rgba(41, 171, 226, 0.1); color: #29ABE2;">${announcement.category || 'General'}</span>
+                                <span class="badge" style="background: rgba(99, 102, 241, 0.1); color: var(--primary);">${announcement.category || 'General'}</span>
                             </div>
                         </div>
                         <p class="item-card-description">${this.escapeHtml(announcement.description || announcement.content || '')}</p>
@@ -7789,25 +7801,25 @@
                         <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
                             ${announcement.priority === 'high' || announcement.isImportant ? '<span class="badge badge-important"><i class="fas fa-exclamation-circle"></i> Important</span>' : ''}
                             ${adminBadgeHtml}
-                            <span class="badge" style="background: rgba(41, 171, 226, 0.1); color: #29ABE2;">${announcement.category || 'General'}</span>
+                            <span class="badge" style="background: rgba(99, 102, 241, 0.1); color: var(--primary);">${announcement.category || 'General'}</span>
                         </div>
                     </div>
                     <div style="margin-bottom: 1.5rem;">
-                        <p style="color: #1F2933; line-height: 1.8; white-space: pre-wrap;">${this.escapeHtml(announcement.description || announcement.content || 'No content provided.')}</p>
+                        <p style="color: var(--dark); line-height: 1.8; white-space: pre-wrap;">${this.escapeHtml(announcement.description || announcement.content || 'No content provided.')}</p>
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1rem; background: rgba(41, 171, 226, 0.05); border-radius: 12px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1rem; background: rgba(99, 102, 241, 0.05); border-radius: 12px;">
                         <div>
                             <span style="font-size: 0.85rem; color: #6B7280;">Posted By</span>
-                            <p style="font-weight: 600; color: #1F2933;">${announcement.createdBy?.split('@')[0] || 'Admin'}</p>
+                            <p style="font-weight: 600; color: var(--dark);">${announcement.createdBy?.split('@')[0] || 'Admin'}</p>
                         </div>
                         <div>
                             <span style="font-size: 0.85rem; color: #6B7280;">Posted On</span>
-                            <p style="font-weight: 600; color: #1F2933;">${this.formatDate(announcement.createdAt)}</p>
+                            <p style="font-weight: 600; color: var(--dark);">${this.formatDate(announcement.createdAt)}</p>
                         </div>
                         ${announcement.scopeName ? `
                             <div>
                                 <span style="font-size: 0.85rem; color: #6B7280;">Target Scope</span>
-                                <p style="font-weight: 600; color: #29ABE2;"><i class="fas fa-sitemap"></i> ${announcement.scopeName}</p>
+                                <p style="font-weight: 600; color: var(--primary);"><i class="fas fa-sitemap"></i> ${announcement.scopeName}</p>
                             </div>
                         ` : ''}
                         ${announcement.deadline ? `
