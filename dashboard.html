@@ -1372,6 +1372,397 @@
             background: rgba(107, 114, 128, 0.2);
         }
         
+        /* Vote Section Styles */
+        .vote-section {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(41, 171, 226, 0.05);
+            border-radius: 12px;
+        }
+        .vote-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border: 2px solid rgba(107, 114, 128, 0.2);
+            border-radius: 8px;
+            background: white;
+            color: #6B7280;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+        }
+        .vote-btn:hover {
+            transform: scale(1.1);
+        }
+        .vote-btn.upvote:hover {
+            border-color: #10B981;
+            color: #10B981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        .vote-btn.downvote:hover {
+            border-color: #EF4444;
+            color: #EF4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+        .vote-btn.upvote.active {
+            border-color: #10B981;
+            background: #10B981;
+            color: white;
+        }
+        .vote-btn.downvote.active {
+            border-color: #EF4444;
+            background: #EF4444;
+            color: white;
+        }
+        .vote-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .vote-score {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            min-width: 40px;
+            text-align: center;
+            color: #4B5563;
+        }
+        .vote-score.positive {
+            color: #10B981;
+        }
+        .vote-score.negative {
+            color: #EF4444;
+        }
+        .vote-count-detail {
+            margin-left: auto;
+            font-size: 0.8rem;
+            color: #6B7280;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .vote-count-detail i {
+            font-size: 0.75rem;
+        }
+        
+        /* Solutions Preview Styles */
+        .solutions-preview {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(16, 185, 129, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(16, 185, 129, 0.1);
+        }
+        .solutions-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #059669;
+        }
+        .view-all-solutions-btn {
+            background: none;
+            border: none;
+            color: #29ABE2;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        .view-all-solutions-btn:hover {
+            background: rgba(41, 171, 226, 0.1);
+        }
+        .solution-item {
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            background: white;
+            border-radius: 8px;
+            border-left: 3px solid #10B981;
+        }
+        .solution-item.accepted {
+            border-left-color: #059669;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        .solution-item.top-priority {
+            border-left-color: #F59E0B;
+        }
+        .solution-item.latest {
+            border-left-color: #29ABE2;
+        }
+        .solution-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.25rem;
+        }
+        .solution-accepted-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #059669;
+            background: rgba(16, 185, 129, 0.2);
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+        }
+        .solution-type-badge {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #6B7280;
+        }
+        .solution-type-badge i {
+            margin-right: 0.25rem;
+        }
+        .solution-votes {
+            font-size: 0.7rem;
+            color: #6B7280;
+        }
+        .solution-text {
+            font-size: 0.8rem;
+            color: #4B5563;
+            margin: 0;
+            line-height: 1.4;
+        }
+        .solution-author {
+            font-size: 0.7rem;
+            color: #9CA3AF;
+            margin-top: 0.25rem;
+            display: block;
+        }
+        
+        /* Full Solution Card (in modal) */
+        .solution-card-full {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+        .solution-card-full:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .solution-card-full.accepted {
+            border-color: #10B981;
+            background: rgba(16, 185, 129, 0.05);
+        }
+        .solution-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+        .solution-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .solution-card-content {
+            color: #1F2933;
+            line-height: 1.6;
+            margin-bottom: 0.75rem;
+            white-space: pre-wrap;
+        }
+        .solution-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .solution-vote-section {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .solution-vote-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border: 2px solid rgba(107, 114, 128, 0.2);
+            border-radius: 6px;
+            background: white;
+            color: #6B7280;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+        .solution-vote-btn:hover {
+            transform: scale(1.1);
+        }
+        .solution-vote-btn.upvote:hover,
+        .solution-vote-btn.upvote.active {
+            border-color: #10B981;
+            color: #10B981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        .solution-vote-btn.upvote.active {
+            background: #10B981;
+            color: white;
+        }
+        .solution-vote-btn.downvote:hover,
+        .solution-vote-btn.downvote.active {
+            border-color: #EF4444;
+            color: #EF4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+        .solution-vote-btn.downvote.active {
+            background: #EF4444;
+            color: white;
+        }
+        .solution-vote-score {
+            font-weight: 700;
+            min-width: 30px;
+            text-align: center;
+        }
+        .solution-vote-score.positive { color: #10B981; }
+        .solution-vote-score.negative { color: #EF4444; }
+        .solution-accept-btn {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .solution-accept-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        
+        /* Add Solution Button */
+        .item-action-btn.solution {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .item-action-btn.solution:hover {
+            background: #10B981;
+            color: white;
+            border-color: #10B981;
+        }
+        
+        /* Solution Modal Styles */
+        .solution-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 1rem;
+        }
+        .solution-modal-overlay.show {
+            display: flex;
+        }
+        .solution-modal {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalIn 0.2s ease;
+        }
+        .solution-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+        }
+        .solution-modal-header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #059669;
+            margin: 0;
+        }
+        .solution-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6B7280;
+        }
+        .solution-modal-body {
+            padding: 1.5rem;
+        }
+        .solution-problem-info {
+            padding: 1rem;
+            background: rgba(41, 171, 226, 0.05);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+        .solution-problem-title {
+            font-weight: 600;
+            color: #1F2933;
+            margin-bottom: 0.25rem;
+        }
+        .solution-problem-desc {
+            font-size: 0.85rem;
+            color: #6B7280;
+        }
+        .solution-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 1rem;
+            border: 2px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        .solution-textarea:focus {
+            border-color: #10B981;
+        }
+        .solution-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        .solution-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .solution-btn.cancel {
+            background: rgba(107, 114, 128, 0.1);
+            border: none;
+            color: #4B5563;
+        }
+        .solution-btn.submit {
+            background: linear-gradient(135deg, #10B981, #059669);
+            border: none;
+            color: white;
+        }
+        .solution-btn.submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        
         /* Empty State */
         .empty-state {
             text-align: center;
@@ -1455,9 +1846,6 @@
             font-size: 2rem;
             color: #29ABE2;
             animation: spin 1s linear infinite;
-        }d-actions {
-                flex-direction: column;
-            }
         }
 
         /* Flowchart Tree Styles - Similar to Welcome Page */
@@ -1698,6 +2086,75 @@
             .child-branch::before { display: none; }
             .children-horizontal-line { display: none; }
             .node-card { min-width: 180px; }
+        }
+        
+        /* Browse Section Styles */
+        .browse-section {
+            margin-top: 2rem;
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        .browse-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .browse-header h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.1rem;
+            color: #1F2933;
+            margin: 0;
+        }
+        .browse-search {
+            margin-bottom: 1rem;
+        }
+        .browse-search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid rgba(41, 171, 226, 0.2);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        .browse-search-input:focus {
+            outline: none;
+            border-color: #29ABE2;
+            box-shadow: 0 0 0 3px rgba(41, 171, 226, 0.1);
+        }
+        .browse-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .browse-org-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(41, 171, 226, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(41, 171, 226, 0.1);
+            transition: all 0.3s ease;
+        }
+        .browse-org-item:hover {
+            background: rgba(41, 171, 226, 0.1);
+            border-color: #29ABE2;
+        }
+        .browse-org-info h4 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            color: #1F2933;
+            margin: 0 0 0.25rem 0;
+        }
+        .browse-org-info p {
+            font-size: 0.85rem;
+            color: #6B7280;
+            margin: 0;
         }
 
         /* ========== COMPOSE PROBLEM BUTTON (Gmail-style) ========== */
@@ -2810,6 +3267,11 @@
                         Archived
                         <span class="tab-count" id="archivedProblemsTabCount">0</span>
                     </button>
+                    <button class="tab-btn" data-tab="bookmarked-problems">
+                        <i class="fas fa-bookmark"></i>
+                        Bookmarks
+                        <span class="tab-count" id="bookmarkedProblemsTabCount">0</span>
+                    </button>
                 </div>
                 
                 <!-- Problems List -->
@@ -2907,6 +3369,84 @@
                         <div class="section-loading">
                             <i class="fas fa-spinner"></i>
                             <p style="margin-top: 1rem; color: #6B7280;">Loading announcements...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Flowchart Section -->
+            <section class="section-page" id="flowchartSection">
+                <div class="flowchart-card">
+                    <div class="flowchart-header">
+                        <h2 class="flowchart-title"><i class="fas fa-project-diagram"></i> Your Network</h2>
+                        <div class="flowchart-actions">
+                            <button class="flowchart-btn secondary" id="browseOrgsBtn">
+                                <i class="fas fa-search"></i>
+                                Browse Organizations
+                            </button>
+                            <button class="flowchart-btn primary" id="addNodeBtn">
+                                <i class="fas fa-plus"></i>
+                                Add Node
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flowchart-container" id="flowchartContainer">
+                        <div class="flowchart-loading">
+                            <i class="fas fa-spinner"></i>
+                            <p>Loading your network...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Browse Organizations Section -->
+                <div class="browse-section" id="browseSection" style="display: none;">
+                    <div class="browse-header">
+                        <h3><i class="fas fa-building"></i> Browse Organizations</h3>
+                        <button class="flowchart-btn secondary" id="closeBrowseBtn">
+                            <i class="fas fa-times"></i>
+                            Close
+                        </button>
+                    </div>
+                    <div class="browse-search">
+                        <input type="text" class="browse-search-input" id="searchOrgsInput" placeholder="Search organizations...">
+                    </div>
+                    <div class="browse-list" id="browseOrgsList">
+                        <div class="flowchart-loading">
+                            <i class="fas fa-spinner"></i>
+                            <p>Loading organizations...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Profile Section -->
+            <section class="section-page" id="profileSection">
+                <div class="section-header">
+                    <h2 class="section-header-title">My Profile</h2>
+                </div>
+                <div class="profile-card" style="background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                    <div class="profile-header" style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;">
+                        <div class="profile-avatar" id="profileAvatar" style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #29ABE2, #29E2D0); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="profile-info">
+                            <h3 id="profileName" style="font-family: 'Poppins', sans-serif; font-size: 1.5rem; color: #1F2933; margin: 0;">Loading...</h3>
+                            <p id="profileEmail" style="color: #6B7280; margin: 0.25rem 0;">Loading...</p>
+                            <span id="profileRole" style="display: inline-block; background: rgba(41, 171, 226, 0.1); color: #29ABE2; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">Member</span>
+                        </div>
+                    </div>
+                    <div class="profile-details">
+                        <div class="detail-item" style="display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                            <span style="color: #6B7280;">Organization</span>
+                            <span id="profileOrg" style="font-weight: 600; color: #1F2933;">Not joined</span>
+                        </div>
+                        <div class="detail-item" style="display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                            <span style="color: #6B7280;">Member Since</span>
+                            <span id="profileJoined" style="font-weight: 600; color: #1F2933;">-</span>
+                        </div>
+                        <div class="detail-item" style="display: flex; justify-content: space-between; padding: 1rem 0;">
+                            <span style="color: #6B7280;">Problems Reported</span>
+                            <span id="profileProblemsCount" style="font-weight: 600; color: #1F2933;">0</span>
                         </div>
                     </div>
                 </div>
@@ -3032,6 +3572,32 @@
         </div>
     </div>
     
+    <!-- Add Solution Modal -->
+    <div class="solution-modal-overlay" id="solutionModalOverlay">
+        <div class="solution-modal">
+            <div class="solution-modal-header">
+                <h2><i class="fas fa-lightbulb"></i> Add Solution</h2>
+                <button class="solution-modal-close" id="solutionModalClose">&times;</button>
+            </div>
+            <div class="solution-modal-body">
+                <div class="solution-problem-info" id="solutionProblemInfo">
+                    <div class="solution-problem-title" id="solutionProblemTitle">Problem Title</div>
+                    <div class="solution-problem-desc" id="solutionProblemDesc">Problem description...</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-edit"></i> Your Solution</label>
+                    <textarea class="solution-textarea" id="solutionContent" placeholder="Describe your solution in detail..."></textarea>
+                </div>
+            </div>
+            <div class="solution-modal-footer">
+                <button class="solution-btn cancel" id="solutionCancelBtn">Cancel</button>
+                <button class="solution-btn submit" id="solutionSubmitBtn">
+                    <i class="fas fa-paper-plane"></i> Submit Solution
+                </button>
+            </div>
+        </div>
+    </div>
+    
     <!-- View Announcement Modal -->
     <div class="modal-overlay" id="viewAnnouncementModal">
         <div class="modal-content" style="max-width: 600px;">
@@ -3052,6 +3618,22 @@
     <div class="toast-notification" id="toastNotification">
         <i class="fas fa-check-circle" id="toastIcon"></i>
         <span id="toastMessage">Success!</span>
+    </div>
+    
+    <!-- View All Solutions Modal -->
+    <div class="modal-overlay" id="viewAllSolutionsModal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));">
+                <h2 class="modal-title" style="color: #059669;"><i class="fas fa-lightbulb"></i> <span id="solutionsModalTitle">All Solutions</span></h2>
+                <button class="modal-close" id="closeAllSolutionsModal">&times;</button>
+            </div>
+            <div class="modal-body" id="allSolutionsContent" style="max-height: 60vh; overflow-y: auto;">
+                <!-- Solutions will be dynamically inserted -->
+            </div>
+            <div class="modal-footer">
+                <button class="flowchart-btn secondary" id="closeAllSolutionsBtn">Close</button>
+            </div>
+        </div>
     </div>
 
     <!-- Compose Problem FAB (Gmail-style) -->
@@ -3114,32 +3696,11 @@
                         <option value="other">Other</option>
                     </select>
                 </div>
-                
-                <div class="compose-form-group">
-                    <label class="compose-label">
-                        <i class="fas fa-flag"></i>
-                        Priority
-                    </label>
-                    <div class="priority-options">
-                        <div class="priority-option low">
-                            <input type="radio" name="composePriority" id="priorityLow" value="low">
-                            <label for="priorityLow"><i class="fas fa-arrow-down"></i> Low</label>
-                        </div>
-                        <div class="priority-option medium">
-                            <input type="radio" name="composePriority" id="priorityMedium" value="medium" checked>
-                            <label for="priorityMedium"><i class="fas fa-minus"></i> Medium</label>
-                        </div>
-                        <div class="priority-option high">
-                            <input type="radio" name="composePriority" id="priorityHigh" value="high">
-                            <label for="priorityHigh"><i class="fas fa-arrow-up"></i> High</label>
-                        </div>
-                    </div>
-                </div>
             </div>
             <div class="compose-footer">
                 <div class="compose-footer-info">
                     <i class="fas fa-info-circle"></i>
-                    Problem will be sent for admin approval
+                    Problem will be sent for admin approval. Priority is determined by community votes.
                 </div>
                 <div class="compose-footer-actions">
                     <button class="compose-btn cancel" id="composeCancelBtn">Cancel</button>
@@ -3354,12 +3915,16 @@
             getDoc,
             setDoc,
             deleteDoc,
+            updateDoc,
             collection,
             getDocs,
             addDoc,
             serverTimestamp,
             arrayUnion,
-            arrayRemove
+            arrayRemove,
+            increment,
+            query,
+            where
         } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
@@ -4430,36 +4995,267 @@
                 this.currentUser = null;
                 this.currentFilter = 'all';
                 this.editingProblem = null;
+                // Read indices for tracking which problems user has seen
+                this.problemReadIndex = 0;
+                this.solvedReadIndex = 0;
+                this.archivedReadIndex = 0;
+                // Bookmark arrays
+                this.bookmarkedProblems = [];
+                this.bookmarkedSolved = [];
+                this.bookmarkedArchived = [];
             }
 
             async loadProblems(userEmail) {
                 this.currentUser = userEmail;
                 try {
-                    const problemsRef = collection(db, 'problems');
-                    const snapshot = await getDocs(problemsRef);
-                    
                     this.problems = [];
-                    snapshot.forEach(docSnap => {
+                    
+                    // Load user's read indices and bookmarks
+                    await this.loadUserProblemData(userEmail);
+                    
+                    // Load from main problems collection (open/approved problems)
+                    const problemsRef = collection(db, 'problems');
+                    const problemsSnapshot = await getDocs(problemsRef);
+                    
+                    problemsSnapshot.forEach(docSnap => {
                         const data = docSnap.data();
                         this.problems.push({
                             id: docSnap.id,
                             ...data,
+                            source: 'problems',
+                            status: data.status || 'open',
                             createdAt: data.createdAt?.toDate() || new Date()
                         });
                     });
                     
-                    // Sort by date (newest first)
-                    this.problems.sort((a, b) => b.createdAt - a.createdAt);
+                    // Load from solvedProblems collection
+                    try {
+                        const solvedRef = collection(db, 'solvedProblems');
+                        const solvedSnapshot = await getDocs(solvedRef);
+                        
+                        solvedSnapshot.forEach(docSnap => {
+                            const data = docSnap.data();
+                            if (!this.problems.find(p => p.id === docSnap.id)) {
+                                this.problems.push({
+                                    id: docSnap.id,
+                                    ...data,
+                                    source: 'solved',
+                                    status: 'solved',
+                                    createdAt: data.createdAt?.toDate() || new Date(),
+                                    solvedAt: data.solvedAt?.toDate() || new Date()
+                                });
+                            }
+                        });
+                        console.log('Loaded solved problems:', solvedSnapshot.size);
+                    } catch (solvedError) {
+                        console.log('Error loading solved problems:', solvedError);
+                    }
                     
+                    // Load from archivedProblems collection
+                    try {
+                        const archivedRef = collection(db, 'archivedProblems');
+                        const archivedSnapshot = await getDocs(archivedRef);
+                        
+                        archivedSnapshot.forEach(docSnap => {
+                            const data = docSnap.data();
+                            if (!this.problems.find(p => p.id === docSnap.id)) {
+                                this.problems.push({
+                                    id: docSnap.id,
+                                    ...data,
+                                    source: 'archived',
+                                    status: 'archived',
+                                    createdAt: data.createdAt?.toDate() || new Date(),
+                                    archivedAt: data.archivedAt?.toDate() || new Date()
+                                });
+                            }
+                        });
+                        console.log('Loaded archived problems:', archivedSnapshot.size);
+                    } catch (archivedError) {
+                        console.log('Error loading archived problems:', archivedError);
+                    }
+                    
+                    // Load pending problems (to show user their pending submissions)
+                    try {
+                        const pendingRef = collection(db, 'pendingProblemApprovals');
+                        const pendingSnapshot = await getDocs(pendingRef);
+                        
+                        pendingSnapshot.forEach(docSnap => {
+                            const data = docSnap.data();
+                            // Only add if created by current user and not already in list
+                            if (data.createdBy === userEmail && !this.problems.find(p => p.id === docSnap.id)) {
+                                this.problems.push({
+                                    id: docSnap.id,
+                                    ...data,
+                                    source: 'pending',
+                                    status: 'pending',
+                                    createdAt: data.createdAt?.toDate() || new Date()
+                                });
+                            }
+                        });
+                        console.log('Loaded pending problems for user');
+                    } catch (pendingError) {
+                        console.log('Error loading pending problems:', pendingError);
+                    }
+                    
+                    // Sort problems: unread first (index > readIndex), then by date
+                    this.sortProblemsWithReadIndex();
+                    
+                    console.log('Total problems loaded:', this.problems.length);
                     return this.problems;
                 } catch (error) {
                     console.error('Error loading problems:', error);
                     return [];
                 }
             }
+            
+            async loadUserProblemData(userEmail) {
+                try {
+                    const userRef = doc(db, 'users', userEmail);
+                    const userDoc = await getDoc(userRef);
+                    
+                    if (userDoc.exists()) {
+                        const data = userDoc.data();
+                        this.problemReadIndex = data.problemReadIndex || 0;
+                        this.solvedReadIndex = data.solvedReadIndex || 0;
+                        this.archivedReadIndex = data.archivedReadIndex || 0;
+                        this.bookmarkedProblems = data.bookmarkedProblems || [];
+                        this.bookmarkedSolved = data.bookmarkedSolved || [];
+                        this.bookmarkedArchived = data.bookmarkedArchived || [];
+                    } else {
+                        this.problemReadIndex = 0;
+                        this.solvedReadIndex = 0;
+                        this.archivedReadIndex = 0;
+                        this.bookmarkedProblems = [];
+                        this.bookmarkedSolved = [];
+                        this.bookmarkedArchived = [];
+                    }
+                } catch (error) {
+                    console.error('Error loading user problem data:', error);
+                    this.problemReadIndex = 0;
+                    this.solvedReadIndex = 0;
+                    this.archivedReadIndex = 0;
+                    this.bookmarkedProblems = [];
+                    this.bookmarkedSolved = [];
+                    this.bookmarkedArchived = [];
+                }
+            }
+            
+            sortProblemsWithReadIndex() {
+                // Sort: unread problems first, then by date (newest first)
+                this.problems.sort((a, b) => {
+                    // Pending always at top
+                    if (a.status === 'pending' && b.status !== 'pending') return -1;
+                    if (b.status === 'pending' && a.status !== 'pending') return 1;
+                    
+                    // Then by date (newest first)
+                    return b.createdAt - a.createdAt;
+                });
+            }
+            
+            async updateReadIndex(type) {
+                try {
+                    const userRef = doc(db, 'users', this.currentUser);
+                    const updateData = {};
+                    
+                    if (type === 'problem') {
+                        const openProblems = this.getOpenProblems();
+                        updateData.problemReadIndex = openProblems.length;
+                        this.problemReadIndex = openProblems.length;
+                    } else if (type === 'solved') {
+                        const solvedProblems = this.getSolvedProblems();
+                        updateData.solvedReadIndex = solvedProblems.length;
+                        this.solvedReadIndex = solvedProblems.length;
+                    } else if (type === 'archived') {
+                        const archivedProblems = this.getArchivedProblems();
+                        updateData.archivedReadIndex = archivedProblems.length;
+                        this.archivedReadIndex = archivedProblems.length;
+                    }
+                    
+                    await setDoc(userRef, updateData, { merge: true });
+                } catch (error) {
+                    console.error('Error updating read index:', error);
+                }
+            }
+            
+            async toggleBookmark(problemId, type) {
+                try {
+                    const userRef = doc(db, 'users', this.currentUser);
+                    let bookmarkArray, fieldName;
+                    
+                    if (type === 'problem' || type === 'open') {
+                        bookmarkArray = this.bookmarkedProblems;
+                        fieldName = 'bookmarkedProblems';
+                    } else if (type === 'solved') {
+                        bookmarkArray = this.bookmarkedSolved;
+                        fieldName = 'bookmarkedSolved';
+                    } else if (type === 'archived') {
+                        bookmarkArray = this.bookmarkedArchived;
+                        fieldName = 'bookmarkedArchived';
+                    }
+                    
+                    const isBookmarked = bookmarkArray.includes(problemId);
+                    
+                    if (isBookmarked) {
+                        // Remove from bookmarks
+                        await setDoc(userRef, {
+                            [fieldName]: arrayRemove(problemId)
+                        }, { merge: true });
+                        
+                        const index = bookmarkArray.indexOf(problemId);
+                        if (index > -1) bookmarkArray.splice(index, 1);
+                        
+                        return false;
+                    } else {
+                        // Add to bookmarks
+                        await setDoc(userRef, {
+                            [fieldName]: arrayUnion(problemId)
+                        }, { merge: true });
+                        
+                        bookmarkArray.push(problemId);
+                        return true;
+                    }
+                } catch (error) {
+                    console.error('Error toggling bookmark:', error);
+                    throw error;
+                }
+            }
+            
+            isBookmarked(problemId, type) {
+                if (type === 'problem' || type === 'open') {
+                    return this.bookmarkedProblems.includes(problemId);
+                } else if (type === 'solved') {
+                    return this.bookmarkedSolved.includes(problemId);
+                } else if (type === 'archived') {
+                    return this.bookmarkedArchived.includes(problemId);
+                }
+                return false;
+            }
+            
+            getBookmarkedProblems(type) {
+                let bookmarkIds;
+                if (type === 'problem' || type === 'open') {
+                    bookmarkIds = this.bookmarkedProblems;
+                } else if (type === 'solved') {
+                    bookmarkIds = this.bookmarkedSolved;
+                } else if (type === 'archived') {
+                    bookmarkIds = this.bookmarkedArchived;
+                } else {
+                    // All bookmarks
+                    bookmarkIds = [...this.bookmarkedProblems, ...this.bookmarkedSolved, ...this.bookmarkedArchived];
+                }
+                return this.problems.filter(p => bookmarkIds.includes(p.id));
+            }
 
             getOpenProblems() {
-                return this.problems.filter(p => p.status !== 'solved' && p.status !== 'archived');
+                return this.problems.filter(p => 
+                    p.status !== 'solved' && 
+                    p.status !== 'archived' && 
+                    p.status !== 'pending'
+                );
+            }
+
+            getPendingProblems() {
+                return this.problems.filter(p => p.status === 'pending');
             }
 
             getSolvedProblems() {
@@ -4470,12 +5266,29 @@
                 return this.problems.filter(p => p.status === 'archived');
             }
 
+            getApprovedProblems() {
+                return this.problems.filter(p => p.status === 'approved');
+            }
+
             getMyProblems() {
-                return this.problems.filter(p => p.createdBy === this.currentUser && p.status !== 'archived');
+                return this.problems.filter(p => 
+                    (p.createdBy === this.currentUser || p.submittedBy === this.currentUser) && 
+                    p.status !== 'archived'
+                );
             }
 
             getMySolvedProblems() {
-                return this.problems.filter(p => p.createdBy === this.currentUser && p.status === 'solved');
+                return this.problems.filter(p => 
+                    (p.createdBy === this.currentUser || p.submittedBy === this.currentUser) && 
+                    p.status === 'solved'
+                );
+            }
+
+            getMyPendingProblems() {
+                return this.problems.filter(p => 
+                    (p.createdBy === this.currentUser || p.submittedBy === this.currentUser) && 
+                    p.status === 'pending'
+                );
             }
 
             updateStats() {
@@ -4484,6 +5297,7 @@
                 const archived = this.getArchivedProblems().length;
                 const myProblems = this.getMyProblems().length;
                 const mySolved = this.getMySolvedProblems().length;
+                const bookmarked = this.getBookmarkedProblems('all').length;
                 
                 // Update stats
                 const openCount = document.getElementById('openProblemsCount');
@@ -4503,11 +5317,13 @@
                 const openTab = document.getElementById('openProblemsTabCount');
                 const solvedTab = document.getElementById('solvedProblemsTabCount');
                 const archivedTab = document.getElementById('archivedProblemsTabCount');
+                const bookmarkedTab = document.getElementById('bookmarkedProblemsTabCount');
                 
                 if (allTab) allTab.textContent = this.problems.filter(p => p.status !== 'archived').length;
                 if (openTab) openTab.textContent = open;
                 if (solvedTab) solvedTab.textContent = solved;
                 if (archivedTab) archivedTab.textContent = archived;
+                if (bookmarkedTab) bookmarkedTab.textContent = bookmarked;
             }
 
             renderProblems(containerId, filter = 'all') {
@@ -4524,17 +5340,16 @@
                     filteredProblems = this.getArchivedProblems();
                 } else if (filter === 'my') {
                     filteredProblems = this.getMyProblems();
+                } else if (filter === 'bookmarked') {
+                    filteredProblems = this.getBookmarkedProblems('all');
                 }
                 
                 if (filteredProblems.length === 0) {
                     container.innerHTML = `
                         <div class="empty-state">
-                            <i class="fas ${filter === 'archived' ? 'fa-archive' : 'fa-clipboard-list'}"></i>
+                            <i class="fas ${filter === 'archived' ? 'fa-archive' : filter === 'bookmarked' ? 'fa-bookmark' : 'fa-clipboard-list'}"></i>
                             <h3>No Problems Found</h3>
-                            <p>${filter === 'my' ? 'You haven\'t reported any problems yet.' : filter === 'archived' ? 'No archived problems.' : 'No problems to display.'}</p>
-                            ${filter !== 'archived' ? `<button class="action-btn-primary" onclick="problemsManager.openProblemModal()">
-                                <i class="fas fa-plus"></i> Report Problem
-                            </button>` : ''}
+                            <p>${filter === 'my' ? 'You haven\'t reported any problems yet.' : filter === 'archived' ? 'No archived problems.' : filter === 'bookmarked' ? 'No bookmarked problems.' : 'No problems to display.'}</p>
                         </div>
                     `;
                     return;
@@ -4547,14 +5362,6 @@
                     btn.addEventListener('click', (e) => {
                         const problemId = e.currentTarget.dataset.id;
                         this.viewProblem(problemId);
-                    });
-                });
-                
-                container.querySelectorAll('.solve-problem-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const problemId = e.currentTarget.dataset.id;
-                        this.markAsSolved(problemId);
                     });
                 });
                 
@@ -4581,36 +5388,244 @@
                         this.unarchiveProblem(problemId);
                     });
                 });
+                
+                // Bookmark event listeners
+                container.querySelectorAll('.bookmark-problem-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const problemId = e.currentTarget.dataset.id;
+                        const type = e.currentTarget.dataset.type;
+                        try {
+                            const isNowBookmarked = await this.toggleBookmark(problemId, type);
+                            // Update button appearance
+                            if (isNowBookmarked) {
+                                btn.innerHTML = '<i class="fas fa-bookmark"></i> Bookmarked';
+                                btn.style.background = 'rgba(245, 158, 11, 0.1)';
+                                btn.style.color = '#D97706';
+                                btn.style.borderColor = '#F59E0B';
+                                btn.classList.add('bookmarked');
+                            } else {
+                                btn.innerHTML = '<i class="fas fa-bookmark"></i> Bookmark';
+                                btn.style.background = '';
+                                btn.style.color = '';
+                                btn.style.borderColor = '';
+                                btn.classList.remove('bookmarked');
+                            }
+                            flowchartManager.showToast(isNowBookmarked ? 'Problem bookmarked!' : 'Bookmark removed', 'success');
+                        } catch (error) {
+                            flowchartManager.showToast('Failed to update bookmark', 'error');
+                        }
+                    });
+                });
+                
+                // Vote button event listeners
+                container.querySelectorAll('.vote-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const problemId = e.currentTarget.dataset.id;
+                        const voteType = e.currentTarget.dataset.vote;
+                        const voteSection = e.currentTarget.closest('.vote-section');
+                        
+                        try {
+                            btn.disabled = true;
+                            let result;
+                            
+                            if (voteType === 'up') {
+                                result = await this.upvoteProblem(problemId);
+                            } else {
+                                result = await this.downvoteProblem(problemId);
+                            }
+                            
+                            // Update UI
+                            const scoreEl = voteSection.querySelector('.vote-score');
+                            const upBtn = voteSection.querySelector('.vote-btn.upvote');
+                            const downBtn = voteSection.querySelector('.vote-btn.downvote');
+                            const detailEl = voteSection.querySelector('.vote-count-detail');
+                            
+                            // Update score display
+                            scoreEl.textContent = result.voteScore;
+                            scoreEl.className = 'vote-score ' + (result.voteScore > 0 ? 'positive' : result.voteScore < 0 ? 'negative' : '');
+                            
+                            // Update button states
+                            const problem = this.problems.find(p => p.id === problemId);
+                            const userVote = (problem.voters || []).find(v => v.email === this.currentUser);
+                            
+                            upBtn.classList.toggle('active', userVote?.vote === 'up');
+                            downBtn.classList.toggle('active', userVote?.vote === 'down');
+                            
+                            // Update detail counts
+                            if (detailEl) {
+                                detailEl.innerHTML = `
+                                    <i class="fas fa-thumbs-up"></i> ${problem.upvotes || 0} 
+                                    <i class="fas fa-thumbs-down" style="margin-left: 0.5rem;"></i> ${problem.downvotes || 0}
+                                `;
+                            }
+                            
+                            // Update priority badge
+                            const card = voteSection.closest('.item-card');
+                            const priorityBadge = card.querySelector('.badge:first-child');
+                            if (priorityBadge) {
+                                const newPriority = this.calculatePriority(result.voteScore, problem.hierarchyLevel || 0);
+                                priorityBadge.className = `badge badge-${newPriority}`;
+                                priorityBadge.textContent = newPriority.charAt(0).toUpperCase() + newPriority.slice(1);
+                            }
+                            
+                        } catch (error) {
+                            console.error('Vote error:', error);
+                            flowchartManager.showToast('Failed to vote', 'error');
+                        } finally {
+                            btn.disabled = false;
+                        }
+                    });
+                });
+                
+                // Add Solution button event listeners
+                container.querySelectorAll('.add-solution-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const problemId = e.currentTarget.dataset.id;
+                        const problemStatus = e.currentTarget.dataset.status;
+                        this.openSolutionModal(problemId, problemStatus);
+                    });
+                });
+                
+                // View All Solutions button event listeners
+                container.querySelectorAll('.view-all-solutions-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const problemId = e.currentTarget.dataset.id;
+                        const problemStatus = e.currentTarget.dataset.status;
+                        this.viewAllSolutions(problemId, problemStatus);
+                    });
+                });
             }
 
             createProblemCard(problem) {
                 const isSolved = problem.status === 'solved';
                 const isArchived = problem.status === 'archived';
-                const isOwner = problem.createdBy === this.currentUser;
+                const isPending = problem.status === 'pending';
+                const isApproved = problem.status === 'approved';
+                const isOwner = problem.createdBy === this.currentUser || problem.submittedBy === this.currentUser;
                 const timeAgo = this.getTimeAgo(problem.createdAt);
                 
+                // Determine bookmark status
+                let bookmarkType = 'problem';
+                if (isSolved) bookmarkType = 'solved';
+                else if (isArchived) bookmarkType = 'archived';
+                const isBookmarked = this.isBookmarked(problem.id, bookmarkType);
+                
+                // Determine status display
+                let statusBadge = '';
+                let cardStyle = '';
+                if (isPending) {
+                    statusBadge = `<span class="badge" style="background: rgba(245, 158, 11, 0.1); color: #D97706;">Pending Approval</span>`;
+                    cardStyle = 'border-left: 4px solid #F59E0B;';
+                } else if (isApproved || problem.status === 'open') {
+                    statusBadge = `<span class="badge badge-open">Open</span>`;
+                } else if (isSolved) {
+                    statusBadge = `<span class="badge badge-solved">Solved</span>`;
+                } else if (isArchived) {
+                    statusBadge = `<span class="badge badge-archived" style="background: rgba(107, 114, 128, 0.1); color: #4B5563;">Archived</span>`;
+                    cardStyle = 'opacity: 0.7; border-left: 4px solid #6B7280;';
+                } else {
+                    statusBadge = `<span class="badge badge-open">Open</span>`;
+                }
+                
+                // Calculate vote score and priority
+                const upvotes = problem.upvotes || 0;
+                const downvotes = problem.downvotes || 0;
+                const voteScore = upvotes - downvotes;
+                const voters = problem.voters || [];
+                
+                // Check if current user has voted
+                const userVote = voters.find(v => v.email === this.currentUser);
+                const hasUpvoted = userVote?.vote === 'up';
+                const hasDownvoted = userVote?.vote === 'down';
+                
+                // Calculate priority based on votes and hierarchy level
+                const calculatedPriority = this.calculatePriority(voteScore, problem.hierarchyLevel || 0);
+                
+                // Get solutions preview (top priority + latest)
+                const solutions = problem.solutionsPreview || [];
+                const solutionCount = problem.solutionCount || 0;
+                const acceptedSolution = problem.acceptedSolution || null;
+                
+                // Build solutions preview HTML
+                let solutionsPreviewHtml = '';
+                if (solutions.length > 0 || acceptedSolution || solutionCount > 0) {
+                    solutionsPreviewHtml = `
+                        <div class="solutions-preview" data-problem-id="${problem.id}">
+                            <div class="solutions-preview-header">
+                                <span><i class="fas fa-lightbulb"></i> Solutions (${solutionCount})</span>
+                                ${solutionCount > 0 ? `<button class="view-all-solutions-btn" data-id="${problem.id}" data-status="${problem.status}">View All <i class="fas fa-chevron-right"></i></button>` : ''}
+                            </div>
+                            ${acceptedSolution ? `
+                                <div class="solution-item accepted">
+                                    <div class="solution-item-header">
+                                        <span class="solution-accepted-badge"><i class="fas fa-check-circle"></i> Accepted</span>
+                                        <span class="solution-votes">${(acceptedSolution.upvotes || 0) - (acceptedSolution.downvotes || 0)} votes</span>
+                                    </div>
+                                    <p class="solution-text">${this.escapeHtml(acceptedSolution.content?.substring(0, 100) || '')}${acceptedSolution.content?.length > 100 ? '...' : ''}</p>
+                                    <span class="solution-author">by ${(acceptedSolution.createdBy || 'Anonymous').split('@')[0]}</span>
+                                </div>
+                            ` : ''}
+                            ${solutions.filter(s => s.id !== acceptedSolution?.id).slice(0, acceptedSolution ? 1 : 2).map(sol => `
+                                <div class="solution-item ${sol.isTopPriority ? 'top-priority' : 'latest'}">
+                                    <div class="solution-item-header">
+                                        <span class="solution-type-badge">${sol.isTopPriority ? '<i class="fas fa-star"></i> Top' : '<i class="fas fa-clock"></i> Latest'}</span>
+                                        <span class="solution-votes">${(sol.upvotes || 0) - (sol.downvotes || 0)} votes</span>
+                                    </div>
+                                    <p class="solution-text">${this.escapeHtml(sol.content?.substring(0, 100) || '')}${sol.content?.length > 100 ? '...' : ''}</p>
+                                    <span class="solution-author">by ${(sol.createdBy || 'Anonymous').split('@')[0]}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+                
                 return `
-                    <div class="item-card ${isSolved ? 'solved' : isArchived ? 'archived' : 'open'}" style="${isArchived ? 'opacity: 0.7; border-left: 4px solid #6B7280;' : ''}">
+                    <div class="item-card ${isSolved ? 'solved' : isArchived ? 'archived' : isPending ? 'pending' : 'open'}" style="${cardStyle}" data-problem-id="${problem.id}">
                         <div class="item-card-header">
                             <h4 class="item-card-title">${this.escapeHtml(problem.title)}</h4>
                             <div class="item-card-badges">
-                                <span class="badge badge-${problem.priority || 'medium'}">${problem.priority || 'Medium'}</span>
-                                <span class="badge ${isSolved ? 'badge-solved' : isArchived ? 'badge-archived' : 'badge-open'}" ${isArchived ? 'style="background: rgba(107, 114, 128, 0.1); color: #4B5563;"' : ''}>${isSolved ? 'Solved' : isArchived ? 'Archived' : 'Open'}</span>
+                                <span class="badge badge-${calculatedPriority}">${calculatedPriority.charAt(0).toUpperCase() + calculatedPriority.slice(1)}</span>
+                                ${statusBadge}
                             </div>
                         </div>
                         <p class="item-card-description">${this.escapeHtml(problem.description || '')}</p>
                         <div class="item-card-meta">
                             <span><i class="fas fa-folder"></i> ${problem.category || 'General'}</span>
                             <span><i class="fas fa-clock"></i> ${timeAgo}</span>
-                            <span><i class="fas fa-user"></i> ${problem.createdBy?.split('@')[0] || 'Anonymous'}</span>
+                            <span><i class="fas fa-user"></i> ${(problem.createdBy || problem.submittedBy || 'Anonymous').split('@')[0]}</span>
                         </div>
+                        ${!isPending ? `
+                        <div class="vote-section" data-problem-id="${problem.id}">
+                            <button class="vote-btn upvote ${hasUpvoted ? 'active' : ''}" data-id="${problem.id}" data-vote="up" title="Upvote">
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                            <span class="vote-score ${voteScore > 0 ? 'positive' : voteScore < 0 ? 'negative' : ''}">${voteScore}</span>
+                            <button class="vote-btn downvote ${hasDownvoted ? 'active' : ''}" data-id="${problem.id}" data-vote="down" title="Downvote">
+                                <i class="fas fa-arrow-down"></i>
+                            </button>
+                            <span class="vote-count-detail">
+                                <i class="fas fa-thumbs-up"></i> ${upvotes} 
+                                <i class="fas fa-thumbs-down" style="margin-left: 0.5rem;"></i> ${downvotes}
+                            </span>
+                        </div>
+                        ` : ''}
+                        ${solutionsPreviewHtml}
                         <div class="item-card-actions">
                             <button class="item-action-btn primary view-problem-btn" data-id="${problem.id}">
                                 <i class="fas fa-eye"></i> View
                             </button>
-                            ${!isSolved && !isArchived && isOwner ? `
-                                <button class="item-action-btn success solve-problem-btn" data-id="${problem.id}">
-                                    <i class="fas fa-check"></i> Mark Solved
+                            ${!isPending && !isSolved ? `
+                                <button class="item-action-btn solution add-solution-btn" data-id="${problem.id}" data-status="${problem.status}">
+                                    <i class="fas fa-lightbulb"></i> Add Solution
+                                </button>
+                            ` : ''}
+                            ${!isPending ? `
+                                <button class="item-action-btn ${isBookmarked ? 'bookmarked' : 'secondary'} bookmark-problem-btn" data-id="${problem.id}" data-type="${bookmarkType}" style="${isBookmarked ? 'background: rgba(245, 158, 11, 0.1); color: #D97706; border-color: #F59E0B;' : ''}">
+                                    <i class="fas fa-bookmark"></i> ${isBookmarked ? 'Bookmarked' : 'Bookmark'}
                                 </button>
                             ` : ''}
                             ${isArchived && isOwner ? `
@@ -4618,15 +5633,18 @@
                                     <i class="fas fa-undo"></i> Restore
                                 </button>
                             ` : ''}
-                            ${!isArchived && isOwner ? `
+                            ${!isArchived && !isPending && isOwner ? `
                                 <button class="item-action-btn secondary archive-problem-btn" data-id="${problem.id}">
                                     <i class="fas fa-archive"></i> Archive
                                 </button>
                             ` : ''}
-                            ${isOwner ? `
+                            ${isOwner && !isPending ? `
                                 <button class="item-action-btn danger delete-problem-btn" data-id="${problem.id}">
                                     <i class="fas fa-trash"></i> Delete
                                 </button>
+                            ` : ''}
+                            ${isPending && isOwner ? `
+                                <span style="color: #F59E0B; font-size: 0.85rem;"><i class="fas fa-hourglass-half"></i> Awaiting admin approval</span>
                             ` : ''}
                         </div>
                     </div>
@@ -4641,17 +5659,40 @@
                 const title = document.getElementById('viewProblemTitle');
                 const content = document.getElementById('viewProblemContent');
                 
+                // Calculate vote info
+                const upvotes = problem.upvotes || 0;
+                const downvotes = problem.downvotes || 0;
+                const voteScore = upvotes - downvotes;
+                const calculatedPriority = this.calculatePriority(voteScore, problem.hierarchyLevel || 0);
+                
                 title.textContent = problem.title;
                 content.innerHTML = `
                     <div style="margin-bottom: 1rem;">
                         <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-                            <span class="badge badge-${problem.priority || 'medium'}">${problem.priority || 'Medium'}</span>
+                            <span class="badge badge-${calculatedPriority}">${calculatedPriority.charAt(0).toUpperCase() + calculatedPriority.slice(1)}</span>
                             <span class="badge ${problem.status === 'solved' ? 'badge-solved' : problem.status === 'archived' ? 'badge-archived' : 'badge-open'}" ${problem.status === 'archived' ? 'style="background: rgba(107, 114, 128, 0.1); color: #4B5563;"' : ''}>${problem.status === 'solved' ? 'Solved' : problem.status === 'archived' ? 'Archived' : 'Open'}</span>
                         </div>
                     </div>
                     <div style="margin-bottom: 1.5rem;">
                         <h4 style="font-size: 0.9rem; color: #6B7280; margin-bottom: 0.5rem;">Description</h4>
                         <p style="color: #1F2933; line-height: 1.6;">${this.escapeHtml(problem.description || 'No description provided.')}</p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(41, 171, 226, 0.05); border-radius: 12px; margin-bottom: 1rem;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: ${voteScore > 0 ? '#10B981' : voteScore < 0 ? '#EF4444' : '#4B5563'};">${voteScore}</div>
+                            <div style="font-size: 0.75rem; color: #6B7280;">Vote Score</div>
+                        </div>
+                        <div style="height: 40px; width: 1px; background: rgba(0,0,0,0.1);"></div>
+                        <div style="display: flex; gap: 1.5rem;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 1.1rem; font-weight: 600; color: #10B981;"><i class="fas fa-arrow-up"></i> ${upvotes}</div>
+                                <div style="font-size: 0.7rem; color: #6B7280;">Upvotes</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 1.1rem; font-weight: 600; color: #EF4444;"><i class="fas fa-arrow-down"></i> ${downvotes}</div>
+                                <div style="font-size: 0.7rem; color: #6B7280;">Downvotes</div>
+                            </div>
+                        </div>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1rem; background: rgba(41, 171, 226, 0.05); border-radius: 12px;">
                         <div>
@@ -4778,23 +5819,108 @@
             }
 
             async markAsSolved(problemId) {
-                if (!confirm('Mark this problem as solved?')) return;
+                if (!confirm('Mark this problem as solved? You can also accept a specific solution to mark it as solved.')) return;
                 
                 try {
-                    const problemRef = doc(db, 'problems', problemId);
-                    await setDoc(problemRef, {
+                    // Get the problem data first
+                    const problem = this.problems.find(p => p.id === problemId);
+                    console.log('Marking problem as solved:', problemId, problem);
+                    
+                    if (!problem) {
+                        flowchartManager.showToast('Problem not found', 'error');
+                        return;
+                    }
+                    
+                    // Get solutions subcollection to move
+                    console.log('Step 0: Getting solutions subcollection...');
+                    const solutionsSubRef = collection(db, 'problems', problemId, 'solutions');
+                    const solutionsSubSnap = await getDocs(solutionsSubRef);
+                    console.log('Found', solutionsSubSnap.size, 'solutions to move');
+                    
+                    // Move to solvedProblems collection
+                    console.log('Step 1: Creating document in solvedProblems collection...');
+                    const solvedRef = doc(db, 'solvedProblems', problemId);
+                    const solvedData = {
+                        title: problem.title || '',
+                        description: problem.description || '',
+                        category: problem.category || 'general',
+                        // Vote-based priority fields
+                        upvotes: problem.upvotes || 0,
+                        downvotes: problem.downvotes || 0,
+                        voters: problem.voters || [],
+                        hierarchyLevel: problem.hierarchyLevel || 0,
+                        solutionCount: problem.solutionCount || 0,
+                        createdBy: problem.createdBy || problem.submittedBy || '',
+                        submittedBy: problem.submittedBy || problem.createdBy || '',
+                        hierarchyPath: problem.hierarchyPath || [],
+                        hierarchyPaths: problem.hierarchyPaths || [],
+                        targetNodes: problem.targetNodes || [],
                         status: 'solved',
+                        solvedBy: this.currentUser,
                         solvedAt: serverTimestamp(),
-                        updatedAt: serverTimestamp()
-                    }, { merge: true });
+                        createdAt: problem.createdAt instanceof Date ? problem.createdAt : serverTimestamp(),
+                        approvedBy: problem.approvedBy || '',
+                        approvedAt: problem.approvedAt || null
+                    };
+                    console.log('Solved data to save:', solvedData);
+                    await setDoc(solvedRef, solvedData);
+                    console.log('Step 1 complete: Saved to solvedProblems');
+                    
+                    // Copy solutions subcollection to new location
+                    console.log('Step 1.5: Copying solutions subcollection...');
+                    for (const solDoc of solutionsSubSnap.docs) {
+                        const newSolRef = doc(db, 'solvedProblems', problemId, 'solutions', solDoc.id);
+                        await setDoc(newSolRef, solDoc.data());
+                        console.log('Copied solution:', solDoc.id);
+                    }
+                    
+                    // Update hierarchy nodes: remove from problemIds, add to solvedProblemIds
+                    console.log('Step 2: Updating hierarchy nodes...');
+                    if (problem.hierarchyPaths && problem.hierarchyPaths.length > 0) {
+                        for (const path of problem.hierarchyPaths) {
+                            try {
+                                console.log('Updating node:', path);
+                                const nodeRef = doc(db, path);
+                                await setDoc(nodeRef, {
+                                    problemIds: arrayRemove(problemId),
+                                    solvedProblemIds: arrayUnion(problemId),
+                                    updatedAt: serverTimestamp()
+                                }, { merge: true });
+                                console.log('Node updated:', path);
+                            } catch (nodeError) {
+                                console.error('Error updating node:', path, nodeError);
+                                // Continue even if node update fails
+                            }
+                        }
+                    }
+                    console.log('Step 2 complete: Hierarchy nodes updated');
+                    
+                    // Delete solutions from source collection
+                    console.log('Step 2.5: Deleting solutions from source...');
+                    for (const solDoc of solutionsSubSnap.docs) {
+                        await deleteDoc(doc(db, 'problems', problemId, 'solutions', solDoc.id));
+                    }
+                    
+                    // Delete from problems collection
+                    console.log('Step 3: Deleting from problems collection...');
+                    try {
+                        await deleteDoc(doc(db, 'problems', problemId));
+                        console.log('Step 3 complete: Deleted from problems');
+                    } catch (deleteError) {
+                        console.error('Error deleting from problems (continuing anyway):', deleteError);
+                        // Continue even if delete fails - the problem is already in solvedProblems
+                    }
                     
                     flowchartManager.showToast('Problem marked as solved!', 'success');
                     
                     // Reload problems
+                    console.log('Step 4: Reloading problems...');
                     await this.loadProblems(this.currentUser);
+                    await this.loadAllSolutionsPreviews();
                     this.updateStats();
                     this.renderProblems('problemsList', this.currentFilter);
                     this.renderProblems('myProblemsList', 'my');
+                    console.log('All steps complete!');
                 } catch (error) {
                     console.error('Error marking problem as solved:', error);
                     flowchartManager.showToast('Failed to update problem', 'error');
@@ -4805,7 +5931,33 @@
                 if (!confirm('Are you sure you want to delete this problem?')) return;
                 
                 try {
-                    await deleteDoc(doc(db, 'problems', problemId));
+                    const problem = this.problems.find(p => p.id === problemId);
+                    
+                    // Delete from appropriate collection based on source
+                    if (problem?.source === 'solved') {
+                        await deleteDoc(doc(db, 'solvedProblems', problemId));
+                    } else if (problem?.source === 'archived') {
+                        await deleteDoc(doc(db, 'archivedProblems', problemId));
+                    } else {
+                        await deleteDoc(doc(db, 'problems', problemId));
+                    }
+                    
+                    // Remove from hierarchy nodes
+                    if (problem?.hierarchyPaths && problem.hierarchyPaths.length > 0) {
+                        for (const path of problem.hierarchyPaths) {
+                            try {
+                                const nodeRef = doc(db, path);
+                                await setDoc(nodeRef, {
+                                    problemIds: arrayRemove(problemId),
+                                    solvedProblemIds: arrayRemove(problemId),
+                                    archivedProblemIds: arrayRemove(problemId),
+                                    updatedAt: serverTimestamp()
+                                }, { merge: true });
+                            } catch (nodeError) {
+                                console.error('Error updating node:', path, nodeError);
+                            }
+                        }
+                    }
                     
                     flowchartManager.showToast('Problem deleted successfully!', 'success');
                     
@@ -4824,17 +5976,78 @@
                 if (!confirm('Archive this problem? It will be moved to the Archived tab.')) return;
                 
                 try {
-                    const problemRef = doc(db, 'problems', problemId);
-                    await setDoc(problemRef, {
+                    // Get the problem data first
+                    const problem = this.problems.find(p => p.id === problemId);
+                    if (!problem) {
+                        flowchartManager.showToast('Problem not found', 'error');
+                        return;
+                    }
+                    
+                    // Get solutions subcollection to move
+                    const solutionsSubRef = collection(db, 'problems', problemId, 'solutions');
+                    const solutionsSubSnap = await getDocs(solutionsSubRef);
+                    
+                    // Move to archivedProblems collection
+                    const archivedRef = doc(db, 'archivedProblems', problemId);
+                    await setDoc(archivedRef, {
+                        title: problem.title || '',
+                        description: problem.description || '',
+                        category: problem.category || 'general',
+                        // Vote-based priority fields
+                        upvotes: problem.upvotes || 0,
+                        downvotes: problem.downvotes || 0,
+                        voters: problem.voters || [],
+                        hierarchyLevel: problem.hierarchyLevel || 0,
+                        solutionCount: problem.solutionCount || 0,
+                        createdBy: problem.createdBy || problem.submittedBy || '',
+                        submittedBy: problem.submittedBy || problem.createdBy || '',
+                        hierarchyPath: problem.hierarchyPath || [],
+                        hierarchyPaths: problem.hierarchyPaths || [],
+                        targetNodes: problem.targetNodes || [],
                         status: 'archived',
+                        archivedBy: this.currentUser,
                         archivedAt: serverTimestamp(),
-                        updatedAt: serverTimestamp()
-                    }, { merge: true });
+                        archiveReason: 'Archived by user',
+                        createdAt: problem.createdAt || serverTimestamp(),
+                        approvedBy: problem.approvedBy || '',
+                        approvedAt: problem.approvedAt || null
+                    });
+                    
+                    // Copy solutions subcollection to new location
+                    for (const solDoc of solutionsSubSnap.docs) {
+                        const newSolRef = doc(db, 'archivedProblems', problemId, 'solutions', solDoc.id);
+                        await setDoc(newSolRef, solDoc.data());
+                    }
+                    
+                    // Update hierarchy nodes: remove from problemIds, add to archivedProblemIds
+                    if (problem.hierarchyPaths && problem.hierarchyPaths.length > 0) {
+                        for (const path of problem.hierarchyPaths) {
+                            try {
+                                const nodeRef = doc(db, path);
+                                await setDoc(nodeRef, {
+                                    problemIds: arrayRemove(problemId),
+                                    archivedProblemIds: arrayUnion(problemId),
+                                    updatedAt: serverTimestamp()
+                                }, { merge: true });
+                            } catch (nodeError) {
+                                console.error('Error updating node:', path, nodeError);
+                            }
+                        }
+                    }
+                    
+                    // Delete solutions from source collection
+                    for (const solDoc of solutionsSubSnap.docs) {
+                        await deleteDoc(doc(db, 'problems', problemId, 'solutions', solDoc.id));
+                    }
+                    
+                    // Delete from problems collection
+                    await deleteDoc(doc(db, 'problems', problemId));
                     
                     flowchartManager.showToast('Problem archived!', 'success');
                     
                     // Reload problems
                     await this.loadProblems(this.currentUser);
+                    await this.loadAllSolutionsPreviews();
                     this.updateStats();
                     this.renderProblems('problemsList', this.currentFilter);
                     this.renderProblems('myProblemsList', 'my');
@@ -4846,17 +6059,77 @@
 
             async unarchiveProblem(problemId) {
                 try {
+                    // Get the problem data first
+                    const problem = this.problems.find(p => p.id === problemId);
+                    if (!problem) {
+                        flowchartManager.showToast('Problem not found', 'error');
+                        return;
+                    }
+                    
+                    // Get solutions subcollection to move
+                    const solutionsSubRef = collection(db, 'archivedProblems', problemId, 'solutions');
+                    const solutionsSubSnap = await getDocs(solutionsSubRef);
+                    
+                    // Move back to problems collection
                     const problemRef = doc(db, 'problems', problemId);
                     await setDoc(problemRef, {
+                        title: problem.title || '',
+                        description: problem.description || '',
+                        category: problem.category || 'general',
+                        // Vote-based priority fields
+                        upvotes: problem.upvotes || 0,
+                        downvotes: problem.downvotes || 0,
+                        voters: problem.voters || [],
+                        hierarchyLevel: problem.hierarchyLevel || 0,
+                        solutionCount: problem.solutionCount || 0,
+                        createdBy: problem.createdBy || problem.submittedBy || '',
+                        submittedBy: problem.submittedBy || problem.createdBy || '',
+                        hierarchyPath: problem.hierarchyPath || [],
+                        hierarchyPaths: problem.hierarchyPaths || [],
+                        targetNodes: problem.targetNodes || [],
                         status: 'open',
-                        archivedAt: null,
-                        updatedAt: serverTimestamp()
-                    }, { merge: true });
+                        restoredBy: this.currentUser,
+                        restoredAt: serverTimestamp(),
+                        createdAt: problem.createdAt || serverTimestamp(),
+                        approvedBy: problem.approvedBy || '',
+                        approvedAt: problem.approvedAt || null
+                    });
+                    
+                    // Copy solutions subcollection to new location
+                    for (const solDoc of solutionsSubSnap.docs) {
+                        const newSolRef = doc(db, 'problems', problemId, 'solutions', solDoc.id);
+                        await setDoc(newSolRef, solDoc.data());
+                    }
+                    
+                    // Update hierarchy nodes: remove from archivedProblemIds, add to problemIds
+                    if (problem.hierarchyPaths && problem.hierarchyPaths.length > 0) {
+                        for (const path of problem.hierarchyPaths) {
+                            try {
+                                const nodeRef = doc(db, path);
+                                await setDoc(nodeRef, {
+                                    archivedProblemIds: arrayRemove(problemId),
+                                    problemIds: arrayUnion(problemId),
+                                    updatedAt: serverTimestamp()
+                                }, { merge: true });
+                            } catch (nodeError) {
+                                console.error('Error updating node:', path, nodeError);
+                            }
+                        }
+                    }
+                    
+                    // Delete solutions from source collection
+                    for (const solDoc of solutionsSubSnap.docs) {
+                        await deleteDoc(doc(db, 'archivedProblems', problemId, 'solutions', solDoc.id));
+                    }
+                    
+                    // Delete from archivedProblems collection
+                    await deleteDoc(doc(db, 'archivedProblems', problemId));
                     
                     flowchartManager.showToast('Problem restored!', 'success');
                     
                     // Reload problems
                     await this.loadProblems(this.currentUser);
+                    await this.loadAllSolutionsPreviews();
                     this.updateStats();
                     this.renderProblems('problemsList', this.currentFilter);
                     this.renderProblems('myProblemsList', 'my');
@@ -4899,6 +6172,151 @@
                 }
                 return 'Just now';
             }
+            
+            // Calculate priority based on vote score and hierarchy level
+            calculatePriority(voteScore, hierarchyLevel) {
+                // Base score from votes
+                // Higher hierarchy level (deeper) = problems at lower organizational levels
+                // Lower hierarchy level = problems at higher organizational levels (more important)
+                
+                // Adjust score based on hierarchy level
+                // Level 0 (org level) gets +3 boost, level 1 gets +2, level 2 gets +1, etc.
+                const hierarchyBoost = Math.max(0, 3 - hierarchyLevel);
+                const adjustedScore = voteScore + hierarchyBoost;
+                
+                // Determine priority based on adjusted score
+                if (adjustedScore >= 5) return 'high';
+                if (adjustedScore >= 0) return 'medium';
+                return 'low';
+            }
+            
+            // Upvote a problem
+            async upvoteProblem(problemId) {
+                try {
+                    const problem = this.problems.find(p => p.id === problemId);
+                    if (!problem) throw new Error('Problem not found');
+                    
+                    const voters = problem.voters || [];
+                    const existingVote = voters.find(v => v.email === this.currentUser);
+                    
+                    // Determine the collection based on problem source/status
+                    let collectionName = 'problems';
+                    if (problem.source === 'solved' || problem.status === 'solved') {
+                        collectionName = 'solvedProblems';
+                    } else if (problem.source === 'archived' || problem.status === 'archived') {
+                        collectionName = 'archivedProblems';
+                    }
+                    
+                    const problemRef = doc(db, collectionName, problemId);
+                    
+                    if (existingVote) {
+                        if (existingVote.vote === 'up') {
+                            // Remove upvote
+                            await updateDoc(problemRef, {
+                                upvotes: increment(-1),
+                                voters: arrayRemove(existingVote),
+                                updatedAt: serverTimestamp()
+                            });
+                            problem.upvotes = (problem.upvotes || 1) - 1;
+                            problem.voters = voters.filter(v => v.email !== this.currentUser);
+                            return { action: 'removed', voteScore: problem.upvotes - (problem.downvotes || 0) };
+                        } else {
+                            // Change from downvote to upvote
+                            await updateDoc(problemRef, {
+                                upvotes: increment(1),
+                                downvotes: increment(-1),
+                                voters: arrayRemove(existingVote)
+                            });
+                            await updateDoc(problemRef, {
+                                voters: arrayUnion({ email: this.currentUser, vote: 'up' }),
+                                updatedAt: serverTimestamp()
+                            });
+                            problem.upvotes = (problem.upvotes || 0) + 1;
+                            problem.downvotes = (problem.downvotes || 1) - 1;
+                            const idx = voters.findIndex(v => v.email === this.currentUser);
+                            if (idx > -1) voters[idx].vote = 'up';
+                            return { action: 'changed', voteScore: problem.upvotes - problem.downvotes };
+                        }
+                    } else {
+                        // New upvote
+                        await updateDoc(problemRef, {
+                            upvotes: increment(1),
+                            voters: arrayUnion({ email: this.currentUser, vote: 'up' }),
+                            updatedAt: serverTimestamp()
+                        });
+                        problem.upvotes = (problem.upvotes || 0) + 1;
+                        problem.voters = [...voters, { email: this.currentUser, vote: 'up' }];
+                        return { action: 'added', voteScore: problem.upvotes - (problem.downvotes || 0) };
+                    }
+                } catch (error) {
+                    console.error('Error upvoting problem:', error);
+                    throw error;
+                }
+            }
+            
+            // Downvote a problem
+            async downvoteProblem(problemId) {
+                try {
+                    const problem = this.problems.find(p => p.id === problemId);
+                    if (!problem) throw new Error('Problem not found');
+                    
+                    const voters = problem.voters || [];
+                    const existingVote = voters.find(v => v.email === this.currentUser);
+                    
+                    // Determine the collection based on problem source/status
+                    let collectionName = 'problems';
+                    if (problem.source === 'solved' || problem.status === 'solved') {
+                        collectionName = 'solvedProblems';
+                    } else if (problem.source === 'archived' || problem.status === 'archived') {
+                        collectionName = 'archivedProblems';
+                    }
+                    
+                    const problemRef = doc(db, collectionName, problemId);
+                    
+                    if (existingVote) {
+                        if (existingVote.vote === 'down') {
+                            // Remove downvote
+                            await updateDoc(problemRef, {
+                                downvotes: increment(-1),
+                                voters: arrayRemove(existingVote),
+                                updatedAt: serverTimestamp()
+                            });
+                            problem.downvotes = (problem.downvotes || 1) - 1;
+                            problem.voters = voters.filter(v => v.email !== this.currentUser);
+                            return { action: 'removed', voteScore: (problem.upvotes || 0) - problem.downvotes };
+                        } else {
+                            // Change from upvote to downvote
+                            await updateDoc(problemRef, {
+                                downvotes: increment(1),
+                                upvotes: increment(-1),
+                                voters: arrayRemove(existingVote)
+                            });
+                            await updateDoc(problemRef, {
+                                voters: arrayUnion({ email: this.currentUser, vote: 'down' }),
+                                updatedAt: serverTimestamp()
+                            });
+                            problem.downvotes = (problem.downvotes || 0) + 1;
+                            problem.upvotes = (problem.upvotes || 1) - 1;
+                            const idx = voters.findIndex(v => v.email === this.currentUser);
+                            if (idx > -1) voters[idx].vote = 'down';
+                            return { action: 'changed', voteScore: problem.upvotes - problem.downvotes };
+                        }
+                    } else {
+                        // New downvote
+                        await updateDoc(problemRef, {
+                            downvotes: increment(1),
+                            voters: arrayUnion({ email: this.currentUser, vote: 'down' }),
+                            updatedAt: serverTimestamp()
+                        });
+                        problem.downvotes = (problem.downvotes || 0) + 1;
+                        problem.voters = [...voters, { email: this.currentUser, vote: 'down' }];
+                        return { action: 'added', voteScore: (problem.upvotes || 0) - problem.downvotes };
+                    }
+                } catch (error) {
+                    console.error('Error downvoting problem:', error);
+                    throw error;
+                }
+            }
 
             formatDate(date) {
                 return date.toLocaleDateString('en-US', {
@@ -4914,6 +6332,575 @@
                 const div = document.createElement('div');
                 div.textContent = text;
                 return div.innerHTML;
+            }
+            
+            // ========== SOLUTION METHODS ==========
+            
+            // Open solution modal
+            openSolutionModal(problemId, problemStatus) {
+                const problem = this.problems.find(p => p.id === problemId);
+                if (!problem) {
+                    flowchartManager.showToast('Problem not found', 'error');
+                    return;
+                }
+                
+                this.currentSolutionProblemId = problemId;
+                this.currentSolutionProblemStatus = problemStatus || problem.status;
+                
+                document.getElementById('solutionProblemTitle').textContent = problem.title;
+                document.getElementById('solutionProblemDesc').textContent = problem.description?.substring(0, 150) + (problem.description?.length > 150 ? '...' : '') || 'No description';
+                document.getElementById('solutionContent').value = '';
+                document.getElementById('solutionModalOverlay').classList.add('show');
+            }
+            
+            closeSolutionModal() {
+                document.getElementById('solutionModalOverlay').classList.remove('show');
+                this.currentSolutionProblemId = null;
+                this.currentSolutionProblemStatus = null;
+            }
+            
+            // Submit a new solution
+            async submitSolution() {
+                const content = document.getElementById('solutionContent').value.trim();
+                
+                if (!content) {
+                    flowchartManager.showToast('Please enter your solution', 'error');
+                    return;
+                }
+                
+                if (content.length < 10) {
+                    flowchartManager.showToast('Solution must be at least 10 characters', 'error');
+                    return;
+                }
+                
+                const problemId = this.currentSolutionProblemId;
+                const problemStatus = this.currentSolutionProblemStatus;
+                
+                if (!problemId) {
+                    flowchartManager.showToast('No problem selected', 'error');
+                    return;
+                }
+                
+                const submitBtn = document.getElementById('solutionSubmitBtn');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+                
+                try {
+                    // Create solution in global solutions collection
+                    const solutionData = {
+                        problemId: problemId,
+                        content: content,
+                        createdBy: this.currentUser,
+                        createdAt: serverTimestamp(),
+                        updatedAt: serverTimestamp(),
+                        upvotes: 0,
+                        downvotes: 0,
+                        voters: [],
+                        isAccepted: false
+                    };
+                    
+                    const solutionsRef = collection(db, 'solutions');
+                    const solutionDoc = await addDoc(solutionsRef, solutionData);
+                    const solutionId = solutionDoc.id;
+                    
+                    console.log('Created solution:', solutionId);
+                    
+                    // Determine which collection the problem is in
+                    let collectionName = 'problems';
+                    if (problemStatus === 'solved') {
+                        collectionName = 'solvedProblems';
+                    } else if (problemStatus === 'archived') {
+                        collectionName = 'archivedProblems';
+                    }
+                    
+                    // Add solution ID to problem's solutions subcollection
+                    const problemSolutionRef = doc(db, collectionName, problemId, 'solutions', solutionId);
+                    await setDoc(problemSolutionRef, {
+                        solutionId: solutionId,
+                        addedAt: serverTimestamp(),
+                        voteScore: 0
+                    });
+                    
+                    // Update problem's solution count
+                    const problemRef = doc(db, collectionName, problemId);
+                    await updateDoc(problemRef, {
+                        solutionCount: increment(1),
+                        updatedAt: serverTimestamp()
+                    });
+                    
+                    // Update local problem data
+                    const problem = this.problems.find(p => p.id === problemId);
+                    if (problem) {
+                        problem.solutionCount = (problem.solutionCount || 0) + 1;
+                    }
+                    
+                    flowchartManager.showToast('Solution submitted successfully!', 'success');
+                    this.closeSolutionModal();
+                    
+                    // Reload solutions preview for this problem
+                    await this.loadSolutionsPreview(problemId, collectionName);
+                    this.renderProblems('problemsList', this.currentFilter);
+                    
+                } catch (error) {
+                    console.error('Error submitting solution:', error);
+                    flowchartManager.showToast('Failed to submit solution: ' + error.message, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Solution';
+                }
+            }
+            
+            // Load solutions preview for a problem (top priority + latest)
+            async loadSolutionsPreview(problemId, collectionName = 'problems') {
+                try {
+                    const problem = this.problems.find(p => p.id === problemId);
+                    if (!problem) return;
+                    
+                    // Get solution IDs from problem's subcollection
+                    const solutionsSubRef = collection(db, collectionName, problemId, 'solutions');
+                    const solutionsSubSnap = await getDocs(solutionsSubRef);
+                    
+                    if (solutionsSubSnap.empty) {
+                        problem.solutionsPreview = [];
+                        problem.solutionCount = 0;
+                        return;
+                    }
+                    
+                    const solutionIds = solutionsSubSnap.docs.map(d => d.data().solutionId);
+                    
+                    // Fetch actual solutions from global collection
+                    const solutions = [];
+                    for (const solId of solutionIds) {
+                        try {
+                            const solDoc = await getDoc(doc(db, 'solutions', solId));
+                            if (solDoc.exists()) {
+                                solutions.push({
+                                    id: solDoc.id,
+                                    ...solDoc.data(),
+                                    createdAt: solDoc.data().createdAt?.toDate() || new Date()
+                                });
+                            }
+                        } catch (e) {
+                            console.log('Error fetching solution:', solId, e);
+                        }
+                    }
+                    
+                    // Sort by vote score (descending) for top priority
+                    const sortedByVotes = [...solutions].sort((a, b) => {
+                        const scoreA = (a.upvotes || 0) - (a.downvotes || 0);
+                        const scoreB = (b.upvotes || 0) - (b.downvotes || 0);
+                        return scoreB - scoreA;
+                    });
+                    
+                    // Sort by date (newest first) for latest
+                    const sortedByDate = [...solutions].sort((a, b) => b.createdAt - a.createdAt);
+                    
+                    // Get top priority and latest (if different)
+                    const preview = [];
+                    const acceptedSolution = solutions.find(s => s.isAccepted);
+                    
+                    if (sortedByVotes.length > 0 && !sortedByVotes[0].isAccepted) {
+                        preview.push({ ...sortedByVotes[0], isTopPriority: true });
+                    }
+                    
+                    if (sortedByDate.length > 0 && sortedByDate[0].id !== sortedByVotes[0]?.id && !sortedByDate[0].isAccepted) {
+                        preview.push({ ...sortedByDate[0], isLatest: true });
+                    }
+                    
+                    problem.solutionsPreview = preview;
+                    problem.solutionCount = solutions.length;
+                    problem.acceptedSolution = acceptedSolution || null;
+                    
+                } catch (error) {
+                    console.error('Error loading solutions preview:', error);
+                }
+            }
+            
+            // Load solutions preview for all problems
+            async loadAllSolutionsPreviews() {
+                for (const problem of this.problems) {
+                    if (problem.status !== 'pending') {
+                        let collectionName = 'problems';
+                        if (problem.source === 'solved' || problem.status === 'solved') {
+                            collectionName = 'solvedProblems';
+                        } else if (problem.source === 'archived' || problem.status === 'archived') {
+                            collectionName = 'archivedProblems';
+                        }
+                        await this.loadSolutionsPreview(problem.id, collectionName);
+                    }
+                }
+            }
+            
+            // Upvote a solution
+            async upvoteSolution(solutionId) {
+                try {
+                    const solutionRef = doc(db, 'solutions', solutionId);
+                    const solutionDoc = await getDoc(solutionRef);
+                    
+                    if (!solutionDoc.exists()) throw new Error('Solution not found');
+                    
+                    const solution = solutionDoc.data();
+                    const voters = solution.voters || [];
+                    const existingVote = voters.find(v => v.email === this.currentUser);
+                    
+                    if (existingVote) {
+                        if (existingVote.vote === 'up') {
+                            // Remove upvote
+                            await updateDoc(solutionRef, {
+                                upvotes: increment(-1),
+                                voters: arrayRemove(existingVote)
+                            });
+                            return { action: 'removed' };
+                        } else {
+                            // Change from downvote to upvote
+                            await updateDoc(solutionRef, {
+                                upvotes: increment(1),
+                                downvotes: increment(-1),
+                                voters: arrayRemove(existingVote)
+                            });
+                            await updateDoc(solutionRef, {
+                                voters: arrayUnion({ email: this.currentUser, vote: 'up' })
+                            });
+                            return { action: 'changed' };
+                        }
+                    } else {
+                        // New upvote
+                        await updateDoc(solutionRef, {
+                            upvotes: increment(1),
+                            voters: arrayUnion({ email: this.currentUser, vote: 'up' })
+                        });
+                        return { action: 'added' };
+                    }
+                } catch (error) {
+                    console.error('Error upvoting solution:', error);
+                    throw error;
+                }
+            }
+            
+            // Downvote a solution
+            async downvoteSolution(solutionId) {
+                try {
+                    const solutionRef = doc(db, 'solutions', solutionId);
+                    const solutionDoc = await getDoc(solutionRef);
+                    
+                    if (!solutionDoc.exists()) throw new Error('Solution not found');
+                    
+                    const solution = solutionDoc.data();
+                    const voters = solution.voters || [];
+                    const existingVote = voters.find(v => v.email === this.currentUser);
+                    
+                    if (existingVote) {
+                        if (existingVote.vote === 'down') {
+                            // Remove downvote
+                            await updateDoc(solutionRef, {
+                                downvotes: increment(-1),
+                                voters: arrayRemove(existingVote)
+                            });
+                            return { action: 'removed' };
+                        } else {
+                            // Change from upvote to downvote
+                            await updateDoc(solutionRef, {
+                                downvotes: increment(1),
+                                upvotes: increment(-1),
+                                voters: arrayRemove(existingVote)
+                            });
+                            await updateDoc(solutionRef, {
+                                voters: arrayUnion({ email: this.currentUser, vote: 'down' })
+                            });
+                            return { action: 'changed' };
+                        }
+                    } else {
+                        // New downvote
+                        await updateDoc(solutionRef, {
+                            downvotes: increment(1),
+                            voters: arrayUnion({ email: this.currentUser, vote: 'down' })
+                        });
+                        return { action: 'added' };
+                    }
+                } catch (error) {
+                    console.error('Error downvoting solution:', error);
+                    throw error;
+                }
+            }
+            
+            // Accept a solution (marks problem as solved)
+            async acceptSolution(problemId, solutionId) {
+                try {
+                    const problem = this.problems.find(p => p.id === problemId);
+                    if (!problem) throw new Error('Problem not found');
+                    
+                    // Determine source collection
+                    let sourceCollection = 'problems';
+                    if (problem.source === 'archived' || problem.status === 'archived') {
+                        sourceCollection = 'archivedProblems';
+                    }
+                    
+                    // Mark solution as accepted and give it highest priority boost
+                    const solutionRef = doc(db, 'solutions', solutionId);
+                    await updateDoc(solutionRef, {
+                        isAccepted: true,
+                        acceptedAt: serverTimestamp(),
+                        upvotes: increment(100) // Boost to ensure highest priority
+                    });
+                    
+                    // Get all solutions for this problem to copy to new collection
+                    const solutionsSubRef = collection(db, sourceCollection, problemId, 'solutions');
+                    const solutionsSubSnap = await getDocs(solutionsSubRef);
+                    
+                    // Create problem data for solvedProblems collection
+                    const problemData = {
+                        ...problem,
+                        status: 'solved',
+                        solvedAt: serverTimestamp(),
+                        acceptedSolutionId: solutionId,
+                        updatedAt: serverTimestamp()
+                    };
+                    
+                    // Remove non-serializable fields
+                    delete problemData.createdAt;
+                    delete problemData.source;
+                    delete problemData.solutionsPreview;
+                    delete problemData.acceptedSolution;
+                    
+                    // Save to solvedProblems collection
+                    const solvedRef = doc(db, 'solvedProblems', problemId);
+                    await setDoc(solvedRef, {
+                        ...problemData,
+                        createdAt: serverTimestamp()
+                    });
+                    
+                    // Copy solutions subcollection to new location
+                    for (const solDoc of solutionsSubSnap.docs) {
+                        const newSolRef = doc(db, 'solvedProblems', problemId, 'solutions', solDoc.id);
+                        await setDoc(newSolRef, solDoc.data());
+                    }
+                    
+                    // Update hierarchy nodes
+                    if (problem.hierarchyPaths && problem.hierarchyPaths.length > 0) {
+                        for (const path of problem.hierarchyPaths) {
+                            try {
+                                const nodeRef = doc(db, path);
+                                await setDoc(nodeRef, {
+                                    problemIds: arrayRemove(problemId),
+                                    solvedProblemIds: arrayUnion(problemId),
+                                    updatedAt: serverTimestamp()
+                                }, { merge: true });
+                            } catch (nodeError) {
+                                console.error('Error updating node:', path, nodeError);
+                            }
+                        }
+                    }
+                    
+                    // Delete from source collection (including subcollection)
+                    for (const solDoc of solutionsSubSnap.docs) {
+                        await deleteDoc(doc(db, sourceCollection, problemId, 'solutions', solDoc.id));
+                    }
+                    await deleteDoc(doc(db, sourceCollection, problemId));
+                    
+                    flowchartManager.showToast('Solution accepted! Problem marked as solved.', 'success');
+                    
+                    // Close the modal
+                    document.getElementById('viewAllSolutionsModal').classList.remove('show');
+                    
+                    // Reload problems
+                    await this.loadProblems(this.currentUser);
+                    await this.loadAllSolutionsPreviews();
+                    this.updateStats();
+                    this.renderProblems('problemsList', this.currentFilter);
+                    
+                } catch (error) {
+                    console.error('Error accepting solution:', error);
+                    flowchartManager.showToast('Failed to accept solution: ' + error.message, 'error');
+                }
+            }
+            
+            // View all solutions for a problem
+            async viewAllSolutions(problemId, problemStatus) {
+                const problem = this.problems.find(p => p.id === problemId);
+                if (!problem) {
+                    flowchartManager.showToast('Problem not found', 'error');
+                    return;
+                }
+                
+                this.currentViewSolutionsProblemId = problemId;
+                this.currentViewSolutionsProblemStatus = problemStatus;
+                
+                const modal = document.getElementById('viewAllSolutionsModal');
+                const titleEl = document.getElementById('solutionsModalTitle');
+                const contentEl = document.getElementById('allSolutionsContent');
+                
+                titleEl.textContent = `Solutions for: ${problem.title}`;
+                contentEl.innerHTML = '<div style="text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #29ABE2;"></i><p>Loading solutions...</p></div>';
+                
+                modal.classList.add('show');
+                
+                try {
+                    // Determine collection
+                    let collectionName = 'problems';
+                    if (problemStatus === 'solved' || problem.source === 'solved') {
+                        collectionName = 'solvedProblems';
+                    } else if (problemStatus === 'archived' || problem.source === 'archived') {
+                        collectionName = 'archivedProblems';
+                    }
+                    
+                    // Get solution IDs from problem's subcollection
+                    const solutionsSubRef = collection(db, collectionName, problemId, 'solutions');
+                    const solutionsSubSnap = await getDocs(solutionsSubRef);
+                    
+                    if (solutionsSubSnap.empty) {
+                        contentEl.innerHTML = '<div style="text-align: center; padding: 2rem; color: #6B7280;"><i class="fas fa-lightbulb" style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem;"></i><p>No solutions yet. Be the first to add one!</p></div>';
+                        return;
+                    }
+                    
+                    const solutionIds = solutionsSubSnap.docs.map(d => d.data().solutionId);
+                    
+                    // Fetch actual solutions from global collection
+                    const solutions = [];
+                    for (const solId of solutionIds) {
+                        try {
+                            const solDoc = await getDoc(doc(db, 'solutions', solId));
+                            if (solDoc.exists()) {
+                                const data = solDoc.data();
+                                const voters = data.voters || [];
+                                const userVote = voters.find(v => v.email === this.currentUser);
+                                
+                                solutions.push({
+                                    id: solDoc.id,
+                                    ...data,
+                                    createdAt: data.createdAt?.toDate() || new Date(),
+                                    hasUpvoted: userVote?.vote === 'up',
+                                    hasDownvoted: userVote?.vote === 'down'
+                                });
+                            }
+                        } catch (e) {
+                            console.log('Error fetching solution:', solId, e);
+                        }
+                    }
+                    
+                    // Sort by vote score (descending)
+                    solutions.sort((a, b) => {
+                        const scoreA = (a.upvotes || 0) - (a.downvotes || 0);
+                        const scoreB = (b.upvotes || 0) - (b.downvotes || 0);
+                        return scoreB - scoreA;
+                    });
+                    
+                    const isOwner = problem.createdBy === this.currentUser || problem.submittedBy === this.currentUser;
+                    const isSolved = problem.status === 'solved';
+                    
+                    // Render solutions
+                    contentEl.innerHTML = solutions.map(sol => {
+                        const voteScore = (sol.upvotes || 0) - (sol.downvotes || 0);
+                        const timeAgo = this.getTimeAgo(sol.createdAt);
+                        
+                        return `
+                            <div class="solution-card-full ${sol.isAccepted ? 'accepted' : ''}" data-solution-id="${sol.id}">
+                                <div class="solution-card-header">
+                                    <div class="solution-card-meta">
+                                        ${sol.isAccepted ? '<span class="solution-accepted-badge"><i class="fas fa-check-circle"></i> Accepted Solution</span>' : ''}
+                                        <span style="font-size: 0.8rem; color: #6B7280;"><i class="fas fa-user"></i> ${(sol.createdBy || 'Anonymous').split('@')[0]}</span>
+                                        <span style="font-size: 0.8rem; color: #9CA3AF;"><i class="fas fa-clock"></i> ${timeAgo}</span>
+                                    </div>
+                                </div>
+                                <div class="solution-card-content">${this.escapeHtml(sol.content || '')}</div>
+                                <div class="solution-card-footer">
+                                    <div class="solution-vote-section">
+                                        <button class="solution-vote-btn upvote ${sol.hasUpvoted ? 'active' : ''}" data-solution-id="${sol.id}" data-vote="up" title="Upvote">
+                                            <i class="fas fa-arrow-up"></i>
+                                        </button>
+                                        <span class="solution-vote-score ${voteScore > 0 ? 'positive' : voteScore < 0 ? 'negative' : ''}">${voteScore}</span>
+                                        <button class="solution-vote-btn downvote ${sol.hasDownvoted ? 'active' : ''}" data-solution-id="${sol.id}" data-vote="down" title="Downvote">
+                                            <i class="fas fa-arrow-down"></i>
+                                        </button>
+                                        <span style="font-size: 0.75rem; color: #9CA3AF; margin-left: 0.5rem;">
+                                            <i class="fas fa-thumbs-up"></i> ${sol.upvotes || 0} 
+                                            <i class="fas fa-thumbs-down" style="margin-left: 0.25rem;"></i> ${sol.downvotes || 0}
+                                        </span>
+                                    </div>
+                                    ${isOwner && !isSolved && !sol.isAccepted ? `
+                                        <button class="solution-accept-btn" data-problem-id="${problemId}" data-solution-id="${sol.id}">
+                                            <i class="fas fa-check"></i> Accept Solution
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    // Add event listeners for vote buttons
+                    this.setupSolutionVoteListeners(contentEl);
+                    
+                    // Add event listeners for accept buttons
+                    contentEl.querySelectorAll('.solution-accept-btn').forEach(btn => {
+                        btn.addEventListener('click', async (e) => {
+                            const problemId = e.currentTarget.dataset.problemId;
+                            const solutionId = e.currentTarget.dataset.solutionId;
+                            if (confirm('Accept this solution? This will mark the problem as solved.')) {
+                                await this.acceptSolution(problemId, solutionId);
+                            }
+                        });
+                    });
+                    
+                } catch (error) {
+                    console.error('Error loading solutions:', error);
+                    contentEl.innerHTML = '<div style="text-align: center; padding: 2rem; color: #EF4444;"><i class="fas fa-exclamation-circle" style="font-size: 2rem;"></i><p>Failed to load solutions</p></div>';
+                }
+            }
+            
+            // Setup vote listeners for solutions in modal
+            setupSolutionVoteListeners(container) {
+                container.querySelectorAll('.solution-vote-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const solutionId = e.currentTarget.dataset.solutionId;
+                        const voteType = e.currentTarget.dataset.vote;
+                        const card = e.currentTarget.closest('.solution-card-full');
+                        const voteSection = e.currentTarget.closest('.solution-vote-section');
+                        
+                        try {
+                            btn.disabled = true;
+                            
+                            let result;
+                            if (voteType === 'up') {
+                                result = await this.upvoteSolution(solutionId);
+                            } else {
+                                result = await this.downvoteSolution(solutionId);
+                            }
+                            
+                            // Refresh the solution data
+                            const solDoc = await getDoc(doc(db, 'solutions', solutionId));
+                            if (solDoc.exists()) {
+                                const data = solDoc.data();
+                                const upvotes = data.upvotes || 0;
+                                const downvotes = data.downvotes || 0;
+                                const voteScore = upvotes - downvotes;
+                                const voters = data.voters || [];
+                                const userVote = voters.find(v => v.email === this.currentUser);
+                                
+                                // Update UI
+                                const scoreEl = voteSection.querySelector('.solution-vote-score');
+                                const upBtn = voteSection.querySelector('.solution-vote-btn.upvote');
+                                const downBtn = voteSection.querySelector('.solution-vote-btn.downvote');
+                                const countEl = voteSection.querySelector('span:last-child');
+                                
+                                scoreEl.textContent = voteScore;
+                                scoreEl.className = 'solution-vote-score ' + (voteScore > 0 ? 'positive' : voteScore < 0 ? 'negative' : '');
+                                
+                                upBtn.classList.toggle('active', userVote?.vote === 'up');
+                                downBtn.classList.toggle('active', userVote?.vote === 'down');
+                                
+                                if (countEl) {
+                                    countEl.innerHTML = `<i class="fas fa-thumbs-up"></i> ${upvotes} <i class="fas fa-thumbs-down" style="margin-left: 0.25rem;"></i> ${downvotes}`;
+                                }
+                            }
+                            
+                        } catch (error) {
+                            console.error('Vote error:', error);
+                            flowchartManager.showToast('Failed to vote', 'error');
+                        } finally {
+                            btn.disabled = false;
+                        }
+                    });
+                });
             }
         }
 
@@ -4961,7 +6948,6 @@
                 document.getElementById('composeProblemTitle').value = '';
                 document.getElementById('composeProblemDescription').value = '';
                 document.getElementById('composeProblemCategory').value = 'general';
-                document.getElementById('priorityMedium').checked = true;
                 this.selectedNodes = [];
                 this.updateSelectedNodesPreview();
                 
@@ -5185,7 +7171,6 @@
                 const title = document.getElementById('composeProblemTitle').value.trim();
                 const description = document.getElementById('composeProblemDescription').value.trim();
                 const category = document.getElementById('composeProblemCategory').value;
-                const priority = document.querySelector('input[name="composePriority"]:checked')?.value || 'medium';
                 
                 // Validation
                 if (!title) {
@@ -5219,12 +7204,20 @@
                         });
                     });
                     
-                    // Create problem approval request
+                    // Calculate hierarchy level (depth) for priority calculation
+                    // Higher level (deeper in hierarchy) = lower base priority
+                    const hierarchyLevel = Math.max(...this.selectedNodes.map(n => (n.path.match(/\//g) || []).length));
+                    
+                    // Create problem approval request with vote fields
                     const problemData = {
                         title,
                         description,
                         category,
-                        priority,
+                        // Vote-based priority system
+                        upvotes: 0,
+                        downvotes: 0,
+                        voters: [], // Array of {email, vote: 'up'|'down'} to track who voted
+                        hierarchyLevel: hierarchyLevel, // Used for priority calculation
                         targetNodes: this.selectedNodes.map(n => ({
                             path: n.path,
                             name: n.name
@@ -5641,6 +7634,8 @@
                 const problemsSection = document.getElementById('problemsSection');
                 const myProblemsSection = document.getElementById('myProblemsSection');
                 const announcementsSection = document.getElementById('announcementsSection');
+                const flowchartSection = document.getElementById('flowchartSection');
+                const profileSection = document.getElementById('profileSection');
                 
                 // Hide all sections first
                 if (dashboardGrid) dashboardGrid.style.display = 'none';
@@ -5648,6 +7643,8 @@
                 if (problemsSection) problemsSection.classList.remove('active');
                 if (myProblemsSection) myProblemsSection.classList.remove('active');
                 if (announcementsSection) announcementsSection.classList.remove('active');
+                if (flowchartSection) flowchartSection.classList.remove('active');
+                if (profileSection) profileSection.classList.remove('active');
                 
                 if (page === 'problems') {
                     if (problemsSection) {
@@ -5663,6 +7660,16 @@
                     if (announcementsSection) {
                         announcementsSection.classList.add('active');
                         this.loadAnnouncementsSection();
+                    }
+                } else if (page === 'flowchart') {
+                    if (flowchartSection) {
+                        flowchartSection.classList.add('active');
+                        this.loadFlowchartSection();
+                    }
+                } else if (page === 'profile') {
+                    if (profileSection) {
+                        profileSection.classList.add('active');
+                        this.loadProfileSection();
                     }
                 } else {
                     // Show dashboard (default)
@@ -6020,6 +8027,7 @@
                 if (!user) return;
                 
                 await problemsManager.loadProblems(user.email);
+                await problemsManager.loadAllSolutionsPreviews();
                 problemsManager.updateStats();
                 problemsManager.renderProblems('problemsList', 'all');
             }
@@ -6030,6 +8038,7 @@
                 if (!user) return;
                 
                 await problemsManager.loadProblems(user.email);
+                await problemsManager.loadAllSolutionsPreviews();
                 problemsManager.updateStats();
                 problemsManager.renderProblems('myProblemsList', 'my');
             }
@@ -6042,6 +8051,104 @@
                 await announcementsManager.loadAnnouncements(user.email);
                 announcementsManager.updateStats();
                 announcementsManager.renderAnnouncements('announcementsList', 'all');
+            }
+            
+            // Load Flowchart Section
+            async loadFlowchartSection() {
+                const user = dashboardAuth.getCurrentUser();
+                if (!user) return;
+                
+                const container = document.getElementById('flowchartContainer');
+                if (container) {
+                    container.innerHTML = `<div class="flowchart-loading"><i class="fas fa-spinner"></i><p>Loading your network...</p></div>`;
+                }
+                
+                try {
+                    await flowchartManager.loadHierarchy(user);
+                    flowchartManager.renderFlowchart(container);
+                } catch (error) {
+                    console.error('Error loading flowchart:', error);
+                    if (container) {
+                        container.innerHTML = `
+                            <div class="flowchart-empty">
+                                <i class="fas fa-sitemap"></i>
+                                <h3>No Network Setup Yet</h3>
+                                <p>You haven't set up your network yet. Browse organizations or create your own.</p>
+                                <div style="display: flex; gap: 0.75rem; justify-content: center; margin-top: 1rem;">
+                                    <button class="flowchart-btn secondary" onclick="flowchartManager.showBrowseSection()">
+                                        <i class="fas fa-search"></i> Browse Organizations
+                                    </button>
+                                    <button class="flowchart-btn primary" onclick="flowchartManager.openAddNodeModal()">
+                                        <i class="fas fa-plus"></i> Create New
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+            }
+            
+            // Load Profile Section
+            async loadProfileSection() {
+                const user = dashboardAuth.getCurrentUser();
+                if (!user) return;
+                
+                try {
+                    // Update profile display
+                    const profileName = document.getElementById('profileName');
+                    const profileEmail = document.getElementById('profileEmail');
+                    const profileRole = document.getElementById('profileRole');
+                    const profileOrg = document.getElementById('profileOrg');
+                    const profileJoined = document.getElementById('profileJoined');
+                    const profileProblemsCount = document.getElementById('profileProblemsCount');
+                    const profileAvatar = document.getElementById('profileAvatar');
+                    
+                    // Set basic info
+                    if (profileName) profileName.textContent = user.displayName || 'User';
+                    if (profileEmail) profileEmail.textContent = user.email;
+                    
+                    // Set avatar
+                    if (profileAvatar && user.photoURL) {
+                        profileAvatar.innerHTML = `<img src="${user.photoURL}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                    }
+                    
+                    // Load user data from Firestore
+                    const userDoc = await getDoc(doc(db, 'users', user.email));
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        
+                        if (profileRole) {
+                            const role = userData.role || 'Member';
+                            profileRole.textContent = role;
+                        }
+                        
+                        if (profileJoined && userData.createdAt) {
+                            const joinDate = userData.createdAt.toDate ? userData.createdAt.toDate() : new Date(userData.createdAt);
+                            profileJoined.textContent = joinDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                        }
+                    }
+                    
+                    // Get organization info
+                    if (profileOrg) {
+                        const hierarchiesRef = collection(db, 'users', user.email, 'hierarchies');
+                        const hierarchiesSnap = await getDocs(hierarchiesRef);
+                        if (!hierarchiesSnap.empty) {
+                            const firstOrg = hierarchiesSnap.docs[0];
+                            const orgData = firstOrg.data();
+                            profileOrg.textContent = orgData.name || firstOrg.id;
+                        }
+                    }
+                    
+                    // Count user's problems
+                    if (profileProblemsCount) {
+                        const problemsRef = collection(db, 'pendingProblemApprovals');
+                        const q = query(problemsRef, where('createdBy', '==', user.email));
+                        const problemsSnap = await getDocs(q);
+                        profileProblemsCount.textContent = problemsSnap.size;
+                    }
+                } catch (error) {
+                    console.error('Error loading profile:', error);
+                }
             }
         }
 
@@ -6073,6 +8180,36 @@
                 document.getElementById('viewProblemModal').classList.remove('show');
             });
             
+            // Solution Modal Event Listeners
+            const solutionModalClose = document.getElementById('solutionModalClose');
+            const solutionCancelBtn = document.getElementById('solutionCancelBtn');
+            const solutionSubmitBtn = document.getElementById('solutionSubmitBtn');
+            const solutionModalOverlay = document.getElementById('solutionModalOverlay');
+            
+            solutionModalClose?.addEventListener('click', () => problemsManager.closeSolutionModal());
+            solutionCancelBtn?.addEventListener('click', () => problemsManager.closeSolutionModal());
+            solutionSubmitBtn?.addEventListener('click', () => problemsManager.submitSolution());
+            solutionModalOverlay?.addEventListener('click', (e) => {
+                if (e.target.id === 'solutionModalOverlay') problemsManager.closeSolutionModal();
+            });
+            
+            // View All Solutions Modal Event Listeners
+            const closeAllSolutionsModal = document.getElementById('closeAllSolutionsModal');
+            const closeAllSolutionsBtn = document.getElementById('closeAllSolutionsBtn');
+            const viewAllSolutionsModal = document.getElementById('viewAllSolutionsModal');
+            
+            closeAllSolutionsModal?.addEventListener('click', () => {
+                document.getElementById('viewAllSolutionsModal').classList.remove('show');
+            });
+            closeAllSolutionsBtn?.addEventListener('click', () => {
+                document.getElementById('viewAllSolutionsModal').classList.remove('show');
+            });
+            viewAllSolutionsModal?.addEventListener('click', (e) => {
+                if (e.target.id === 'viewAllSolutionsModal') {
+                    document.getElementById('viewAllSolutionsModal').classList.remove('show');
+                }
+            });
+            
             // Problems Tab Navigation
             document.querySelectorAll('#problemsSection .tab-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -6081,6 +8218,7 @@
                     else if (tab === 'open-problems') problemsManager.setFilter('open');
                     else if (tab === 'solved-problems') problemsManager.setFilter('solved');
                     else if (tab === 'archived-problems') problemsManager.setFilter('archived');
+                    else if (tab === 'bookmarked-problems') problemsManager.setFilter('bookmarked');
                 });
             });
             

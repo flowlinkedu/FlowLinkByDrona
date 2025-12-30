@@ -174,18 +174,11 @@ service cloud.firestore {
       // Any signed-in user can create a pending problem approval
       allow create: if isSignedIn();
       
-      // Assigned admins can update (approve/reject/escalate)
-      // Check if user's email is in the assignedAdminEmails array
-      allow update: if isSignedIn() && (
-        request.auth.token.email in resource.data.assignedAdminEmails ||
-        resource.data.createdBy == request.auth.token.email
-      );
+      // Any signed-in user can update (for admin approval workflow)
+      allow update: if isSignedIn();
       
-      // Assigned admins or creator can delete (after approval moves to problems collection)
-      allow delete: if isSignedIn() && (
-        request.auth.token.email in resource.data.assignedAdminEmails ||
-        resource.data.createdBy == request.auth.token.email
-      );
+      // Any signed-in user can delete (for admin approval workflow - moving to approved/rejected)
+      allow delete: if isSignedIn();
       
       // Allow listing for admins to find their pending problems
       allow list: if isSignedIn();
@@ -216,6 +209,35 @@ service cloud.firestore {
     }
     
     //-------------------------------------------------------------------------
+    // Solved Problems Collection Rules
+    // For storing solved problems (moved from problems collection)
+    //-------------------------------------------------------------------------
+    match /solvedProblems/{problemId} {
+      // Super admin has full access
+      allow read, write: if isSuperAdmin();
+      
+      // Any signed-in user can read
+      allow read: if isSignedIn();
+      
+      // Any signed-in user can create (when marking as solved)
+      allow create: if isSignedIn();
+      
+      // Any signed-in user can update
+      allow update: if isSignedIn();
+      
+      // Any signed-in user can delete
+      allow delete: if isSignedIn();
+      
+      // Allow listing
+      allow list: if isSignedIn();
+      
+      // Solutions subcollection under solvedProblems
+      match /solutions/{solutionId} {
+        allow read, write: if isSignedIn();
+      }
+    }
+    
+    //-------------------------------------------------------------------------
     // Archived Problems Collection Rules
     // For storing archived/escalated problems
     //-------------------------------------------------------------------------
@@ -232,8 +254,13 @@ service cloud.firestore {
       // Admins can update (restore from archive)
       allow update: if isSignedIn();
       
-      // Only super admin can permanently delete (covered above)
-      allow delete: if isSuperAdmin();
+      // Admins can delete (when restoring)
+      allow delete: if isSignedIn();
+      
+      // Solutions subcollection under archivedProblems
+      match /solutions/{solutionId} {
+        allow read, write: if isSignedIn();
+      }
     }
     
     //-------------------------------------------------------------------------
@@ -247,8 +274,128 @@ service cloud.firestore {
       // Any signed-in user can read
       allow read: if isSignedIn();
       
-      // Admins can create/update (when escalating)
-      allow create, update: if isSignedIn();
+      // Admins can create/update/delete (when escalating or resolving)
+      allow create, update, delete: if isSignedIn();
+      
+      // Allow listing
+      allow list: if isSignedIn();
+    }
+    
+    //-------------------------------------------------------------------------
+    // Approved Problems Collection Rules
+    // For storing approved problems
+    //-------------------------------------------------------------------------
+    match /approvedProblems/{problemId} {
+      // Super admin has full access
+      allow read, write: if isSuperAdmin();
+      
+      // Any signed-in user can read
+      allow read: if isSignedIn();
+      
+      // Admins can create (when approving)
+      allow create: if isSignedIn();
+      
+      // Admins can update
+      allow update: if isSignedIn();
+      
+      // Admins can delete
+      allow delete: if isSignedIn();
+      
+      // Allow listing
+      allow list: if isSignedIn();
+    }
+    
+    //-------------------------------------------------------------------------
+    // Rejected Problems Collection Rules
+    // For storing rejected problems
+    //-------------------------------------------------------------------------
+    match /rejectedProblems/{problemId} {
+      // Super admin has full access
+      allow read, write: if isSuperAdmin();
+      
+      // Any signed-in user can read
+      allow read: if isSignedIn();
+      
+      // Admins can create (when rejecting)
+      allow create: if isSignedIn();
+      
+      // Admins can update
+      allow update: if isSignedIn();
+      
+      // Admins can delete
+      allow delete: if isSignedIn();
+      
+      // Allow listing
+      allow list: if isSignedIn();
+    }
+    
+    //-------------------------------------------------------------------------
+    // Approved Announcements Collection Rules
+    // For storing approved announcements
+    //-------------------------------------------------------------------------
+    match /approvedAnnouncements/{announcementId} {
+      // Super admin has full access
+      allow read, write: if isSuperAdmin();
+      
+      // Any signed-in user can read
+      allow read: if isSignedIn();
+      
+      // Admins can create (when approving)
+      allow create: if isSignedIn();
+      
+      // Admins can update
+      allow update: if isSignedIn();
+      
+      // Admins can delete
+      allow delete: if isSignedIn();
+      
+      // Allow listing
+      allow list: if isSignedIn();
+    }
+    
+    //-------------------------------------------------------------------------
+    // Rejected Announcements Collection Rules
+    // For storing rejected announcements
+    //-------------------------------------------------------------------------
+    match /rejectedAnnouncements/{announcementId} {
+      // Super admin has full access
+      allow read, write: if isSuperAdmin();
+      
+      // Any signed-in user can read
+      allow read: if isSignedIn();
+      
+      // Admins can create (when rejecting)
+      allow create: if isSignedIn();
+      
+      // Admins can update
+      allow update: if isSignedIn();
+      
+      // Admins can delete
+      allow delete: if isSignedIn();
+      
+      // Allow listing
+      allow list: if isSignedIn();
+    }
+    
+    //-------------------------------------------------------------------------
+    // Resolved Problems Collection Rules
+    // For storing resolved escalated problems
+    //-------------------------------------------------------------------------
+    match /resolvedProblems/{problemId} {
+      // Super admin has full access
+      allow read, write: if isSuperAdmin();
+      
+      // Any signed-in user can read
+      allow read: if isSignedIn();
+      
+      // Admins can create (when resolving)
+      allow create: if isSignedIn();
+      
+      // Admins can update
+      allow update: if isSignedIn();
+      
+      // Admins can delete
+      allow delete: if isSignedIn();
       
       // Allow listing
       allow list: if isSignedIn();
@@ -273,31 +420,25 @@ service cloud.firestore {
       // Any signed-in user can create problems
       allow create: if isSignedIn();
       
-      // Owner, organization admin, or super admin can update
-      allow update: if isSignedIn() && (
-        isExistingOwner() || 
-        isSuperAdmin() ||
-        // Allow org admins to update problems (check if user email is in any hierarchy's adminEmails)
-        request.auth.token.email != null
-      );
+      // Any signed-in user can update problems
+      allow update: if isSignedIn();
       
-      // Owner or super admin can delete
-      allow delete: if isSignedIn() && (
-        isExistingOwner() || 
-        isSuperAdmin()
-      );
+      // Any signed-in user can delete problems (needed for moving to solved/archived)
+      allow delete: if isSignedIn();
+      
+      // Solutions subcollection under problems
+      match /solutions/{solutionId} {
+        allow read, write: if isSignedIn();
+      }
     }
     
     //-------------------------------------------------------------------------
-    // Solutions Collection Rules
+    // Solutions Collection Rules (Global)
     //-------------------------------------------------------------------------
     match /solutions/{solutionId} {
       allow get, list: if isSignedIn();
       allow create: if isSignedIn();
-      allow update: if isSignedIn() && (
-        isExistingOwner() || 
-        isSuperAdmin()
-      );
+      allow update: if isSignedIn();
       allow delete: if isSignedIn() && (
         isExistingOwner() || 
         isSuperAdmin()

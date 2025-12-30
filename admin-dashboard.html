@@ -3068,117 +3068,201 @@
 
         // ========== GOVERNANCE & APPROVAL CENTER FUNCTIONALITY ==========
         
-        // Mock data for governance features (frontend-only logic)
+        // Real data arrays for governance features (loaded from Firebase)
         let pendingProblemApprovals = [];
         let pendingAnnouncementApprovals = [];
         let escalatedItems = [];
         let archivedItems = [];
         let currentGovAction = null;
         
-        // Initialize mock governance data
-        function initGovernanceData() {
-            // Mock pending problem approvals
-            pendingProblemApprovals = [
-                {
-                    id: 'prob-1',
-                    type: 'problem',
-                    title: 'Network connectivity issues in Block A',
-                    description: 'Students are experiencing frequent disconnections from the campus WiFi network in Block A dormitory.',
-                    submittedBy: 'student@example.com',
-                    submittedByOrg: 'Hostel Management',
-                    hierarchyPath: ['IIIT Bhopal', 'Hostel', 'Block A'],
-                    priority: 'high',
-                    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-                    status: 'pending'
-                },
-                {
-                    id: 'prob-2',
-                    type: 'problem',
-                    title: 'Library AC not working',
-                    description: 'The air conditioning system in the main library reading hall has been malfunctioning for the past week.',
-                    submittedBy: 'faculty@example.com',
-                    submittedByOrg: 'Academic',
-                    hierarchyPath: ['IIIT Bhopal', 'Academic', 'Library'],
-                    priority: 'medium',
-                    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
-                    status: 'pending'
+        // Load real governance data from Firebase
+        async function initGovernanceData() {
+            try {
+                // Load pending problem approvals from Firebase
+                await loadPendingProblemApprovals();
+                
+                // Load pending announcement approvals (if collection exists)
+                await loadPendingAnnouncementApprovals();
+                
+                // Load escalated items
+                await loadEscalatedItems();
+                
+                // Load archived items
+                await loadArchivedItems();
+                
+                updateGovernanceMetrics();
+                renderGovernancePanels();
+            } catch (error) {
+                console.error('Error initializing governance data:', error);
+                // Still render with empty arrays
+                updateGovernanceMetrics();
+                renderGovernancePanels();
+            }
+        }
+        
+        // Load pending problem approvals from Firebase
+        async function loadPendingProblemApprovals() {
+            try {
+                const pendingRef = collection(db, 'pendingProblemApprovals');
+                const snapshot = await getDocs(pendingRef);
+                
+                pendingProblemApprovals = [];
+                
+                for (const docSnap of snapshot.docs) {
+                    const data = docSnap.data();
+                    
+                    // Check if this problem is assigned to current admin's organization
+                    const assignedAdmins = data.assignedAdminEmails || [];
+                    const hierarchyPaths = data.hierarchyPaths || [];
+                    
+                    // Check if current user is an assigned admin or if problem is in their org
+                    let isRelevant = assignedAdmins.includes(currentUser?.email);
+                    
+                    if (!isRelevant && selectedOrgId) {
+                        // Check if any hierarchy path matches the selected org
+                        isRelevant = hierarchyPaths.some(path => path.includes(selectedOrgId));
+                    }
+                    
+                    if (isRelevant || assignedAdmins.length === 0) {
+                        // Extract hierarchy path names from hierarchyPaths
+                        let pathNames = [];
+                        if (hierarchyPaths.length > 0) {
+                            // Parse the path to get node names
+                            const firstPath = hierarchyPaths[0];
+                            const pathParts = firstPath.split('/');
+                            // Get the org name and sub-node names
+                            for (let i = 0; i < pathParts.length; i++) {
+                                if (pathParts[i] === 'hierarchies' || pathParts[i] === 'sub-nodes') continue;
+                                pathNames.push(pathParts[i]);
+                            }
+                        }
+                        
+                        pendingProblemApprovals.push({
+                            id: docSnap.id,
+                            type: 'problem',
+                            title: data.title || 'Untitled Problem',
+                            description: data.description || '',
+                            submittedBy: data.createdBy || 'Unknown',
+                            submittedByOrg: data.category || 'General',
+                            hierarchyPath: pathNames.length > 0 ? pathNames : ['Organization'],
+                            priority: data.priority || 'medium',
+                            category: data.category || 'general',
+                            createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt),
+                            status: data.status || 'pending',
+                            assignedAdminEmails: assignedAdmins,
+                            hierarchyPaths: hierarchyPaths
+                        });
+                    }
                 }
-            ];
-            
-            // Mock pending announcement approvals
-            pendingAnnouncementApprovals = [
-                {
-                    id: 'ann-1',
-                    type: 'announcement',
-                    title: 'Upcoming Sports Day Event',
-                    content: 'Annual sports day will be held on January 15th. All students are encouraged to participate.',
-                    submittedBy: 'sports@example.com',
-                    submittedByOrg: 'Sports Department',
-                    hierarchyPath: ['IIIT Bhopal', 'Sports'],
-                    scope: 'org',
-                    deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-                    isUrgent: false,
-                    isVerified: false,
-                    createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-                    status: 'pending'
-                },
-                {
-                    id: 'ann-2',
-                    type: 'announcement',
-                    title: 'Emergency: Water Supply Disruption',
-                    content: 'Water supply will be disrupted tomorrow from 10 AM to 4 PM due to maintenance work.',
-                    submittedBy: 'admin@example.com',
-                    submittedByOrg: 'Administration',
-                    hierarchyPath: ['IIIT Bhopal'],
-                    scope: 'global',
-                    deadline: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day from now
-                    isUrgent: true,
-                    isVerified: false,
-                    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-                    status: 'pending'
+                
+                console.log('Loaded pending problem approvals:', pendingProblemApprovals.length);
+            } catch (error) {
+                console.error('Error loading pending problem approvals:', error);
+                pendingProblemApprovals = [];
+            }
+        }
+        
+        // Load pending announcement approvals from Firebase
+        async function loadPendingAnnouncementApprovals() {
+            try {
+                const pendingRef = collection(db, 'pendingAnnouncementApprovals');
+                const snapshot = await getDocs(pendingRef);
+                
+                pendingAnnouncementApprovals = [];
+                
+                for (const docSnap of snapshot.docs) {
+                    const data = docSnap.data();
+                    
+                    // Check if this announcement is relevant to current admin
+                    const assignedAdmins = data.assignedAdminEmails || [];
+                    let isRelevant = assignedAdmins.includes(currentUser?.email) || assignedAdmins.length === 0;
+                    
+                    if (isRelevant) {
+                        pendingAnnouncementApprovals.push({
+                            id: docSnap.id,
+                            type: 'announcement',
+                            title: data.title || 'Untitled Announcement',
+                            content: data.content || data.description || '',
+                            submittedBy: data.createdBy || 'Unknown',
+                            submittedByOrg: data.category || 'General',
+                            hierarchyPath: data.hierarchyPath || ['Organization'],
+                            scope: data.scope || 'org',
+                            deadline: data.deadline?.toDate ? data.deadline.toDate() : (data.deadline ? new Date(data.deadline) : null),
+                            isUrgent: data.isUrgent || false,
+                            isVerified: data.isVerified || false,
+                            createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt),
+                            status: data.status || 'pending'
+                        });
+                    }
                 }
-            ];
-            
-            // Mock escalated items
-            escalatedItems = [
-                {
-                    id: 'esc-1',
-                    type: 'problem',
-                    title: 'Persistent plumbing issues',
-                    description: 'Recurring water leakage in multiple rooms that local maintenance cannot resolve.',
-                    submittedBy: 'warden@example.com',
-                    previousLevel: 'Block A Admin',
-                    currentLevel: 'Hostel Admin',
-                    escalationReason: 'Auto-escalated: Unresolved for 7+ days',
-                    escalationPath: ['Block A', 'Hostel Management', 'Organization'],
-                    priority: 'high',
-                    createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
-                    escalatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
+                
+                console.log('Loaded pending announcement approvals:', pendingAnnouncementApprovals.length);
+            } catch (error) {
+                console.error('Error loading pending announcement approvals:', error);
+                pendingAnnouncementApprovals = [];
+            }
+        }
+        
+        // Load escalated items from Firebase
+        async function loadEscalatedItems() {
+            try {
+                const escalatedRef = collection(db, 'escalatedProblems');
+                const snapshot = await getDocs(escalatedRef);
+                
+                escalatedItems = [];
+                
+                for (const docSnap of snapshot.docs) {
+                    const data = docSnap.data();
+                    
+                    escalatedItems.push({
+                        id: docSnap.id,
+                        type: 'problem',
+                        title: data.title || 'Untitled',
+                        description: data.description || '',
+                        submittedBy: data.createdBy || 'Unknown',
+                        previousLevel: data.previousLevel || 'Unknown',
+                        currentLevel: data.currentLevel || 'Admin',
+                        escalationReason: data.escalationReason || 'Escalated by admin',
+                        escalationPath: data.escalationPath || [],
+                        priority: data.priority || 'high',
+                        createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(),
+                        escalatedAt: data.escalatedAt?.toDate ? data.escalatedAt.toDate() : new Date()
+                    });
                 }
-            ];
-            
-            // Mock archived items
-            archivedItems = [
-                {
-                    id: 'arch-1',
-                    type: 'problem',
-                    title: 'Old cafeteria complaint',
-                    archiveReason: 'Issue resolved and verified',
-                    archivedBy: 'admin@example.com',
-                    archivedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-                },
-                {
-                    id: 'arch-2',
-                    type: 'announcement',
-                    title: 'Past event notification',
-                    archiveReason: 'Event completed',
-                    archivedBy: 'admin@example.com',
-                    archivedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000)
+                
+                console.log('Loaded escalated items:', escalatedItems.length);
+            } catch (error) {
+                console.error('Error loading escalated items:', error);
+                escalatedItems = [];
+            }
+        }
+        
+        // Load archived items from Firebase
+        async function loadArchivedItems() {
+            try {
+                const archivedRef = collection(db, 'archivedProblems');
+                const snapshot = await getDocs(archivedRef);
+                
+                archivedItems = [];
+                
+                for (const docSnap of snapshot.docs) {
+                    const data = docSnap.data();
+                    
+                    archivedItems.push({
+                        id: docSnap.id,
+                        type: data.type || 'problem',
+                        title: data.title || 'Untitled',
+                        archiveReason: data.archiveReason || 'Archived',
+                        archivedBy: data.archivedBy || 'admin',
+                        archivedAt: data.archivedAt?.toDate ? data.archivedAt.toDate() : new Date()
+                    });
                 }
-            ];
-            
-            updateGovernanceMetrics();
-            renderGovernancePanels();
+                
+                console.log('Loaded archived items:', archivedItems.length);
+            } catch (error) {
+                console.error('Error loading archived items:', error);
+                archivedItems = [];
+            }
         }
         
         // Update governance metrics
@@ -3416,60 +3500,242 @@
             const item = document.querySelector(`.approval-item[data-id="${id}"]`);
             if (item) item.classList.add('approval-success-ripple');
             
-            setTimeout(() => {
-                if (type === 'problem') {
-                    pendingProblemApprovals = pendingProblemApprovals.filter(p => p.id !== id);
-                } else if (type === 'announcement') {
-                    pendingAnnouncementApprovals = pendingAnnouncementApprovals.filter(a => a.id !== id);
+            setTimeout(async () => {
+                try {
+                    if (type === 'problem') {
+                        // Find the problem data
+                        const problem = pendingProblemApprovals.find(p => p.id === id);
+                        console.log('Approving problem:', id, problem);
+                        
+                        // Move to main problems collection (not approvedProblems)
+                        if (problem) {
+                            const problemRef = doc(db, 'problems', id);
+                            // Create a clean object without circular references
+                            // Include vote fields for the upvote/downvote system
+                            const problemData = {
+                                title: problem.title || '',
+                                description: problem.description || '',
+                                category: problem.category || 'general',
+                                // Vote-based priority system
+                                upvotes: problem.upvotes || 0,
+                                downvotes: problem.downvotes || 0,
+                                voters: problem.voters || [],
+                                hierarchyLevel: problem.hierarchyLevel || 0,
+                                submittedBy: problem.submittedBy || problem.createdBy || '',
+                                createdBy: problem.createdBy || problem.submittedBy || '',
+                                hierarchyPath: problem.hierarchyPath || [],
+                                hierarchyPaths: problem.hierarchyPaths || [],
+                                targetNodes: problem.targetNodes || [],
+                                assignedAdminEmails: problem.assignedAdminEmails || [],
+                                status: 'open',
+                                approvedBy: currentUser?.email || '',
+                                approvedAt: serverTimestamp(),
+                                createdAt: problem.createdAt instanceof Date ? problem.createdAt : serverTimestamp()
+                            };
+                            console.log('Saving to problems collection:', problemData);
+                            await setDoc(problemRef, problemData);
+                            console.log('Saved to problems collection');
+                            
+                            // Add problem ID to hierarchy nodes' problemIds array
+                            if (problem.hierarchyPaths && problem.hierarchyPaths.length > 0) {
+                                for (const path of problem.hierarchyPaths) {
+                                    try {
+                                        const nodeRef = doc(db, path);
+                                        await setDoc(nodeRef, {
+                                            problemIds: arrayUnion(id),
+                                            updatedAt: serverTimestamp()
+                                        }, { merge: true });
+                                        console.log('Added problem ID to node:', path);
+                                    } catch (nodeError) {
+                                        console.error('Error updating node:', path, nodeError);
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // Delete from pending
+                        console.log('Deleting from pendingProblemApprovals:', id);
+                        try {
+                            await deleteDoc(doc(db, 'pendingProblemApprovals', id));
+                            console.log('Deleted from pendingProblemApprovals');
+                        } catch (deleteError) {
+                            console.error('Error deleting from pending:', deleteError);
+                        }
+                        pendingProblemApprovals = pendingProblemApprovals.filter(p => p.id !== id);
+                    } else if (type === 'announcement') {
+                        // Find the announcement data
+                        const announcement = pendingAnnouncementApprovals.find(a => a.id === id);
+                        
+                        // Move to announcements collection
+                        if (announcement) {
+                            const announcementRef = doc(db, 'announcements', id);
+                            const announcementData = {
+                                title: announcement.title || '',
+                                content: announcement.content || '',
+                                submittedBy: announcement.submittedBy || '',
+                                createdBy: announcement.createdBy || announcement.submittedBy || '',
+                                scope: announcement.scope || 'org',
+                                isUrgent: announcement.isUrgent || false,
+                                isVerified: true,
+                                status: 'published',
+                                approvedBy: currentUser?.email || '',
+                                approvedAt: serverTimestamp()
+                            };
+                            await setDoc(announcementRef, announcementData);
+                        }
+                        
+                        // Delete from pending
+                        try {
+                            await deleteDoc(doc(db, 'pendingAnnouncementApprovals', id));
+                        } catch (deleteError) {
+                            console.error('Error deleting announcement from pending:', deleteError);
+                        }
+                        pendingAnnouncementApprovals = pendingAnnouncementApprovals.filter(a => a.id !== id);
+                    }
+                    updateGovernanceMetrics();
+                    renderGovernancePanels();
+                    showToast('Item approved successfully!', 'success');
+                } catch (error) {
+                    console.error('Error approving item:', error);
+                    showToast('Error approving item: ' + error.message, 'error');
                 }
-                updateGovernanceMetrics();
-                renderGovernancePanels();
-                showToast('Item approved successfully!', 'success');
             }, 300);
         };
         
-        window.govApproveAnnouncement = function(id) {
+        window.govApproveAnnouncement = async function(id) {
             const ann = pendingAnnouncementApprovals.find(a => a.id === id);
             if (ann) {
-                ann.isVerified = true;
-                ann.status = 'approved';
-                pendingAnnouncementApprovals = pendingAnnouncementApprovals.filter(a => a.id !== id);
-                updateGovernanceMetrics();
-                renderGovernancePanels();
-                showToast('Announcement approved and published!', 'success');
+                try {
+                    // Move to approved announcements
+                    const approvedRef = doc(db, 'approvedAnnouncements', id);
+                    await setDoc(approvedRef, {
+                        ...ann,
+                        isVerified: true,
+                        status: 'approved',
+                        approvedBy: currentUser?.email,
+                        approvedAt: serverTimestamp()
+                    });
+                    
+                    // Delete from pending
+                    await deleteDoc(doc(db, 'pendingAnnouncementApprovals', id));
+                    pendingAnnouncementApprovals = pendingAnnouncementApprovals.filter(a => a.id !== id);
+                    
+                    updateGovernanceMetrics();
+                    renderGovernancePanels();
+                    showToast('Announcement approved and published!', 'success');
+                } catch (error) {
+                    console.error('Error approving announcement:', error);
+                    showToast('Error: ' + error.message, 'error');
+                }
             }
         };
         
-        window.govApproveEscalation = function(id) {
-            escalatedItems = escalatedItems.filter(e => e.id !== id);
-            updateGovernanceMetrics();
-            renderGovernancePanels();
-            showToast('Escalation resolved!', 'success');
-        };
-        
-        window.govSendBack = function(id) {
-            escalatedItems = escalatedItems.filter(e => e.id !== id);
-            updateGovernanceMetrics();
-            renderGovernancePanels();
-            showToast('Item sent back to lower node.', 'success');
-        };
-        
-        window.govForceEscalate = function(id) {
-            showToast('Item escalated to platform admin.', 'success');
-        };
-        
-        window.govRestore = function(id) {
-            const item = archivedItems.find(a => a.id === id);
-            if (item) {
-                archivedItems = archivedItems.filter(a => a.id !== id);
-                if (item.type === 'problem') {
-                    pendingProblemApprovals.push({...item, status: 'pending'});
-                } else {
-                    pendingAnnouncementApprovals.push({...item, status: 'pending'});
+        window.govApproveEscalation = async function(id) {
+            try {
+                const item = escalatedItems.find(e => e.id === id);
+                if (item) {
+                    // Move to resolved problems
+                    const resolvedRef = doc(db, 'resolvedProblems', id);
+                    await setDoc(resolvedRef, {
+                        ...item,
+                        status: 'resolved',
+                        resolvedBy: currentUser?.email,
+                        resolvedAt: serverTimestamp()
+                    });
+                    
+                    // Delete from escalated
+                    await deleteDoc(doc(db, 'escalatedProblems', id));
                 }
+                escalatedItems = escalatedItems.filter(e => e.id !== id);
                 updateGovernanceMetrics();
                 renderGovernancePanels();
-                showToast('Item restored to pending approvals.', 'success');
+                showToast('Escalation resolved!', 'success');
+            } catch (error) {
+                console.error('Error resolving escalation:', error);
+                showToast('Error: ' + error.message, 'error');
+            }
+        };
+        
+        window.govSendBack = async function(id) {
+            try {
+                const item = escalatedItems.find(e => e.id === id);
+                if (item) {
+                    // Move back to pending
+                    const pendingRef = doc(db, 'pendingProblemApprovals', id);
+                    await setDoc(pendingRef, {
+                        ...item,
+                        status: 'pending',
+                        sentBackBy: currentUser?.email,
+                        sentBackAt: serverTimestamp()
+                    });
+                    
+                    // Delete from escalated
+                    await deleteDoc(doc(db, 'escalatedProblems', id));
+                }
+                escalatedItems = escalatedItems.filter(e => e.id !== id);
+                updateGovernanceMetrics();
+                renderGovernancePanels();
+                showToast('Item sent back to lower node.', 'success');
+            } catch (error) {
+                console.error('Error sending back item:', error);
+                showToast('Error: ' + error.message, 'error');
+            }
+        };
+        
+        window.govForceEscalate = async function(id) {
+            try {
+                const item = escalatedItems.find(e => e.id === id);
+                if (item) {
+                    // Update escalation level
+                    await setDoc(doc(db, 'escalatedProblems', id), {
+                        currentLevel: 'Platform Admin',
+                        forceEscalatedBy: currentUser?.email,
+                        forceEscalatedAt: serverTimestamp()
+                    }, { merge: true });
+                }
+                showToast('Item escalated to platform admin.', 'success');
+            } catch (error) {
+                console.error('Error force escalating:', error);
+                showToast('Error: ' + error.message, 'error');
+            }
+        };
+        
+        window.govRestore = async function(id) {
+            const item = archivedItems.find(a => a.id === id);
+            if (item) {
+                try {
+                    // Move back to pending
+                    if (item.type === 'problem') {
+                        const pendingRef = doc(db, 'pendingProblemApprovals', id);
+                        await setDoc(pendingRef, {
+                            ...item,
+                            status: 'pending',
+                            restoredBy: currentUser?.email,
+                            restoredAt: serverTimestamp()
+                        });
+                        pendingProblemApprovals.push({...item, status: 'pending'});
+                    } else {
+                        const pendingRef = doc(db, 'pendingAnnouncementApprovals', id);
+                        await setDoc(pendingRef, {
+                            ...item,
+                            status: 'pending',
+                            restoredBy: currentUser?.email,
+                            restoredAt: serverTimestamp()
+                        });
+                        pendingAnnouncementApprovals.push({...item, status: 'pending'});
+                    }
+                    
+                    // Delete from archived
+                    await deleteDoc(doc(db, 'archivedProblems', id));
+                    archivedItems = archivedItems.filter(a => a.id !== id);
+                    
+                    updateGovernanceMetrics();
+                    renderGovernancePanels();
+                    showToast('Item restored to pending approvals.', 'success');
+                } catch (error) {
+                    console.error('Error restoring item:', error);
+                    showToast('Error: ' + error.message, 'error');
+                }
             }
         };
         
@@ -3526,7 +3792,7 @@
         };
         
         // Confirm actions
-        document.getElementById('confirmGovRejectBtn')?.addEventListener('click', function() {
+        document.getElementById('confirmGovRejectBtn')?.addEventListener('click', async function() {
             if (!currentGovAction) return;
             const reason = document.getElementById('govRejectReason').value.trim();
             if (!reason) {
@@ -3534,76 +3800,193 @@
                 return;
             }
             
-            if (currentGovAction.type === 'problem') {
-                pendingProblemApprovals = pendingProblemApprovals.filter(p => p.id !== currentGovAction.id);
-            } else if (currentGovAction.type === 'announcement') {
-                pendingAnnouncementApprovals = pendingAnnouncementApprovals.filter(a => a.id !== currentGovAction.id);
+            try {
+                let item;
+                if (currentGovAction.type === 'problem') {
+                    item = pendingProblemApprovals.find(p => p.id === currentGovAction.id);
+                    
+                    // Save to rejected collection
+                    if (item) {
+                        const rejectedRef = doc(db, 'rejectedProblems', currentGovAction.id);
+                        await setDoc(rejectedRef, {
+                            ...item,
+                            status: 'rejected',
+                            rejectionReason: reason,
+                            rejectedBy: currentUser?.email,
+                            rejectedAt: serverTimestamp()
+                        });
+                    }
+                    
+                    // Delete from pending
+                    await deleteDoc(doc(db, 'pendingProblemApprovals', currentGovAction.id));
+                    pendingProblemApprovals = pendingProblemApprovals.filter(p => p.id !== currentGovAction.id);
+                } else if (currentGovAction.type === 'announcement') {
+                    item = pendingAnnouncementApprovals.find(a => a.id === currentGovAction.id);
+                    
+                    // Save to rejected collection
+                    if (item) {
+                        const rejectedRef = doc(db, 'rejectedAnnouncements', currentGovAction.id);
+                        await setDoc(rejectedRef, {
+                            ...item,
+                            status: 'rejected',
+                            rejectionReason: reason,
+                            rejectedBy: currentUser?.email,
+                            rejectedAt: serverTimestamp()
+                        });
+                    }
+                    
+                    // Delete from pending
+                    await deleteDoc(doc(db, 'pendingAnnouncementApprovals', currentGovAction.id));
+                    pendingAnnouncementApprovals = pendingAnnouncementApprovals.filter(a => a.id !== currentGovAction.id);
+                }
+                
+                closeModal('govRejectModal');
+                updateGovernanceMetrics();
+                renderGovernancePanels();
+                showToast('Item rejected.', 'success');
+            } catch (error) {
+                console.error('Error rejecting item:', error);
+                showToast('Error: ' + error.message, 'error');
             }
-            
-            closeModal('govRejectModal');
-            updateGovernanceMetrics();
-            renderGovernancePanels();
-            showToast('Item rejected.', 'success');
         });
         
-        document.getElementById('confirmGovEscalateBtn')?.addEventListener('click', function() {
+        document.getElementById('confirmGovEscalateBtn')?.addEventListener('click', async function() {
             if (!currentGovAction) return;
             const escalateTo = document.getElementById('govEscalateTo').value;
             const reason = document.getElementById('govEscalateReason').value.trim();
             
-            let item;
-            if (currentGovAction.type === 'problem') {
-                item = pendingProblemApprovals.find(p => p.id === currentGovAction.id);
-                pendingProblemApprovals = pendingProblemApprovals.filter(p => p.id !== currentGovAction.id);
-            } else if (currentGovAction.type === 'announcement') {
-                item = pendingAnnouncementApprovals.find(a => a.id === currentGovAction.id);
-                pendingAnnouncementApprovals = pendingAnnouncementApprovals.filter(a => a.id !== currentGovAction.id);
+            try {
+                let item;
+                if (currentGovAction.type === 'problem') {
+                    item = pendingProblemApprovals.find(p => p.id === currentGovAction.id);
+                    
+                    // Move to escalated collection
+                    if (item) {
+                        const escalatedRef = doc(db, 'escalatedProblems', currentGovAction.id);
+                        await setDoc(escalatedRef, {
+                            ...item,
+                            escalationReason: reason || `Escalated to ${escalateTo}`,
+                            escalationPath: [...(item.hierarchyPath || []), escalateTo],
+                            currentLevel: escalateTo,
+                            previousLevel: item.hierarchyPath?.[item.hierarchyPath.length - 1] || 'Unknown',
+                            escalatedBy: currentUser?.email,
+                            escalatedAt: serverTimestamp()
+                        });
+                        
+                        escalatedItems.push({
+                            ...item,
+                            escalationReason: reason || `Escalated to ${escalateTo}`,
+                            escalationPath: [...(item.hierarchyPath || []), escalateTo],
+                            escalatedAt: new Date()
+                        });
+                    }
+                    
+                    // Delete from pending
+                    await deleteDoc(doc(db, 'pendingProblemApprovals', currentGovAction.id));
+                    pendingProblemApprovals = pendingProblemApprovals.filter(p => p.id !== currentGovAction.id);
+                } else if (currentGovAction.type === 'announcement') {
+                    item = pendingAnnouncementApprovals.find(a => a.id === currentGovAction.id);
+                    pendingAnnouncementApprovals = pendingAnnouncementApprovals.filter(a => a.id !== currentGovAction.id);
+                }
+                
+                closeModal('govEscalateModal');
+                updateGovernanceMetrics();
+                renderGovernancePanels();
+                showToast(`Item escalated to ${escalateTo}.`, 'success');
+            } catch (error) {
+                console.error('Error escalating item:', error);
+                showToast('Error: ' + error.message, 'error');
             }
-            
-            if (item) {
-                escalatedItems.push({
-                    ...item,
-                    escalationReason: reason || `Escalated to ${escalateTo}`,
-                    escalationPath: [...(item.hierarchyPath || []), escalateTo],
-                    escalatedAt: new Date()
-                });
-            }
-            
-            closeModal('govEscalateModal');
-            updateGovernanceMetrics();
-            renderGovernancePanels();
-            showToast(`Item escalated to ${escalateTo}.`, 'success');
         });
         
-        document.getElementById('confirmGovArchiveBtn')?.addEventListener('click', function() {
+        document.getElementById('confirmGovArchiveBtn')?.addEventListener('click', async function() {
             if (!currentGovAction) return;
             const reason = document.getElementById('govArchiveReason').value.trim() || 'Archived by admin';
             
-            let item;
-            if (currentGovAction.type === 'problem') {
-                item = pendingProblemApprovals.find(p => p.id === currentGovAction.id);
-                pendingProblemApprovals = pendingProblemApprovals.filter(p => p.id !== currentGovAction.id);
-            } else if (currentGovAction.type === 'announcement') {
-                item = pendingAnnouncementApprovals.find(a => a.id === currentGovAction.id);
-                pendingAnnouncementApprovals = pendingAnnouncementApprovals.filter(a => a.id !== currentGovAction.id);
-            } else if (currentGovAction.type === 'escalation') {
-                item = escalatedItems.find(e => e.id === currentGovAction.id);
-                escalatedItems = escalatedItems.filter(e => e.id !== currentGovAction.id);
+            try {
+                let item;
+                if (currentGovAction.type === 'problem') {
+                    item = pendingProblemApprovals.find(p => p.id === currentGovAction.id);
+                    
+                    // Move to archived collection
+                    if (item) {
+                        const archivedRef = doc(db, 'archivedProblems', currentGovAction.id);
+                        await setDoc(archivedRef, {
+                            ...item,
+                            archiveReason: reason,
+                            archivedBy: currentUser?.email,
+                            archivedAt: serverTimestamp()
+                        });
+                        
+                        archivedItems.push({
+                            ...item,
+                            archiveReason: reason,
+                            archivedBy: currentUser?.email || 'admin',
+                            archivedAt: new Date()
+                        });
+                    }
+                    
+                    // Delete from pending
+                    await deleteDoc(doc(db, 'pendingProblemApprovals', currentGovAction.id));
+                    pendingProblemApprovals = pendingProblemApprovals.filter(p => p.id !== currentGovAction.id);
+                } else if (currentGovAction.type === 'announcement') {
+                    item = pendingAnnouncementApprovals.find(a => a.id === currentGovAction.id);
+                    
+                    // Move to archived collection
+                    if (item) {
+                        const archivedRef = doc(db, 'archivedProblems', currentGovAction.id);
+                        await setDoc(archivedRef, {
+                            ...item,
+                            archiveReason: reason,
+                            archivedBy: currentUser?.email,
+                            archivedAt: serverTimestamp()
+                        });
+                        
+                        archivedItems.push({
+                            ...item,
+                            archiveReason: reason,
+                            archivedBy: currentUser?.email || 'admin',
+                            archivedAt: new Date()
+                        });
+                    }
+                    
+                    // Delete from pending
+                    await deleteDoc(doc(db, 'pendingAnnouncementApprovals', currentGovAction.id));
+                    pendingAnnouncementApprovals = pendingAnnouncementApprovals.filter(a => a.id !== currentGovAction.id);
+                } else if (currentGovAction.type === 'escalation') {
+                    item = escalatedItems.find(e => e.id === currentGovAction.id);
+                    
+                    // Move to archived collection
+                    if (item) {
+                        const archivedRef = doc(db, 'archivedProblems', currentGovAction.id);
+                        await setDoc(archivedRef, {
+                            ...item,
+                            archiveReason: reason,
+                            archivedBy: currentUser?.email,
+                            archivedAt: serverTimestamp()
+                        });
+                        
+                        archivedItems.push({
+                            ...item,
+                            archiveReason: reason,
+                            archivedBy: currentUser?.email || 'admin',
+                            archivedAt: new Date()
+                        });
+                    }
+                    
+                    // Delete from escalated
+                    await deleteDoc(doc(db, 'escalatedProblems', currentGovAction.id));
+                    escalatedItems = escalatedItems.filter(e => e.id !== currentGovAction.id);
+                }
+                
+                closeModal('govArchiveModal');
+                updateGovernanceMetrics();
+                renderGovernancePanels();
+                showToast('Item archived.', 'success');
+            } catch (error) {
+                console.error('Error archiving item:', error);
+                showToast('Error: ' + error.message, 'error');
             }
-            
-            if (item) {
-                archivedItems.push({
-                    ...item,
-                    archiveReason: reason,
-                    archivedBy: currentUser?.email || 'admin',
-                    archivedAt: new Date()
-                });
-            }
-            
-            closeModal('govArchiveModal');
-            updateGovernanceMetrics();
-            renderGovernancePanels();
-            showToast('Item archived.', 'success');
         });
         
         document.getElementById('confirmEditAnnouncementBtn')?.addEventListener('click', function() {
