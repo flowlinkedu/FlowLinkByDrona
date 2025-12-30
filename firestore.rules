@@ -76,11 +76,6 @@ service cloud.firestore {
         // Any signed-in user can create/update/delete notifications (for approving/rejecting requests)
         allow create, update, delete: if isSignedIn();
       }
-      
-      // User's saved announcements (copies of bookmarked announcements)
-      match /savedAnnouncements/{announcementId} {
-        allow read, write: if isOwnerByEmail(email);
-      }
     }
     
     //-------------------------------------------------------------------------
